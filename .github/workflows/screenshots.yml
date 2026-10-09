@@ -1,0 +1,136 @@
+name: Screenshots
+
+# Runs every theme in a real Playnite fullscreen session and captures library, details and menu.
+# - Pull requests: the screenshots go to the ci-screenshots branch and into a comment on the PR,
+#   updated on every push.
+# - main: the screenshots go to docs/screenshots/, which the README shows.
+
+on:
+  pull_request:
+    paths: ["themes/**", "scripts/ci/**", ".github/workflows/screenshots.yml"]
+  push:
+    branches: [main]
+    paths: ["themes/**", "scripts/ci/**", ".github/workflows/screenshots.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PLAYNITE_VERSION: "10.62"
+
+jobs:
+  capture:
+    name: Capture (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Playnite and Extra Metadata Loader
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download $env:PLAYNITE_VERSION --repo JosefNemec/Playnite --pattern "$env:PLAYNITE_VERSION.7z" --dir playnite-dl
+          7z x "playnite-dl/$env:PLAYNITE_VERSION.7z" -oplaynite -y | Out-Null
+          $tag = gh api repos/darklinkpower/PlayniteExtensionsCollection/releases --jq '[.[] | select(.assets[].name | test("^ExtraMetadataLoader_.*\\.pext$"))][0].tag_name'
+          gh release download $tag --repo darklinkpower/PlayniteExtensionsCollection --pattern "ExtraMetadataLoader_*.pext" --dir eml
+          Get-ChildItem eml | ForEach-Object { Copy-Item $_.FullName eml.pext }
+
+      - name: Run Playnite and capture
+        shell: cmd
+        run: '%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\ci\screenshots.ps1 -PlayniteDir playnite -ThemesDir themes -OutDir screenshots -EmlPext eml.pext -Language it_IT'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots/
+          if-no-files-found: warn
+
+  publish:
+    name: Publish
+    needs: capture
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: screenshots
+          path: shots
+
+      - name: To the pull request
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          git clone --quiet "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" store
+          cd store
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin ci-screenshots >/dev/null; then
+            git fetch --quiet origin ci-screenshots && git checkout --quiet ci-screenshots
+          else
+            git checkout --quiet --orphan ci-screenshots && git rm -rqf . || true
+          fi
+          dir="pr-${PR}"
+          rm -rf "$dir" && mkdir -p "$dir"
+          cp ../shots/*.png "$dir"/
+          git add -A "$dir"
+          git commit --quiet -m "Screenshots for #${PR} at ${SHA::7}" || true
+          git push --quiet origin ci-screenshots
+          rev="$(git rev-parse HEAD)"
+          cd ..
+
+          base="https://github.com/${GITHUB_REPOSITORY}/blob/${rev}/pr-${PR}"
+          {
+            echo "<!-- playnite-screenshots -->"
+            echo "### Screenshots in Playnite ${PLAYNITE_VERSION} (commit ${SHA::7})"
+            echo
+            for theme in cinema shelf glass journal; do
+              [ -f "shots/${theme}-1-library.png" ] || continue
+              echo "#### ${theme^}"
+              echo
+              echo "| Libreria | Dopo qualche spostamento |"
+              echo "|---|---|"
+              echo "| ![](${base}/${theme}-1-library.png?raw=true) | ![](${base}/${theme}-2-library-moved.png?raw=true) |"
+              echo "| **Dettaglio** | **Menu** |"
+              echo "| ![](${base}/${theme}-3-details.png?raw=true) | ![](${base}/${theme}-4-menu.png?raw=true) |"
+              echo
+            done
+          } > comment.md
+
+          existing="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" --paginate \
+            --jq '.[] | select(.body | startswith("<!-- playnite-screenshots -->")) | .id' | head -n 1)"
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${existing}" -F body=@comment.md >/dev/null
+          else
+            gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file comment.md
+          fi
+
+      - name: To the README
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git clone --quiet --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" repo
+          cd repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p docs/screenshots
+          cp ../shots/*.png docs/screenshots/
+          git add docs/screenshots
+          if git diff --cached --quiet; then
+            echo "Screenshots unchanged"
+            exit 0
+          fi
+          git commit --quiet -m "docs: update screenshots [skip ci]"
+          git push --quiet origin HEAD:main

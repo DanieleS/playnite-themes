@@ -11,6 +11,34 @@ Four fullscreen themes for [Playnite](https://playnite.link), built for the couc
 
 Design mocks for every theme are in [`mocks/`](mocks) — open the HTML files in a browser.
 
+## Screenshots
+
+Captured automatically in Playnite 10.62 by the *Screenshots* workflow on every change to `main`.
+
+### Cinema
+
+| Library | Details |
+|---|---|
+| ![Cinema library](docs/screenshots/cinema-1-library.png) | ![Cinema details](docs/screenshots/cinema-3-details.png) |
+
+### Shelf
+
+| Library | Details |
+|---|---|
+| ![Shelf library](docs/screenshots/shelf-1-library.png) | ![Shelf details](docs/screenshots/shelf-3-details.png) |
+
+### Glass
+
+| Library | Details |
+|---|---|
+| ![Glass library](docs/screenshots/glass-1-library.png) | ![Glass details](docs/screenshots/glass-3-details.png) |
+
+### Journal
+
+| Library | Details |
+|---|---|
+| ![Journal library](docs/screenshots/journal-1-library.png) | ![Journal details](docs/screenshots/journal-3-details.png) |
+
 ## Requirements
 
 - Playnite 10.62 or later (fullscreen theme API 2.10).
@@ -32,7 +60,7 @@ The themes reuse Playnite's own strings wherever possible, so they follow Playni
 ```
 themes/<theme>/        theme sources (theme.yaml, XAML, Localization/, installer.yaml)
 scripts/build.py       validate, package (.pthm), update installer manifests
-scripts/ci/            Windows check that loads every XAML file with Playnite's assemblies
+scripts/ci/            Windows checks: load every XAML file with Playnite's assemblies, take screenshots
 addon-db/              manifests for the Playnite add-on database
 mocks/                 HTML design mocks
 ```
@@ -51,6 +79,7 @@ Playnite only loads XAML files whose path matches a file of its built-in Default
 ## CI and releases
 
 - **CI** (every push and PR): validates the themes, checks string keys against Playnite's, builds the four packages (downloadable as the `themes` artifact), and loads every XAML file with Playnite 10.62's assemblies on Windows.
+- **Screenshots** (every PR and every push to `main` that touches the themes): runs each theme in a real Playnite fullscreen session on Windows with a sample library and Extra Metadata Loader, captures library, details and menu, posts them as a comment on the PR, and on `main` refreshes `docs/screenshots/` for this README.
 - **Release** (manual, *Actions → Release*): bump `Version` in `themes/<theme>/theme.yaml`, push, then run the workflow for one theme or `all`. For every theme with a new version it creates the tag `<theme>-v<version>`, a GitHub release with the `.pthm`, and adds the package to `themes/<theme>/installer.yaml`, which Playnite reads to install and update the theme.
 
 ## License
