@@ -80,7 +80,7 @@ Playnite only loads XAML files whose path matches a file of its built-in Default
 
 - **CI** (every push and PR): validates the themes, checks string keys against Playnite's, builds the four packages (downloadable as the `themes` artifact), and loads every XAML file with Playnite 10.62's assemblies on Windows.
 - **Screenshots**: every PR that touches the themes runs each theme in a real Playnite fullscreen session on Windows (sample library, Extra Metadata Loader logos) and embeds library, details and menu in a comment on the PR. The images are stored under a hidden ref (`refs/screenshots/pr-<n>`), not a branch, and removed when the PR closes. After a merge, *Screenshots (main)* takes them again and commits only `docs/screenshots/`, shown above.
-- **Release** (manual, *Actions → Release*): bump `Version` in `themes/<theme>/theme.yaml`, push, then run the workflow for one theme or `all`. For every theme with a new version it creates the tag `<theme>-v<version>`, a GitHub release with the `.pthm`, and adds the package to `themes/<theme>/installer.yaml`, which Playnite reads to install and update the theme.
+- **Release** (automatic on every merge to `main` that touches `themes/`, or by hand from *Actions → Release*): for every theme changed since its last release it bumps the patch part of `Version` in `themes/<theme>/theme.yaml` (unless you already bumped it yourself, e.g. for a minor or major release), creates the tag `<theme>-v<version>` and a GitHub release with the `.pthm`, and adds the package to `themes/<theme>/installer.yaml`, which Playnite reads to install and update the theme. The changelog is the list of commit subjects that touched the theme; a manual run can pass its own.
 
 ## License
 

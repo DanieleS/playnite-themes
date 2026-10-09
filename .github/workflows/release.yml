@@ -1,11 +1,18 @@
 name: Release
 
-# Bump Version in themes/<theme>/theme.yaml, push, then run this workflow.
-# For each selected theme whose version has no release yet it creates the tag <theme>-v<version>,
-# a GitHub release with the .pthm package, and adds the package to themes/<theme>/installer.yaml
-# (the installer manifest Playnite reads to install and update the theme).
+# Runs on every push to main that touches a theme, and can be run by hand.
+# For each theme changed since its last release (tag <theme>-v<version>):
+#   - if Version in themes/<theme>/theme.yaml was not bumped, bump the PATCH part automatically;
+#   - build the .pthm, add it to themes/<theme>/installer.yaml (the manifest Playnite reads to install
+#     and update the theme), commit both to main;
+#   - create the tag and a GitHub release with the package.
+# The changelog is the list of commit subjects that touched the theme, unless given by hand.
+# A theme that has never been released is released at its current version.
 
 on:
+  push:
+    branches: [main]
+    paths: ["themes/**"]
   workflow_dispatch:
     inputs:
       theme:
@@ -14,7 +21,7 @@ on:
         options: [all, cinema, shelf, glass, journal]
         default: all
       changelog:
-        description: Changelog lines, separated by |
+        description: Changelog lines, separated by | (default: commit subjects)
         type: string
         required: false
 
@@ -48,7 +55,7 @@ jobs:
 
       - name: Release
         env:
-          THEME: ${{ inputs.theme }}
+          THEME: ${{ inputs.theme || 'all' }}
           CHANGELOG: ${{ inputs.changelog }}
         run: |
           set -euo pipefail
@@ -57,42 +64,73 @@ jobs:
 
           if [ "$THEME" = "all" ]; then themes="cinema shelf glass journal"; else themes="$THEME"; fi
 
-          changelog_args=()
-          notes="Changes:"
+          manual_lines=()
           if [ -n "$CHANGELOG" ]; then
-            IFS='|' read -ra lines <<< "$CHANGELOG"
-            for line in "${lines[@]}"; do
-              line="$(echo "$line" | xargs)"
-              [ -z "$line" ] && continue
-              changelog_args+=(--changelog "$line")
-              notes="$notes"$'\n'"- $line"
+            IFS='|' read -ra parts <<< "$CHANGELOG"
+            for line in "${parts[@]}"; do
+              line="$(sed 's/^[[:space:]]*//;s/[[:space:]]*$//' <<< "$line")"
+              [ -n "$line" ] && manual_lines+=("$line")
             done
-          else
-            notes="See the commit history for this theme."
           fi
 
+          declare -A notes files
           released=()
           for t in $themes; do
+            last_tag="$(git tag --list "$t-v*" --sort=-v:refname | head -n 1)"
             version="$(python scripts/build.py version "$t")"
-            tag="$t-v$version"
-            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
-              echo "::notice::$tag already released, skipping $t (bump Version in themes/$t/theme.yaml)"
-              continue
+            changed=(":(top)themes/$t" ":(top,exclude)themes/$t/installer.yaml")
+
+            if [ -n "$last_tag" ]; then
+              if [ -z "$(git log --format=%H -1 "$last_tag..HEAD" -- "${changed[@]}")" ]; then
+                echo "$t: unchanged since $last_tag"
+                continue
+              fi
+              if git rev-parse -q --verify "refs/tags/$t-v$version" >/dev/null; then
+                version="$(python scripts/build.py bump "$t")"
+                echo "$t: bumped to $version"
+              fi
+              mapfile -t lines < <(git log --no-merges --format=%s "$last_tag..HEAD" -- "${changed[@]}" | grep -v '^release: ' || true)
+            else
+              lines=("First release")
             fi
+            [ ${#manual_lines[@]} -gt 0 ] && lines=("${manual_lines[@]}")
+            [ ${#lines[@]} -eq 0 ] && lines=("Maintenance update")
+
+            tag="$t-v$version"
             package="$(python scripts/build.py build "$t" --out dist | tail -n 1)"
-            file="$(basename "$package")"
-            name="$(grep '^Name:' "themes/$t/theme.yaml" | cut -d: -f2- | xargs)"
-            gh release create "$tag" "$package" --target main --title "$name $version" --notes "$notes"
-            url="https://github.com/${GITHUB_REPOSITORY}/releases/download/$tag/$file"
-            python scripts/build.py installer-entry "$t" --url "$url" "${changelog_args[@]}"
+            url="https://github.com/${GITHUB_REPOSITORY}/releases/download/$tag/$(basename "$package")"
+            changelog_args=()
+            body="Changes:"
+            for line in "${lines[@]}"; do
+              changelog_args+=(--changelog "$line")
+              body="$body"$'\n'"- $line"
+            done
+            if ! grep -qE "^\s*-\s*Version:\s*$version\s*$" "themes/$t/installer.yaml" 2>/dev/null; then
+              python scripts/build.py installer-entry "$t" --url "$url" "${changelog_args[@]}"
+            fi
+            notes[$tag]="$body"
+            files[$tag]="$package"
             released+=("$tag")
           done
 
           if [ ${#released[@]} -eq 0 ]; then
-            echo "::warning::Nothing to release"
+            echo "::notice::Nothing to release"
             exit 0
           fi
 
-          git add themes/*/installer.yaml
-          git commit -m "release: ${released[*]}"
-          git push origin HEAD:main
+          # Commit version bumps and installer manifests; retry if main moved (e.g. the screenshots job).
+          git add themes/*/theme.yaml themes/*/installer.yaml
+          git diff --cached --quiet || git commit -m "release: ${released[*]}"
+          for i in 1 2 3 4 5; do
+            git push origin HEAD:main && break
+            [ "$i" = 5 ] && exit 1
+            sleep $((i * 3))
+            git pull --rebase origin main
+          done
+          sha="$(git rev-parse HEAD)"
+
+          for tag in "${released[@]}"; do
+            t="${tag%-v*}"
+            name="$(grep '^Name:' "themes/$t/theme.yaml" | cut -d: -f2- | xargs)"
+            gh release create "$tag" "${files[$tag]}" --target "$sha" --title "$name ${tag#*-v}" --notes "${notes[$tag]}"
+          done
