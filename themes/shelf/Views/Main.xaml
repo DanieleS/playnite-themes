@@ -60,10 +60,11 @@
                              WPF has no perspective, so both faces are skewed around the shared edge (the nearest
                              corner) and the box is lifted so its lowest corner rests on the plank.
                              Prototype: mocks/shelf-box-3d.html (variant A). -->
-                        <Grid x:Name="Box" Width="356" Height="470" Margin="18,0,34,0" Visibility="Collapsed"
+                        <Grid x:Name="Box" Width="346" Height="452" Margin="18,0,34,0" Visibility="Collapsed"
                               VerticalAlignment="Bottom">
+                            <!-- Lifted so the lowest corner (front, bottom right) stays inside the list, which clips. -->
                             <Grid.RenderTransform>
-                                <TranslateTransform Y="-48" />
+                                <TranslateTransform Y="-62" />
                             </Grid.RenderTransform>
                             <!-- Spine face -->
                             <Grid Width="42" HorizontalAlignment="Left" RenderTransformOrigin="1,1">
@@ -80,13 +81,13 @@
                                 <Rectangle Width="2" HorizontalAlignment="Right" Fill="#40FFFFFF" />
                             </Grid>
                             <!-- Front face -->
-                            <Grid Width="314" HorizontalAlignment="Right" RenderTransformOrigin="0,1">
+                            <Grid Width="304" HorizontalAlignment="Right" RenderTransformOrigin="0,1">
                                 <Grid.RenderTransform>
                                     <SkewTransform AngleY="8" />
                                 </Grid.RenderTransform>
                                 <Border Background="#FF1D1B17">
                                     <Border.Effect>
-                                        <DropShadowEffect ShadowDepth="24" Direction="315" BlurRadius="44" Opacity="0.45" Color="#FF3C2805" />
+                                        <DropShadowEffect ShadowDepth="12" Direction="315" BlurRadius="30" Opacity="0.4" Color="#FF3C2805" />
                                     </Border.Effect>
                                 </Border>
                                 <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"

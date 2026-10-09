@@ -23,7 +23,8 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="340" />
+                                <!-- Taller than the tiles: the focused tile scales up and its ring needs room, or the list clips it. -->
+                                <RowDefinition Height="410" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
