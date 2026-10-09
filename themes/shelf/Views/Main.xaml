@@ -315,11 +315,11 @@
                                                    Text="{Binding SelectedGame.Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,28,0,0">
-                                        <ButtonEx x:Name="PART_ButtonInstall" Style="{DynamicResource ButtonBottomMenu}"
+                                        <ButtonEx x:Name="PART_ButtonInstall" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCInstallGame}" />
-                                        <ButtonEx x:Name="PART_ButtonPlay" Style="{DynamicResource ButtonBottomMenu}"
+                                        <ButtonEx x:Name="PART_ButtonPlay" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCPlayGame}" />
-                                        <ButtonEx x:Name="PART_ButtonDetails" Style="{DynamicResource ButtonBottomMenu}"
+                                        <ButtonEx x:Name="PART_ButtonDetails" InputHint="{DynamicResource ButtonPromptA}" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCDS_Shelf_BackOfBox}" />
                                         <ButtonEx x:Name="PART_ButtonGameOptions" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCGameOptions}" />

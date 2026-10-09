@@ -41,14 +41,38 @@ public static class Win32 {
 "@
 [void][Win32]::SetProcessDPIAware()
 
-# --- Display: aim for 1920x1080 (the themes' reference size) --------------------------------------------
-try {
-    Set-DisplayResolution -Width 1920 -Height 1080 -Force -ErrorAction Stop
-    Start-Sleep -Seconds 3
+# --- Display: 1920x1080, the themes' reference size (runners start at 1024x768) --------------------------
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public static class Display {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct DEVMODE {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmDeviceName;
+        public short dmSpecVersion, dmDriverVersion, dmSize, dmDriverExtra;
+        public int dmFields, dmPositionX, dmPositionY, dmDisplayOrientation, dmDisplayFixedOutput;
+        public short dmColor, dmDuplex, dmYResolution, dmTTOption, dmCollate;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmFormName;
+        public short dmLogPixels;
+        public int dmBitsPerPel, dmPelsWidth, dmPelsHeight, dmDisplayFlags, dmDisplayFrequency;
+        public int dmICMMethod, dmICMIntent, dmMediaType, dmDitherType, dmReserved1, dmReserved2, dmPanningWidth, dmPanningHeight;
+    }
+    [DllImport("user32.dll")] static extern int EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+    [DllImport("user32.dll")] static extern int ChangeDisplaySettings(ref DEVMODE devMode, int flags);
+    public static int Set(int width, int height) {
+        var mode = new DEVMODE();
+        mode.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+        EnumDisplaySettings(null, -1, ref mode);
+        mode.dmPelsWidth = width;
+        mode.dmPelsHeight = height;
+        mode.dmFields = 0x80000 | 0x100000;
+        return ChangeDisplaySettings(ref mode, 0);
+    }
 }
-catch {
-    Write-Host "Set-DisplayResolution unavailable: $($_.Exception.Message)"
-}
+"@
+$result = [Display]::Set(1920, 1080)
+Write-Host "ChangeDisplaySettings -> $result"
+Start-Sleep -Seconds 3
 $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
 Write-Host "Screen: $($bounds.Width)x$($bounds.Height)"
 
@@ -141,6 +165,7 @@ if ($EmlPext -and (Test-Path $EmlPext)) {
 # --- Playnite configuration -------------------------------------------------------------------------------
 $config = @{
     FirstTimeWizardComplete = $true
+    ShowElevatedRightsWarning = $false
     DatabasePath            = $libraryDir
     Language                = $Language
     UpdateLevel             = 0

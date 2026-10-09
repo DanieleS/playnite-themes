@@ -316,11 +316,11 @@
 
                                     <Grid Grid.Row="2" Margin="22,0,22,10">
                                         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                            <ButtonEx x:Name="PART_ButtonInstall" Style="{DynamicResource GlassPrimaryHint}"
+                                            <ButtonEx x:Name="PART_ButtonInstall" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource GlassPrimaryHint}"
                                                       Content="{DynamicResource LOCInstallGame}" />
-                                            <ButtonEx x:Name="PART_ButtonPlay" Style="{DynamicResource GlassPrimaryHint}"
+                                            <ButtonEx x:Name="PART_ButtonPlay" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource GlassPrimaryHint}"
                                                       Content="{DynamicResource LOCPlayGame}" />
-                                            <ButtonEx x:Name="PART_ButtonDetails" Style="{DynamicResource ButtonBottomMenu}"
+                                            <ButtonEx x:Name="PART_ButtonDetails" InputHint="{DynamicResource ButtonPromptA}" Style="{DynamicResource ButtonBottomMenu}"
                                                       Content="{DynamicResource LOCDS_Glass_FullDetails}" />
                                             <ButtonEx x:Name="PART_ButtonGameOptions" Style="{DynamicResource ButtonBottomMenu}"
                                                       Content="{DynamicResource LOCGameOptions}" />
