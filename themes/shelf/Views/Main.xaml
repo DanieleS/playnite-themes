@@ -22,22 +22,22 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Grid>
-                        <!-- Spine: the cover, heavily blurred, with the game's name. -->
+                        <!-- Spine: the central slice of the cover, lightly blurred, with the game's name. -->
                         <Grid x:Name="Spine" Width="62" Height="470" VerticalAlignment="Bottom" ClipToBounds="True"
                               Background="#FF2B241B">
-                            <!-- Oversized so the blur's soft edges fall outside the clip. -->
+                            <!-- Slightly oversized so the blur's soft edges fall outside the clip. -->
                             <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
-                                   Margin="-40" RenderOptions.BitmapScalingMode="LowQuality">
+                                   HorizontalAlignment="Center" Margin="-8" RenderOptions.BitmapScalingMode="Fant">
                                 <Image.Effect>
-                                    <BlurEffect Radius="36" RenderingBias="Performance" />
+                                    <BlurEffect Radius="5" RenderingBias="Performance" />
                                 </Image.Effect>
                             </Image>
                             <Rectangle>
                                 <Rectangle.Fill>
                                     <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                                        <GradientStop Color="#59000000" Offset="0" />
-                                        <GradientStop Color="#14000000" Offset="0.45" />
-                                        <GradientStop Color="#66000000" Offset="1" />
+                                        <GradientStop Color="#80000000" Offset="0" />
+                                        <GradientStop Color="#26000000" Offset="0.4" />
+                                        <GradientStop Color="#8C000000" Offset="1" />
                                     </LinearGradientBrush>
                                 </Rectangle.Fill>
                             </Rectangle>
@@ -136,13 +136,14 @@
                                         </Viewport2DVisual3D.Material>
                                         <Viewport2DVisual3D.Visual>
                                             <Grid Width="68" Height="450" Background="#FF2B241B" ClipToBounds="True">
+                                                <!-- Central slice, like the shelf spines (the left edge would repeat the front). -->
                                                 <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
-                                                       Margin="-40" RenderOptions.BitmapScalingMode="LowQuality">
+                                                       HorizontalAlignment="Center" Margin="-8" RenderOptions.BitmapScalingMode="Fant">
                                                     <Image.Effect>
-                                                        <BlurEffect Radius="36" RenderingBias="Performance" />
+                                                        <BlurEffect Radius="5" RenderingBias="Performance" />
                                                     </Image.Effect>
                                                 </Image>
-                                                <Rectangle Fill="#73000000" />
+                                                <Rectangle Fill="#80000000" />
                                                 <TextBlock Text="{Binding DisplayName, Converter={StaticResource StringToUpperCaseConverter}}"
                                                            FontFamily="{DynamicResource ShelfFontBody}" FontWeight="Bold" FontSize="20"
                                                            Foreground="#FFFFFFFF" TextTrimming="CharacterEllipsis" Width="400"
