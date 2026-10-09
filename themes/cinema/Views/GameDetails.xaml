@@ -92,11 +92,11 @@
                                         <Setter Property="Foreground" Value="{DynamicResource CinemaTextSoftBrush}" />
                                     </Style>
                                 </WrapPanel.Resources>
-                                <Border><TextBlock Text="{Binding ReleaseYear}" /></Border>
-                                <Border><TextBlock Text="{Binding Genres, Converter={StaticResource ListToStringConverter}}" /></Border>
-                                <Border><TextBlock Text="{Binding Developers, Converter={StaticResource ListToStringConverter}}" /></Border>
-                                <Border><TextBlock Text="{Binding Platforms, Converter={StaticResource ListToStringConverter}}" /></Border>
-                                <Border><TextBlock Text="{Binding Source.Name}" /></Border>
+                                <Border Visibility="{Binding ReleaseYear, Converter={StaticResource NullToVisibilityConverter}}"><TextBlock Text="{Binding ReleaseYear}" /></Border>
+                                <Border Visibility="{Binding Genres, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}"><TextBlock Text="{Binding Genres, Converter={StaticResource ListToStringConverter}}" /></Border>
+                                <Border Visibility="{Binding Developers, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}"><TextBlock Text="{Binding Developers, Converter={StaticResource ListToStringConverter}}" /></Border>
+                                <Border Visibility="{Binding Platforms, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}"><TextBlock Text="{Binding Platforms, Converter={StaticResource ListToStringConverter}}" /></Border>
+                                <Border Visibility="{Binding Source, Converter={StaticResource NullToVisibilityConverter}}"><TextBlock Text="{Binding Source.Name}" /></Border>
                             </WrapPanel>
 
                             <!-- Actions -->

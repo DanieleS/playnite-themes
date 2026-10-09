@@ -95,18 +95,18 @@
                                 </Grid>
 
                                 <WrapPanel Grid.Row="1" Margin="22,26,22,0">
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding ReleaseYear, Converter={StaticResource NullToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding ReleaseYear}" />
                                     </Border>
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding Genres, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}"
                                                    Text="{Binding Genres, Converter={StaticResource ListToStringConverter}}" />
                                     </Border>
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding Developers, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}"
                                                    Text="{Binding Developers, Converter={StaticResource ListToStringConverter}}" />
                                     </Border>
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding Source, Converter={StaticResource NullToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding Source.Name}" />
                                     </Border>
                                 </WrapPanel>

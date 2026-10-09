@@ -112,7 +112,8 @@
                                 <Filters x:Name="PART_ElemFilters" DockPanel.Dock="Left" Focusable="False" />
                                 <FiltersAdditional x:Name="PART_ElemFiltersAdditional" DockPanel.Dock="Left" Focusable="False" />
                                 <ContentControl x:Name="PART_ContentFilterItems" DockPanel.Dock="Left" Focusable="False" />
-                                <ListBoxEx x:Name="JournalList" Margin="56,0,56,0"
+                                <ListBoxEx x:Name="JournalList" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                           Margin="56,0,56,0"
                                            Background="Transparent" BorderThickness="0"
                                            DockPanel.Dock="Right"
                                            ItemsSource="{Binding GamesView.CollectionView}"

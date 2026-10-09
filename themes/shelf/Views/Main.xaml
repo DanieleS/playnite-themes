@@ -103,6 +103,19 @@
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <!-- Real shelves are uneven: vary spine heights a little, repeating every five games. -->
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter TargetName="Spine" Property="Height" Value="446" />
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="2">
+                            <Setter TargetName="Spine" Property="Height" Value="458" />
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="3">
+                            <Setter TargetName="Spine" Property="Height" Value="430" />
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="4">
+                            <Setter TargetName="Spine" Property="Height" Value="464" />
+                        </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Spine" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Box" Property="Visibility" Value="Visible" />
@@ -237,6 +250,7 @@
                                            Visibility="{Binding GameListVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                            FocusBahaviors.FocusBinding="{Binding GameListFocused}"
                                            ItemContainerStyle="{StaticResource ShelfItemStyle}"
+                                           AlternationCount="5"
                                            KeyboardNavigation.DirectionalNavigation="Once"
                                            ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                                            ScrollViewer.VerticalScrollBarVisibility="Disabled"

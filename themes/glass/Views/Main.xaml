@@ -191,7 +191,7 @@
                                                Visibility="{Binding GameListVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                FocusBahaviors.FocusBinding="{Binding GameListFocused}"
                                                ItemContainerStyle="{StaticResource GlassListItemStyle}"
-                                               KeyboardNavigation.DirectionalNavigation="Once"
+                                               KeyboardNavigation.DirectionalNavigation="Contained"
                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                                ScrollViewer.VerticalScrollBarVisibility="Hidden"
                                                ScrollViewer.CanContentScroll="True"
@@ -298,18 +298,18 @@
                                     </Grid>
 
                                     <WrapPanel Grid.Row="1" Margin="22,28,22,0">
-                                        <Border Style="{DynamicResource GlassChip}">
+                                        <Border Style="{DynamicResource GlassChip}" Visibility="{Binding SelectedGame.ReleaseYear, Converter={StaticResource NullToVisibilityConverter}}">
                                             <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding SelectedGame.ReleaseYear}" />
                                         </Border>
-                                        <Border Style="{DynamicResource GlassChip}">
+                                        <Border Style="{DynamicResource GlassChip}" Visibility="{Binding SelectedGame.Genres, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}">
                                             <TextBlock Style="{DynamicResource GlassChipText}"
                                                        Text="{Binding SelectedGame.Genres, Converter={StaticResource ListToStringConverter}}" />
                                         </Border>
-                                        <Border Style="{DynamicResource GlassChip}">
+                                        <Border Style="{DynamicResource GlassChip}" Visibility="{Binding SelectedGame.Developers, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}">
                                             <TextBlock Style="{DynamicResource GlassChipText}"
                                                        Text="{Binding SelectedGame.Developers, Converter={StaticResource ListToStringConverter}}" />
                                         </Border>
-                                        <Border Style="{DynamicResource GlassChip}">
+                                        <Border Style="{DynamicResource GlassChip}" Visibility="{Binding SelectedGame.Source, Converter={StaticResource NullToVisibilityConverter}}">
                                             <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding SelectedGame.Source.Name}" />
                                         </Border>
                                     </WrapPanel>

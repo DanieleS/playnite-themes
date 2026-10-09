@@ -189,6 +189,11 @@ function Send([string]$keys, [int]$waitMs = 1200) {
     Start-Sleep -Milliseconds $waitMs
 }
 
+# --- No taskbar over the screenshots (a real fullscreen session covers it; the runner's doesn't) ----------
+Set-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon' -Name AutoRestartShell -Value 0 -ErrorAction SilentlyContinue
+Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
+Start-Sleep -Seconds 2
+
 # --- One session per theme --------------------------------------------------------------------------------
 $fullscreenThemes = Join-Path $PlayniteDir 'Themes\Fullscreen'
 New-Item -ItemType Directory -Force -Path $fullscreenThemes | Out-Null
@@ -215,7 +220,9 @@ foreach ($theme in Get-ChildItem -Path $ThemesDir -Directory | Sort-Object Name)
     Start-Sleep -Seconds 2
 
     Save-Screen "$($theme.Name)-1-library"
-    Send '{RIGHT}'; Send '{RIGHT}'; Send '{RIGHT}' 2500
+    # Glass has a vertical list; the others move horizontally.
+    $move = if ($theme.Name -eq 'glass') { '{DOWN}' } else { '{RIGHT}' }
+    Send $move; Send $move; Send $move 2500
     Save-Screen "$($theme.Name)-2-library-moved"
     Send 'a' 3000
     Save-Screen "$($theme.Name)-3-details"
