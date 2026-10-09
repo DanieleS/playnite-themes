@@ -47,4 +47,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit --quiet -m "docs: update screenshots"
-          git push --quiet origin HEAD:main
+          # The Release workflow may have pushed to main meanwhile.
+          for attempt in 1 2 3; do
+            git push --quiet origin HEAD:main && break
+            git pull --quiet --rebase origin main
+          done

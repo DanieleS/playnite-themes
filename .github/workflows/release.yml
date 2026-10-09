@@ -1,11 +1,22 @@
 name: Release
 
-# Bump Version in themes/<theme>/theme.yaml, push, then run this workflow.
-# For each selected theme whose version has no release yet it creates the tag <theme>-v<version>,
-# a GitHub release with the .pthm package, and adds the package to themes/<theme>/installer.yaml
-# (the installer manifest Playnite reads to install and update the theme).
+# Automatic release on every push to main (i.e. every merged PR).
+# For each theme whose files changed since its last release (tag <theme>-v<version>):
+#   - bump Version in theme.yaml (patch by default; PR label release:minor / release:major to go higher,
+#     release:skip to release nothing), unless the theme has never been released (then its current version)
+#   - build the .pthm, create the tag and a GitHub release with it
+#   - add the package to themes/<theme>/installer.yaml (what Playnite reads to install and update)
+# The PR title becomes the changelog line. Version bumps and installer manifests are committed back to main.
+# Pushes made with the workflow token don't trigger workflows, so this doesn't loop.
+#
+# Manual run (Actions > Release > Run workflow): release one theme or all, even without changes.
 
 on:
+  push:
+    branches: [main]
+    # The workflow itself is listed so that changing it runs it: themes never released get their first release,
+    # themes without changes are left alone.
+    paths: ["themes/**", ".github/workflows/release.yml"]
   workflow_dispatch:
     inputs:
       theme:
@@ -13,13 +24,19 @@ on:
         type: choice
         options: [all, cinema, shelf, glass, journal]
         default: all
+      level:
+        description: Version bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
       changelog:
-        description: Changelog lines, separated by |
+        description: Changelog line
         type: string
         required: false
 
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
   group: release
@@ -46,53 +63,100 @@ jobs:
           curl -fsSL -o LocSource.xaml "https://raw.githubusercontent.com/JosefNemec/Playnite/${PLAYNITE_VERSION}/source/Playnite/Localization/LocSource.xaml"
           python scripts/build.py validate --loc-source LocSource.xaml
 
-      - name: Release
+      - name: Decide what to release
+        id: plan
         env:
-          THEME: ${{ inputs.theme }}
-          CHANGELOG: ${{ inputs.changelog }}
+          EVENT: ${{ github.event_name }}
+          INPUT_THEME: ${{ inputs.theme }}
+          INPUT_LEVEL: ${{ inputs.level }}
+          INPUT_CHANGELOG: ${{ inputs.changelog }}
+        run: |
+          set -euo pipefail
+          level=patch
+          changelog=""
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            level="$INPUT_LEVEL"
+            changelog="$INPUT_CHANGELOG"
+          else
+            # The PR that produced this push, if any: its labels pick the bump, its title is the changelog.
+            pr="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls" --jq '.[0] // empty')"
+            if [ -n "$pr" ]; then
+              labels="$(jq -r '[.labels[].name] | join(" ")' <<<"$pr")"
+              changelog="$(jq -r '.title' <<<"$pr")"
+              case " $labels " in
+                *" release:skip "*) echo "PR labelled release:skip, nothing to release"; echo "themes=" >> "$GITHUB_OUTPUT"; exit 0 ;;
+                *" release:major "*) level=major ;;
+                *" release:minor "*) level=minor ;;
+              esac
+            else
+              changelog="$(git log -1 --format=%s)"
+            fi
+          fi
+
+          themes=""
+          for dir in themes/*/; do
+            t="$(basename "$dir")"
+            if [ "$EVENT" = "workflow_dispatch" ] && [ "$INPUT_THEME" != "all" ] && [ "$INPUT_THEME" != "$t" ]; then
+              continue
+            fi
+            last="$(git tag --list "${t}-v*" --sort=-v:refname | head -n 1)"
+            if [ -z "$last" ]; then
+              themes="$themes $t:first"
+            elif [ "$EVENT" = "workflow_dispatch" ]; then
+              themes="$themes $t:bump"
+            elif ! git diff --quiet "$last" HEAD -- "themes/$t" ':!themes/'"$t"'/installer.yaml'; then
+              themes="$themes $t:bump"
+            fi
+          done
+          echo "Plan:${themes:- nothing} (level $level)"
+          {
+            echo "themes=${themes# }"
+            echo "level=$level"
+            echo "changelog<<EOF"
+            echo "${changelog:-Maintenance release.}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Release
+        if: steps.plan.outputs.themes != ''
+        env:
+          THEMES: ${{ steps.plan.outputs.themes }}
+          LEVEL: ${{ steps.plan.outputs.level }}
+          CHANGELOG: ${{ steps.plan.outputs.changelog }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if [ "$THEME" = "all" ]; then themes="cinema shelf glass journal"; else themes="$THEME"; fi
-
-          changelog_args=()
-          notes="Changes:"
-          if [ -n "$CHANGELOG" ]; then
-            IFS='|' read -ra lines <<< "$CHANGELOG"
-            for line in "${lines[@]}"; do
-              line="$(echo "$line" | xargs)"
-              [ -z "$line" ] && continue
-              changelog_args+=(--changelog "$line")
-              notes="$notes"$'\n'"- $line"
-            done
-          else
-            notes="See the commit history for this theme."
-          fi
-
           released=()
-          for t in $themes; do
-            version="$(python scripts/build.py version "$t")"
-            tag="$t-v$version"
-            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
-              echo "::notice::$tag already released, skipping $t (bump Version in themes/$t/theme.yaml)"
-              continue
+          for item in $THEMES; do
+            t="${item%%:*}"
+            mode="${item##*:}"
+            if [ "$mode" = "bump" ]; then
+              version="$(python scripts/build.py bump "$t" "$LEVEL")"
+            else
+              version="$(python scripts/build.py version "$t")"
             fi
+            tag="$t-v$version"
             package="$(python scripts/build.py build "$t" --out dist | tail -n 1)"
             file="$(basename "$package")"
-            name="$(grep '^Name:' "themes/$t/theme.yaml" | cut -d: -f2- | xargs)"
-            gh release create "$tag" "$package" --target main --title "$name $version" --notes "$notes"
             url="https://github.com/${GITHUB_REPOSITORY}/releases/download/$tag/$file"
-            python scripts/build.py installer-entry "$t" --url "$url" "${changelog_args[@]}"
-            released+=("$tag")
+            python scripts/build.py installer-entry "$t" --url "$url" --changelog "$CHANGELOG"
+            git add "themes/$t/theme.yaml" "themes/$t/installer.yaml"
+            released+=("$t:$tag:$package")
           done
 
-          if [ ${#released[@]} -eq 0 ]; then
-            echo "::warning::Nothing to release"
-            exit 0
-          fi
+          # Commit versions + manifests first, so each tag points at the commit that contains them.
+          git commit --quiet -m "release: $(for r in "${released[@]}"; do r="${r#*:}"; printf '%s ' "${r%%:*}"; done)"
+          for attempt in 1 2 3; do
+            git push --quiet origin HEAD:main && break
+            git pull --quiet --rebase origin main
+          done
+          sha="$(git rev-parse HEAD)"
 
-          git add themes/*/installer.yaml
-          git commit -m "release: ${released[*]}"
-          git push origin HEAD:main
+          for r in "${released[@]}"; do
+            t="${r%%:*}"; rest="${r#*:}"; tag="${rest%%:*}"; package="${rest#*:}"
+            name="$(grep '^Name:' "themes/$t/theme.yaml" | cut -d: -f2- | xargs)"
+            gh release create "$tag" "$package" --target "$sha" --title "$name ${tag##*-v}" --notes "$CHANGELOG"
+            echo "Released $tag"
+          done
