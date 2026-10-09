@@ -111,7 +111,7 @@
                                     </Border>
                                 </WrapPanel>
 
-                                <ScrollViewerEx Grid.Row="2" x:Name="PART_ScrollHtmlDescription" Margin="22,14,22,14"
+                                <ScrollViewerEx Grid.Row="2" x:Name="PART_ScrollHtmlDescription" FocusVisualStyle="{x:Null}" Margin="22,14,22,14"
                                                 CustomScrollAmount="42">
                                     <HtmlTextView x:Name="PART_HtmlDescription"
                                                   HtmlFontSize="19"
