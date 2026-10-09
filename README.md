@@ -13,7 +13,7 @@ Design mocks for every theme are in [`mocks/`](mocks) — open the HTML files in
 
 ## Screenshots
 
-Captured automatically in Playnite 10.62 by the *Screenshots* workflow on every change to `main`.
+Captured automatically in Playnite 10.62 after every change to `main` (*Screenshots (main)* workflow).
 
 ### Cinema
 
@@ -79,7 +79,7 @@ Playnite only loads XAML files whose path matches a file of its built-in Default
 ## CI and releases
 
 - **CI** (every push and PR): validates the themes, checks string keys against Playnite's, builds the four packages (downloadable as the `themes` artifact), and loads every XAML file with Playnite 10.62's assemblies on Windows.
-- **Screenshots** (every PR and every push to `main` that touches the themes): runs each theme in a real Playnite fullscreen session on Windows with a sample library and Extra Metadata Loader, captures library, details and menu, posts them as a comment on the PR, and on `main` refreshes `docs/screenshots/` for this README.
+- **Screenshots**: every PR that touches the themes runs each theme in a real Playnite fullscreen session on Windows (sample library, Extra Metadata Loader logos) and embeds library, details and menu in a comment on the PR. The images are stored under a hidden ref (`refs/screenshots/pr-<n>`), not a branch, and removed when the PR closes. After a merge, *Screenshots (main)* takes them again and commits only `docs/screenshots/`, shown above.
 - **Release** (manual, *Actions → Release*): bump `Version` in `themes/<theme>/theme.yaml`, push, then run the workflow for one theme or `all`. For every theme with a new version it creates the tag `<theme>-v<version>`, a GitHub release with the `.pthm`, and adds the package to `themes/<theme>/installer.yaml`, which Playnite reads to install and update the theme.
 
 ## License
