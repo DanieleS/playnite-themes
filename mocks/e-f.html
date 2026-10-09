@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playnite Fullscreen v4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#121212; color:#eaeaea; font-family:"Inter Tight",system-ui,sans-serif; padding:40px 16px 80px; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  header.page h1 { font-size:28px; font-weight:800; letter-spacing:-.02em; }
+  header.page p { color:#8a8a8a; margin-top:6px; max-width:900px; line-height:1.5; font-size:15px; }
+  section.variant { margin-top:56px; }
+  section.variant h2 { font-size:22px; font-weight:800; display:flex; gap:12px; align-items:baseline; }
+  section.variant h2 .tag { font-size:13px; font-weight:700; background:#fff; color:#000; border-radius:4px; padding:2px 8px; }
+  section.variant > p { color:#8a8a8a; margin:6px 0 16px; font-size:15px; max-width:950px; line-height:1.5; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px 16px; }
+  .grid .wide { grid-column:1 / -1; }
+  @media (max-width:1000px){ .grid { grid-template-columns:1fr; } }
+  figcaption { color:#8a8a8a; font-size:13px; margin-top:6px; line-height:1.45; }
+  figcaption b { color:#d0d0d0; font-weight:600; }
+  .frame { container-type:inline-size; aspect-ratio:16/9; position:relative; overflow:hidden; border-radius:8px; box-shadow:0 0 0 1px #2a2a2a; }
+  .frame > * { position:absolute; }
+  .img { background-size:cover; background-position:center; }
+  .pad { display:inline-grid; place-items:center; width:1.8cqw; height:1.8cqw; border-radius:50%; flex:none;
+         font:800 1cqw/1 "Inter Tight",sans-serif; color:#111; margin-right:.55cqw; }
+  .pad.a{background:#6cc04a} .pad.b{background:#e2453c;color:#fff} .pad.x{background:#3a8de0;color:#fff} .pad.y{background:#f2c230}
+  .pad.sh { border-radius:.45cqw; width:auto; padding:0 .55cqw; background:rgba(255,255,255,.85); }
+
+  /* ============================ E — ORBITA ============================ */
+  .E { background:#0b0b10; color:#fff; font-family:"Geist",sans-serif; }
+  .E .amb { inset:-4cqw; filter:blur(3.2cqw) saturate(1.5) brightness(.78); }
+  .E .floor { inset:0; background:
+      radial-gradient(ellipse 70% 40% at 50% 100%, rgba(255,255,255,.08), transparent 70%),
+      linear-gradient(transparent 55%, rgba(0,0,0,.45)); }
+  .glass { background:rgba(255,255,255,.11); backdrop-filter:blur(2cqw) saturate(1.6); -webkit-backdrop-filter:blur(2cqw) saturate(1.6);
+           border:1px solid rgba(255,255,255,.2); box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 2cqw 4cqw rgba(0,0,0,.35); }
+  .E .orn { top:2.4cqw; left:50%; transform:translateX(-50%); display:flex; gap:.4cqw; padding:.45cqw; border-radius:10cqw; font-size:1.1cqw; font-weight:500; z-index:3; }
+  .E .orn span { padding:.6cqw 1.4cqw; border-radius:10cqw; color:rgba(255,255,255,.75); display:flex; align-items:center; gap:.6cqw; }
+  .E .orn span svg { width:1.3cqw; height:1.3cqw; }
+  .E .orn .on { background:rgba(255,255,255,.9); color:#000; font-weight:600; }
+  .E .clock { top:2.9cqw; right:3.5cqw; font-size:1.15cqw; color:rgba(255,255,255,.8); z-index:3; }
+  .E .stage { left:0; right:0; top:9.5cqw; height:30cqw; perspective:80cqw; perspective-origin:50% 40%; }
+  .E .ring { position:absolute; left:50%; top:0; width:0; height:100%; transform-style:preserve-3d; }
+  .E .card { position:absolute; top:0; left:-8.4cqw; width:16.8cqw; aspect-ratio:2/3; border-radius:1.1cqw; background-size:cover; background-position:center;
+             -webkit-box-reflect:below .6cqw linear-gradient(transparent 72%, rgba(255,255,255,.22)); box-shadow:0 1.5cqw 3cqw rgba(0,0,0,.45); }
+  .E .card.sel { box-shadow:0 0 0 .3cqw rgba(255,255,255,.95), 0 0 4cqw rgba(255,255,255,.25), 0 2cqw 4cqw rgba(0,0,0,.5); }
+  .E .panel { left:50%; bottom:3.4cqw; transform:translateX(-50%); width:64cqw; border-radius:2.2cqw; padding:1.6cqw 2.2cqw; display:flex; align-items:center; gap:2.2cqw; }
+  .E .panel .lg { width:16cqw; height:6.4cqw; flex:none; background-size:contain; background-repeat:no-repeat; background-position:center; filter:drop-shadow(0 .3cqw .8cqw rgba(0,0,0,.5)); }
+  .E .panel .mid { flex:1; min-width:0; }
+  .E .panel .meta { font-size:1.1cqw; color:rgba(255,255,255,.75); display:flex; gap:.8cqw; align-items:center; white-space:nowrap; }
+  .E .panel .meta i { width:.3cqw; height:.3cqw; border-radius:50%; background:rgba(255,255,255,.5); }
+  .E .panel .line { font-size:1.15cqw; margin-top:.5cqw; color:rgba(255,255,255,.92); line-height:1.4; }
+  .E .gbtn { display:flex; align-items:center; padding:.75cqw 1.5cqw .75cqw .9cqw; border-radius:10cqw; font-size:1.15cqw; font-weight:600; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18); white-space:nowrap; }
+  .E .gbtn.primary { background:#fff; color:#000; border-color:#fff; }
+  .E .count { left:50%; transform:translateX(-50%); bottom:.9cqw; font-family:"Geist Mono",monospace; font-size:.9cqw; color:rgba(255,255,255,.5); letter-spacing:.1em; }
+  /* E detail */
+  .E .win { left:5cqw; top:6.5cqw; width:58cqw; height:41cqw; border-radius:2.4cqw; overflow:hidden; transform:perspective(100cqw) rotateY(5deg); transform-origin:right center; }
+  .E .win .heroimg { position:absolute; left:1.2cqw; right:1.2cqw; top:1.2cqw; height:17cqw; border-radius:1.6cqw; background-size:cover; background-position:center 30%; }
+  .E .win .heroimg::after { content:""; position:absolute; inset:0; border-radius:1.6cqw; background:linear-gradient(0deg, rgba(0,0,0,.55), transparent 55%); }
+  .E .win .wlogo { position:absolute; left:3cqw; top:10.5cqw; width:20cqw; height:6.5cqw; background-size:contain; background-repeat:no-repeat; background-position:left bottom; z-index:1; filter:drop-shadow(0 .3cqw .8cqw rgba(0,0,0,.6)); }
+  .E .win .body { position:absolute; left:3cqw; right:3cqw; top:20cqw; }
+  .E .chips { display:flex; gap:.6cqw; flex-wrap:wrap; }
+  .E .chip { font-size:1cqw; padding:.4cqw 1cqw; border-radius:10cqw; background:rgba(255,255,255,.12); color:rgba(255,255,255,.88); }
+  .E .win p { font-size:1.2cqw; line-height:1.55; color:rgba(255,255,255,.82); margin-top:1.2cqw; }
+  .E .win .acts { position:absolute; left:3cqw; bottom:2.2cqw; display:flex; gap:1cqw; }
+  .E .win .kpis { position:absolute; right:3cqw; bottom:2.2cqw; display:flex; gap:2.4cqw; text-align:right; }
+  .E .win .kpis b { display:block; font-size:2.2cqw; font-weight:700; letter-spacing:-.02em; }
+  .E .win .kpis small { font-size:.9cqw; color:rgba(255,255,255,.55); }
+  .E .side { right:5cqw; top:7.5cqw; width:22cqw; border-radius:2cqw; padding:1.4cqw; transform:perspective(100cqw) rotateY(-12deg); transform-origin:left center; }
+  .E .side h5 { font-size:1.1cqw; font-weight:600; margin-bottom:1cqw; display:flex; justify-content:space-between; }
+  .E .side h5 span { color:rgba(255,255,255,.5); font-weight:400; }
+  .E .side .shot { aspect-ratio:16/9; border-radius:1cqw; background-size:cover; background-position:center; margin-bottom:.9cqw; }
+  .E .side .shot.sel { box-shadow:0 0 0 .25cqw #fff; }
+  .E .orn.bottom { top:auto; bottom:1.6cqw; }
+
+  /* ============================ F — DIARIO ============================ */
+  .F { --bg:#0f1115; --card:#171a20; --line:#262a33; --ink:#eef0f3; --soft:#8b93a1; --acc:#ff7a45;
+       --h0:#1d2129; --h1:#5a2a1c; --h2:#9c3f22; --h3:#e0602f; --h4:#ffa070;
+       background:var(--bg); color:var(--ink); font-family:"Geist",sans-serif; }
+  .F .mono { font-family:"Geist Mono",monospace; }
+  .F .top { top:2.6cqw; left:3.5cqw; right:3.5cqw; display:flex; justify-content:space-between; align-items:center; }
+  .F .top h3 { font-family:"Instrument Serif",serif; font-weight:400; font-size:3cqw; line-height:1; letter-spacing:-.01em; }
+  .F .top h3 em { color:var(--acc); }
+  .F .tabs { display:flex; gap:.4cqw; font-size:1.05cqw; font-weight:500; align-items:center; }
+  .F .tabs span { padding:.5cqw 1.1cqw; border-radius:.6cqw; color:var(--soft); }
+  .F .tabs .on { background:var(--ink); color:var(--bg); }
+  .F .tabs .pad.sh { background:#2a2f39; color:var(--soft); }
+  .F .lbl { font-family:"Geist Mono",monospace; font-size:.9cqw; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); }
+  /* left column */
+  .F .lc { left:3.5cqw; top:8.5cqw; width:31cqw; bottom:3cqw; display:flex; flex-direction:column; gap:1.4cqw; }
+  .F .big { font-size:6cqw; font-weight:700; letter-spacing:-.05em; line-height:.9; }
+  .F .big small { font-size:2.4cqw; color:var(--soft); font-weight:500; letter-spacing:-.02em; }
+  .F .delta { font-size:1.05cqw; color:#7ad39a; margin-top:.5cqw; }
+  .F .week { display:grid; grid-template-columns:repeat(7,1fr); gap:.7cqw; align-items:end; height:8.5cqw; }
+  .F .week div { display:flex; flex-direction:column; align-items:center; gap:.4cqw; height:100%; justify-content:flex-end; }
+  .F .week i { display:block; width:100%; border-radius:.4cqw; background:#2a2f39; }
+  .F .week i.on { background:var(--acc); }
+  .F .week span { font-family:"Geist Mono",monospace; font-size:.85cqw; color:var(--soft); }
+  .F .streak { display:flex; align-items:center; gap:1cqw; font-size:1.15cqw; background:var(--card); border:1px solid var(--line); padding:.9cqw 1.2cqw; border-radius:1cqw; }
+  .F .streak b { font-size:1.8cqw; color:var(--acc); }
+  .F .heat { display:grid; grid-auto-flow:column; grid-template-rows:repeat(7, 1fr); gap:.22cqw; }
+  .F .heat i { display:block; width:.88cqw; height:.88cqw; border-radius:.18cqw; background:var(--h0); }
+  .F .legend { display:flex; justify-content:space-between; margin-top:.5cqw; font-family:"Geist Mono",monospace; font-size:.8cqw; color:var(--soft); }
+  /* journal */
+  .F .jr { left:37.5cqw; right:3.5cqw; top:8.5cqw; bottom:3cqw; overflow:hidden; -webkit-mask-image:linear-gradient(#000 80%, transparent); mask-image:linear-gradient(#000 80%, transparent); }
+  .F .day { display:flex; align-items:baseline; gap:1cqw; margin:1.3cqw 0 .7cqw; }
+  .F .day:first-child { margin-top:0; }
+  .F .day b { font-size:1.15cqw; font-weight:600; }
+  .F .day span { font-family:"Geist Mono",monospace; font-size:.9cqw; color:var(--soft); }
+  .F .entry { display:grid; grid-template-columns:13cqw 1fr auto; gap:1.4cqw; align-items:center; padding:.8cqw; border-radius:1.2cqw; margin-bottom:.6cqw; }
+  .F .entry .th { aspect-ratio:460/215; border-radius:.7cqw; background-size:cover; background-position:center; }
+  .F .entry h6 { font-size:1.35cqw; font-weight:600; letter-spacing:-.01em; }
+  .F .entry .s { font-size:1.05cqw; color:var(--soft); margin-top:.25cqw; }
+  .F .entry .ms { margin-top:.5cqw; font-size:1cqw; display:inline-flex; gap:.5cqw; align-items:center; color:var(--h4); background:rgba(255,122,69,.1); border-radius:.5cqw; padding:.25cqw .6cqw; }
+  .F .entry .dur { font-family:"Geist Mono",monospace; font-size:1.3cqw; text-align:right; }
+  .F .entry .dur small { display:block; font-size:.85cqw; color:var(--soft); }
+  .F .entry.sel { background:var(--card); box-shadow:0 0 0 .2cqw var(--ink); }
+  .F .entry .go { display:flex; align-items:center; font-size:1cqw; font-weight:600; margin-top:.6cqw; }
+  /* bento detail */
+  .F .bento { left:3.5cqw; right:3.5cqw; top:8.5cqw; bottom:3cqw; display:grid; grid-template-columns:1.25fr 1.25fr 1fr 1fr; grid-template-rows:1fr 1fr 1fr; gap:1.1cqw; }
+  .F .t { background:var(--card); border:1px solid var(--line); border-radius:1.4cqw; padding:1.3cqw 1.4cqw; position:relative; overflow:hidden; display:flex; flex-direction:column; }
+  .F .t.hero { grid-column:1 / 3; grid-row:1 / 3; padding:0; border:0; }
+  .F .t.hero .bgi { position:absolute; inset:0; background-size:cover; background-position:center 25%; }
+  .F .t.hero .bgi::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(10,11,14,.95), rgba(10,11,14,.2) 60%, transparent); }
+  .F .t.hero .in { position:absolute; left:2cqw; right:2cqw; bottom:1.8cqw; }
+  .F .t.hero .lg { width:22cqw; height:7cqw; background-size:contain; background-repeat:no-repeat; background-position:left bottom; filter:drop-shadow(0 .3cqw .8cqw rgba(0,0,0,.6)); }
+  .F .t.hero p { font-size:1.15cqw; line-height:1.5; color:rgba(255,255,255,.82); margin-top:.9cqw; max-width:40cqw; }
+  .F .t.hero .acts { display:flex; gap:1.6cqw; margin-top:1.2cqw; font-size:1.1cqw; font-weight:600; }
+  .F .t.hero .acts span { display:flex; align-items:center; }
+  .F .t .v { font-size:3.4cqw; font-weight:700; letter-spacing:-.04em; line-height:1; margin-top:auto; }
+  .F .t .v small { font-size:1.4cqw; color:var(--soft); font-weight:500; letter-spacing:0; }
+  .F .t .sub { font-size:1cqw; color:var(--soft); margin-top:.5cqw; }
+  .F .bars { display:flex; gap:.6cqw; align-items:flex-end; flex:1; margin-top:1cqw; }
+  .F .bars div { flex:1; display:flex; flex-direction:column; align-items:center; gap:.35cqw; height:100%; justify-content:flex-end; }
+  .F .bars i { width:100%; border-radius:.35cqw; background:#2a2f39; display:block; }
+  .F .bars i.on { background:var(--acc); }
+  .F .bars span { font-family:"Geist Mono",monospace; font-size:.75cqw; color:var(--soft); }
+  .F .ringw { display:flex; align-items:center; gap:1.4cqw; margin-top:auto; }
+  .F .ringw svg { width:6.4cqw; height:6.4cqw; }
+  .F .ach { display:flex; flex-direction:column; gap:.6cqw; margin-top:.9cqw; font-size:1cqw; }
+  .F .ach div { display:flex; justify-content:space-between; gap:1cqw; }
+  .F .ach span { color:var(--soft); font-family:"Geist Mono",monospace; font-size:.85cqw; white-space:nowrap; }
+  .F .t.shot { padding:0; border:0; background-size:cover; background-position:center; }
+  /* wrapped */
+  .F .wl { left:3.5cqw; top:9cqw; width:36cqw; }
+  .F .giant { font-family:"Instrument Serif",serif; font-size:15cqw; line-height:.8; letter-spacing:-.03em; }
+  .F .giant em { color:var(--acc); font-style:italic; }
+  .F .wl p { font-size:1.5cqw; color:var(--soft); margin-top:1.2cqw; line-height:1.4; }
+  .F .wl p b { color:var(--ink); font-weight:600; }
+  .F .facts { left:3.5cqw; bottom:3.2cqw; width:36cqw; display:grid; grid-template-columns:1fr 1fr 1fr; gap:1cqw; }
+  .F .facts div { border-top:1px solid var(--line); padding-top:.8cqw; }
+  .F .facts b { display:block; font-size:2cqw; font-weight:700; letter-spacing:-.03em; }
+  .F .facts span { font-size:.95cqw; color:var(--soft); }
+  .F .rank { right:3.5cqw; top:8.5cqw; width:49cqw; display:flex; flex-direction:column; gap:.7cqw; }
+  .F .rk { display:grid; grid-template-columns:3cqw 4.2cqw 1fr; gap:1.2cqw; align-items:center; }
+  .F .rk .n { font-family:"Instrument Serif",serif; font-size:3cqw; color:var(--soft); text-align:right; }
+  .F .rk:first-child .n { color:var(--acc); }
+  .F .rk .cv { aspect-ratio:2/3; border-radius:.5cqw; background-size:cover; background-position:center; }
+  .F .rk h6 { font-size:1.35cqw; font-weight:600; display:flex; justify-content:space-between; }
+  .F .rk h6 span { font-family:"Geist Mono",monospace; font-weight:400; font-size:1.2cqw; }
+  .F .rk .hb { height:.6cqw; border-radius:1cqw; background:#22262e; margin-top:.6cqw; overflow:hidden; }
+  .F .rk .hb i { display:block; height:100%; background:var(--acc); border-radius:1cqw; }
+  .F .rk:not(:first-child) .hb i { background:#c9ced6; }
+  .F .genres { right:3.5cqw; bottom:3.2cqw; width:49cqw; }
+  .F .gbar { display:flex; height:1.2cqw; border-radius:1cqw; overflow:hidden; gap:.2cqw; margin-top:.7cqw; }
+  .F .gleg { display:flex; gap:1.6cqw; margin-top:.7cqw; font-size:.95cqw; color:var(--soft); }
+  .F .gleg i { display:inline-block; width:.8cqw; height:.8cqw; border-radius:.2cqw; margin-right:.4cqw; vertical-align:middle; }
+
+
+  /* ---------- E: libreria statica (master/detail) ---------- */
+  .E .list { left:4cqw; top:8cqw; bottom:3cqw; width:30cqw; border-radius:2.2cqw; padding:1.4cqw 1cqw 1cqw; display:flex; flex-direction:column; overflow:hidden; }
+  .E .list .lh { display:flex; justify-content:space-between; align-items:baseline; padding:0 .8cqw .9cqw; }
+  .E .list .lh b { font-size:1.6cqw; font-weight:700; letter-spacing:-.02em; }
+  .E .list .lh span { font-size:1cqw; color:rgba(255,255,255,.6); }
+  .E .li { display:grid; grid-template-columns:2.6cqw 1fr auto; gap:1cqw; align-items:center; padding:.55cqw .8cqw; border-radius:1cqw; }
+  .E .li .th { width:2.6cqw; aspect-ratio:2/3; border-radius:.35cqw; background-size:cover; background-position:center; }
+  .E .li .n { font-size:1.2cqw; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .E .li .s { font-size:.9cqw; color:rgba(255,255,255,.55); margin-top:.1cqw; }
+  .E .li .dot { width:.7cqw; height:.7cqw; border-radius:50%; background:#6cc04a; }
+  .E .li.sel { background:rgba(255,255,255,.92); color:#000; }
+  .E .li.sel .s { color:rgba(0,0,0,.55); }
+  .E .letter { font-family:"Geist Mono",monospace; font-size:.85cqw; color:rgba(255,255,255,.45); padding:.6cqw .8cqw .2cqw; letter-spacing:.1em; }
+  .E .sb { position:absolute; right:.45cqw; top:5cqw; width:.3cqw; height:8cqw; border-radius:1cqw; background:rgba(255,255,255,.45); }
+  .E .prev { left:36.5cqw; right:4cqw; top:8cqw; bottom:3cqw; border-radius:2.2cqw; overflow:hidden; }
+  .E .prev .heroimg { position:absolute; left:1.2cqw; right:1.2cqw; top:1.2cqw; height:24cqw; border-radius:1.6cqw; background-size:cover; background-position:center 30%; }
+  .E .prev .heroimg::after { content:""; position:absolute; inset:0; border-radius:1.6cqw; background:linear-gradient(0deg, rgba(0,0,0,.6), transparent 55%); }
+  .E .prev .wlogo { position:absolute; left:3cqw; top:15cqw; width:22cqw; height:8cqw; background-size:contain; background-repeat:no-repeat; background-position:left bottom; z-index:1; filter:drop-shadow(0 .3cqw .8cqw rgba(0,0,0,.6)); }
+  .E .prev .body { position:absolute; left:3cqw; right:3cqw; top:27.4cqw; }
+  .E .prev p { font-size:1.2cqw; line-height:1.55; color:rgba(255,255,255,.82); margin-top:1.1cqw; max-width:46cqw; }
+  .E .prev .acts { position:absolute; left:3cqw; bottom:2cqw; display:flex; gap:1cqw; }
+  .E .prev .kpis { position:absolute; right:3cqw; bottom:2cqw; display:flex; gap:2.4cqw; text-align:right; }
+  .E .prev .kpis b { display:block; font-size:2cqw; font-weight:700; letter-spacing:-.02em; }
+  .E .prev .kpis small { font-size:.9cqw; color:rgba(255,255,255,.55); }
+
+  /* ---------- F: muro a riquadri ---------- */
+  .F .sub2 { top:6.3cqw; left:3.5cqw; font-size:1cqw; color:var(--soft); }
+  .F .sorts { top:8.6cqw; left:3.5cqw; display:flex; gap:.5cqw; font-size:1cqw; font-weight:500; }
+  .F .sorts span { padding:.35cqw .9cqw; border-radius:10cqw; border:1px solid var(--line); color:var(--soft); }
+  .F .sorts .on { border-color:var(--acc); color:var(--acc); }
+  .F .wall { left:3.5cqw; right:3.5cqw; top:12cqw; bottom:7cqw; display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(4,1fr); grid-auto-flow:dense; gap:.8cqw; }
+  .F .wt { border-radius:1cqw; background-size:cover; background-position:center; position:relative; overflow:hidden; }
+  .F .wt::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(10,11,14,.75), transparent 45%); }
+  .F .wt .hrs { position:absolute; left:.8cqw; bottom:.6cqw; z-index:1; font-family:"Geist Mono",monospace; font-size:.95cqw; color:#fff; }
+  .F .wt .lg2 { position:absolute; left:1.4cqw; bottom:2.4cqw; width:60%; height:35%; background-size:contain; background-repeat:no-repeat; background-position:left bottom; z-index:1; filter:drop-shadow(0 .2cqw .6cqw rgba(0,0,0,.7)); }
+  .F .wt.sel { box-shadow:0 0 0 .22cqw var(--bg), 0 0 0 .45cqw var(--ink); }
+  .F .w22 { grid-column:span 2; grid-row:span 2; } .F .w21 { grid-column:span 2; } .F .w12 { grid-row:span 2; }
+  .F .selbar { left:3.5cqw; right:3.5cqw; bottom:2.4cqw; display:flex; align-items:center; gap:2cqw; font-size:1.1cqw; }
+  .F .selbar h6 { font-size:1.6cqw; font-weight:700; letter-spacing:-.02em; }
+  .F .selbar .s { color:var(--soft); }
+  .F .selbar .acts { margin-left:auto; display:flex; gap:1.6cqw; font-weight:600; }
+
+  .notes { margin-top:64px; border-top:1px solid #2a2a2a; padding-top:24px; color:#bdbdbd; font-size:15px; line-height:1.6; max-width:950px; }
+  .notes h3 { color:#fff; font-size:17px; margin-bottom:8px; }
+  .notes li { margin-left:20px; margin-bottom:4px; }
+  .notes a { color:#9ecbff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="page">
+  <h1>Playnite Fullscreen — E e F senza caroselli</h1>
+  <p>Le pagine di dettaglio di E e F restano quelle di prima. Cambiano solo le librerie: niente si muove o ruota, si sposta soltanto il focus.</p>
+</header>
+
+<section class="variant">
+  <h2><span class="tag">E</span> Vetro</h2>
+  <p>Il dettaglio di Orbita resta com'era. La libreria diventa una vista elenco + anteprima: a sinistra un elenco di vetro fermo, in cui si sposta solo l'evidenziazione; a destra un'anteprima che è già metà della pagina di dettaglio. Lo sfondo cambia colore col gioco selezionato, ma con una dissolvenza, senza movimento.</p>
+  <div class="grid">
+    <figure><div class="frame E" id="e-lib"></div><figcaption><b>Libreria.</b> Su/giù muove l'evidenziazione. L'elenco scorre solo quando arrivi al bordo, e di una pagina intera. LT/RT salta di lettera.</figcaption></figure>
+    <figure><div class="frame E" id="e-3"></div><figcaption><b>Dettaglio</b> (quello che ti piaceva). Con A dall'anteprima si apre questo: hero, logo e statistiche sono gli stessi, così il passaggio è naturale.</figcaption></figure>
+  </div>
+</section>
+
+<section class="variant">
+  <h2><span class="tag">F</span> Diario</h2>
+  <p>Il dettaglio a riquadri resta. La libreria diventa un muro di riquadri <b>fermo</b>, dove la grandezza dipende da quanto ci hai giocato: i giochi della tua vita sono grandi, quelli mai aperti piccoli. Si cambia criterio con LB/RB (più giocati, recenti, A–Z, mai giocati).</p>
+  <div class="grid">
+    <figure><div class="frame F" id="f-lib"></div><figcaption><b>Libreria.</b> Le frecce muovono il focus tra i riquadri. In basso, la barra del gioco selezionato con le azioni.</figcaption></figure>
+    <figure><div class="frame F" id="f-2"></div><figcaption><b>Dettaglio a riquadri</b> (quello che ti piaceva). Il muro e la scheda parlano la stessa lingua visiva.</figcaption></figure>
+  </div>
+</section>
+<div style="display:none"><div id="e-1"></div><div id="e-2"></div><div id="f-1"></div><div id="f-3"></div></div>
+
+<div class="notes">
+  <h3>Fattibilità in Playnite</h3>
+  <ul>
+    <li><b>E</b>: senza l'anello diventa semplice: un elenco e un pannello affiancati. Il vetro si fa con un'immagine sfocata dietro e un bordo chiaro, perché WPF non ha un vero backdrop-blur.</li>
+    <li><b>F</b>: ore totali e ultima sessione ci sono già. Lo storico delle singole sessioni (heatmap, ore per mese) richiede un'estensione come <i>GameActivity</i>, gli achievement richiedono <i>SuccessStory</i>. Senza estensioni resta la versione con solo totali e "ultima volta".</li>
+    <li>Ispirazioni da Mobbin: <a href="https://mobbin.com/screens/25b055b2-386f-463e-943c-099849dd5f03">Brink</a> (heatmap delle serie consecutive), <a href="https://mobbin.com/screens/ea11133b-fd2c-4d39-a12b-a2d4723c68b3">Garmin Connect</a> (barre settimanali), <a href="https://mobbin.com/screens/dcc4e946-a776-4295-ba32-16cf358e2358">Future</a> (numeri grandi e asciutti).</li>
+  </ul>
+</div>
+</div>
+
+<script>
+const S = 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/';
+const hero = id => `url(${S}${id}/library_hero.jpg)`, cover = id => `url(${S}${id}/library_600x900.jpg)`,
+      logo = id => `url(${S}${id}/logo.png)`, header = id => `url(${S}${id}/header.jpg)`,
+      shot = (id, h) => `url(${S}${id}/${h}.600x338.jpg)`;
+const G = { elden:1245620, hades:1145360, hk:367520, disco:632470, bg3:1086940, cp:1091500, ow:753640, celeste:504230,
+            rdr:1174180, bal:2379780, sek:814380, h2:1145350, sdv:413150, hog:990080, spm:1817070, portal:620, w3:292030, dc:588650, sts:646570, p5:1687950 };
+const SH = { ow:['ss_ec95a283483f0438be40d033f08b9d956e748d54','ss_09f0fa8d9b8d7da1408cf4e03303d896cbd9be18','ss_c624a6b8edca0d451605592edd927dbcc14917a8'],
+             h2:['ss_ef0f63061d0a0a9a7e46f3b84f125d25330e8f19','ss_ae77a1a82d045d44aa13cdf89681e069bd149884'] };
+const pad = (k, t) => `<span style="display:flex;align-items:center"><span class="pad ${k}">${k.toUpperCase()}</span>${t}</span>`;
+const ic = {
+  home:'<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  lib:'<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'
+};
+const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const orn = (on) => `<div class="orn glass">${[['home','Home'],['lib','Libreria'],['dl','Installati'],['search','Cerca']].map(([k,l]) => `<span class="${l===on?'on':''}">${svg(ic[k])}${l}</span>`).join('')}</div>`;
+
+/* ---------- E ---------- */
+const ringGames = ['bg3','bal','celeste','cp','disco','elden','hades','h2','hk','hog','ow','p5','rdr','sek','sdv','spm','sts','w3'];
+function orbit(el, selKey, meta, line) {
+  const si = ringGames.indexOf(selKey), R = 46, step = 19;
+  const cards = ringGames.map((k, i) => {
+    let d = i - si; if (d > 9) d -= 18; if (d < -9) d += 18;
+    if (Math.abs(d) > 4) return '';
+    const a = d * step, rad = a * Math.PI / 180;
+    const x = Math.sin(rad) * R, z = (Math.cos(rad) - 1) * R + (d === 0 ? 3 : 0);
+    const op = 1 - Math.abs(d) * .16;
+    return `<div class="card ${d===0?'sel':''}" style="background-image:${cover(G[k])};transform:translate3d(${x}cqw,${d===0?-.6:0}cqw,${z}cqw) rotateY(${a}deg);opacity:${op};z-index:${10-Math.abs(d)}"></div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="amb img" style="background-image:${hero(G[selKey])}"></div><div class="floor"></div>
+    ${orn('Libreria')}<div class="clock">21:47</div>
+    <div class="stage"><div class="ring">${cards}</div></div>
+    <div class="panel glass">
+      <div class="lg" style="background-image:${logo(G[selKey])}"></div>
+      <div class="mid"><div class="meta">${meta.map(m => `<span>${m}</span>`).join('<i></i>')}</div><div class="line">${line}</div></div>
+      <div style="display:flex;gap:.8cqw"><div class="gbtn primary"><span class="pad a">A</span>Gioca</div><div class="gbtn"><span class="pad y">Y</span>Info</div></div>
+    </div>
+    <div class="count">${String(si+1).padStart(3,'0')} / 412</div>`;
+}
+orbit(document.getElementById('e-1'), 'h2', ['2025','Roguelike','74 h','Steam'], 'Ultima sessione ieri sera · 41 / 49 achievement');
+orbit(document.getElementById('e-2'), 'celeste', ['2018','Platform','23 h','Steam'], 'Completato al 90% · fragole raccolte 175 / 202');
+
+document.getElementById('e-3').innerHTML = `
+  <div class="amb img" style="background-image:${hero(G.ow)}"></div><div class="floor"></div>
+  <div class="clock">21:47</div>
+  <div style="top:2.6cqw;left:5cqw;font-size:1.1cqw;color:rgba(255,255,255,.8);display:flex;align-items:center"><span class="pad b">B</span>Torna all'orbita</div>
+  <div class="win glass">
+    <div class="heroimg" style="background-image:${hero(G.ow)}"></div>
+    <div class="wlogo" style="background-image:${logo(G.ow)}"></div>
+    <div class="body">
+      <div class="chips"><span class="chip">2019</span><span class="chip">Esplorazione</span><span class="chip">Mobius Digital</span><span class="chip">Epic Games</span><span class="chip">Installato · 7,8 GB</span></div>
+      <p>Un sistema solare chiuso in un loop di 22 minuti, poi il Sole esplode e si ricomincia. L'unica cosa che porti con te è quello che hai capito. Nessun potenziamento, solo curiosità.</p>
+    </div>
+    <div class="acts"><div class="gbtn primary"><span class="pad a">A</span>Gioca</div><div class="gbtn"><span class="pad x">X</span>Opzioni</div></div>
+    <div class="kpis"><div><b>31 h</b><small>giocate</small></div><div><b>22 / 31</b><small>achievement</small></div><div><b>3 giorni fa</b><small>ultima volta</small></div></div>
+  </div>
+  <div class="side glass">
+    <h5>Screenshot <span>1 / 12</span></h5>
+    ${SH.ow.map((h,i) => `<div class="shot ${i===0?'sel':''}" style="background-image:${shot(G.ow,h)}"></div>`).join('')}
+  </div>
+  <div class="orn glass bottom"><span class="on">Panoramica</span><span>Achievement</span><span>Screenshot</span><span>DLC</span><span>Note</span></div>`;
+
+/* ---------- F ---------- */
+let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const heatCells = (weeks, density) => Array.from({length: weeks*7}, (_, i) => {
+  const w = Math.floor(i/7), d = i%7, r = rnd();
+  let lv = r < density ? 0 : r < density+.15 ? 1 : r < density+.3 ? 2 : r < density+.42 ? 3 : 4;
+  if (d >= 5 && lv < 3 && rnd() > .4) lv++;            // weekends busier
+  if (w === weeks-1 && d > 4) lv = 0;                   // future days
+  if (w === weeks-1 && d <= 4) lv = Math.max(lv, 1);     // current streak
+  if (w === weeks-2 && d === 6) lv = Math.max(lv, 2);
+  return `<i style="background:var(--h${lv})"></i>`;
+}).join('');
+const ftop = (on) => `<div class="top"><h3>${on === 'Diario' ? 'Il <em>diario</em>' : on === 'Il tuo 2026' ? 'Il tuo <em>2026</em>' : on === 'Muro' ? 'La <em>libreria</em>' : 'Hades II'}</h3>
+  <div class="tabs"><span class="pad sh">LB</span>${['Diario','Libreria','Il tuo 2026','Cerca'].map(t => `<span class="${t===on?'on':''}">${t}</span>`).join('')}<span class="pad sh" style="margin-left:.4cqw">RB</span></div></div>`;
+const weekHrs = [[1.2,'L'],[0,'M'],[2.1,'M'],[1.9,'G'],[0.8,'V'],[2.3,'S'],[1.3,'D']];
+
+document.getElementById('f-1').innerHTML = `
+  ${ftop('Diario')}
+  <div class="lc">
+    <div>
+      <div class="lbl">Questa settimana</div>
+      <div class="big" style="margin-top:.6cqw">9<small> h </small>40<small> min</small></div>
+      <div class="delta">▲ 2 h 10 min rispetto alla scorsa</div>
+    </div>
+    <div class="week">${weekHrs.map(([h,d],i) => `<div><i class="${i===4?'on':''}" style="height:${Math.max(h/2.4*100,4)}%"></i><span>${d}</span></div>`).join('')}</div>
+    <div class="streak"><b>6</b><div>giorni di fila<div style="font-size:.95cqw;color:var(--soft)">record: 19, a marzo</div></div></div>
+    <div>
+      <div class="lbl" style="margin-bottom:.7cqw">Ultimi sei mesi</div>
+      <div class="heat">${heatCells(26,.42)}</div>
+      <div class="legend"><span>apr</span><span>mag</span><span>giu</span><span>lug</span><span>ago</span><span>set</span><span>ott</span></div>
+    </div>
+  </div>
+  <div class="jr">
+    <div class="day"><b>Oggi</b><span>ven 9 ottobre</span></div>
+    <div class="entry sel">
+      <div class="th img" style="background-image:${header(G.h2)}"></div>
+      <div><h6>Hades II</h6><div class="s">Sessione pomeridiana · 3 run, 1 vittoria</div>
+        <div class="go">${pad('a','Riprendi')}</div></div>
+      <div class="dur">0:48<small>h:min</small></div>
+    </div>
+    <div class="day"><b>Ieri</b><span>gio 8 ottobre</span></div>
+    <div class="entry">
+      <div class="th img" style="background-image:${header(G.elden)}"></div>
+      <div><h6>Elden Ring</h6><div class="s">Sessione serale · Haligtree</div>
+        <span class="ms">◆ Sbloccato: Leggenda delle Ceneri</span></div>
+      <div class="dur">1:52<small>h:min</small></div>
+    </div>
+    <div class="entry">
+      <div class="th img" style="background-image:${header(G.bal)}"></div>
+      <div><h6>Balatro</h6><div class="s">Pausa pranzo · Mazzo Abbandonato, puntata 8</div></div>
+      <div class="dur">0:34<small>h:min</small></div>
+    </div>
+    <div class="day"><b>Mercoledì</b><span>7 ottobre</span></div>
+    <div class="entry">
+      <div class="th img" style="background-image:${header(G.ow)}"></div>
+      <div><h6>Outer Wilds</h6><div class="s">Sessione serale · 5 loop</div>
+        <span class="ms">◆ Sbloccato: Archeologo</span></div>
+      <div class="dur">2:06<small>h:min</small></div>
+    </div>
+  </div>`;
+
+seed = 3;
+document.getElementById('f-2').innerHTML = `
+  ${ftop('Libreria')}
+  <div class="bento">
+    <div class="t hero"><div class="bgi" style="background-image:${hero(G.h2)}"></div>
+      <div class="in"><div class="lg" style="background-image:${logo(G.h2)}"></div>
+        <p>Melinoë, principessa degli Inferi, dà la caccia al Titano del Tempo. Roguelike d'azione di Supergiant.</p>
+        <div class="acts">${pad('a','Gioca')}${pad('x','Opzioni')}${pad('b','Indietro')}</div></div></div>
+    <div class="t"><div class="lbl">Tempo totale</div><div class="v">74<small> h</small></div><div class="sub">118 sessioni · media 38 min</div></div>
+    <div class="t"><div class="lbl">Achievement</div>
+      <div class="ringw"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#2a2f39" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#ff7a45" stroke-width="4" stroke-linecap="round" stroke-dasharray="${41/49*94.2} 94.2" transform="rotate(-90 18 18)"/></svg>
+      <div><div class="v" style="font-size:2.6cqw">41<small>/49</small></div><div class="sub">84%</div></div></div></div>
+    <div class="t" style="grid-column:3 / 5"><div class="lbl">Ore per mese</div>
+      <div class="bars">${[['MAG',4],['GIU',11],['LUG',6],['AGO',14],['SET',22],['OTT',9]].map(([m,h],i) => `<div><i class="${i===4?'on':''}" style="height:${h/22*100}%"></i><span>${m}</span></div>`).join('')}</div></div>
+    <div class="t"><div class="lbl">Sessioni · 12 settimane</div><div class="heat" style="margin-top:auto;grid-template-rows:repeat(7,1fr)">${heatCells(12,.55)}</div></div>
+    <div class="t"><div class="lbl">Record</div><div class="v" style="font-size:2.6cqw">5:12</div><div class="sub">sessione più lunga · 14 settembre</div></div>
+    <div class="t"><div class="lbl">Ultimi sbloccati</div>
+      <div class="ach"><div>Notte Infinita<span>ieri</span></div><div>Senza Armatura<span>3 ott</span></div><div>Stregoneria Profonda<span>28 set</span></div></div></div>
+    <div class="t shot" style="background-image:${shot(G.h2, SH.h2[0])}"></div>
+  </div>`;
+
+const tops = [['h2','Hades II',74],['elden','Elden Ring',61],['bal','Balatro',48],['ow','Outer Wilds',31],['celeste','Celeste',23]];
+document.getElementById('f-3').innerHTML = `
+  ${ftop('Il tuo 2026')}
+  <div class="wl">
+    <div class="giant">386<em>h</em></div>
+    <p>giocate dal 1° gennaio, su <b>37 giochi</b>. Più o meno <b>16 giorni</b> pieni.</p>
+  </div>
+  <div class="facts">
+    <div><b>Sabato</b><span>giorno preferito</span></div>
+    <div><b>22:00</b><span>ora di punta</span></div>
+    <div><b>9</b><span>giochi finiti</span></div>
+  </div>
+  <div class="rank">${tops.map(([k,t,h],i) => `<div class="rk"><div class="n">${i+1}</div><div class="cv" style="background-image:${cover(G[k])}"></div>
+    <div><h6>${t}<span>${h} h</span></h6><div class="hb"><i style="width:${h/74*100}%"></i></div></div></div>`).join('')}</div>
+  <div class="genres"><div class="lbl">Generi</div>
+    <div class="gbar"><i style="flex:38;background:#ff7a45"></i><i style="flex:24;background:#ffb08a"></i><i style="flex:18;background:#c9ced6"></i><i style="flex:12;background:#6b7380"></i><i style="flex:8;background:#3a404b"></i></div>
+    <div class="gleg"><span><i style="background:#ff7a45"></i>Roguelike 38%</span><span><i style="background:#ffb08a"></i>GDR 24%</span><span><i style="background:#c9ced6"></i>Carte 18%</span><span><i style="background:#6b7380"></i>Esplorazione 12%</span><span><i style="background:#3a404b"></i>Altro</span></div></div>`;
+
+/* ---------- E libreria statica ---------- */
+const eList = [['H',null],['hades','Hades','Steam · 61 h',1],['h2','Hades II','Steam · 74 h',1],['hog','Hogwarts Legacy','Epic · 12 h',0],['hk','Hollow Knight','Steam · 54 h',1],
+  ['M',null],['spm',"Marvel's Spider-Man Remastered",'Steam · 19 h',0],['O',null],['ow','Outer Wilds','Epic · 31 h',1,1],['P',null],['p5','Persona 5 Royal','Steam · 96 h',0],['portal','Portal 2','Steam · 14 h',1]];
+document.getElementById('e-lib').innerHTML = `
+  <div class="amb img" style="background-image:${hero(G.ow)}"></div><div class="floor"></div>
+  ${orn('Libreria')}<div class="clock">21:47</div>
+  <div class="list glass">
+    <div class="lh"><b>Libreria</b><span>412 giochi · A–Z ▾</span></div>
+    ${eList.map(([k,n,sub,inst,sel]) => n===null ? `<div class="letter">${k}</div>` :
+      `<div class="li ${sel?'sel':''}"><div class="th" style="background-image:${cover(G[k])}"></div><div><div class="n">${n}</div><div class="s">${sub}</div></div>${inst?'<span class="dot"></span>':'<span></span>'}</div>`).join('')}
+    <span class="sb"></span>
+  </div>
+  <div class="prev glass">
+    <div class="heroimg" style="background-image:${hero(G.ow)}"></div>
+    <div class="wlogo" style="background-image:${logo(G.ow)}"></div>
+    <div class="body">
+      <div class="chips"><span class="chip">2019</span><span class="chip">Esplorazione</span><span class="chip">Mobius Digital</span><span class="chip">Installato · 7,8 GB</span></div>
+      <p>Un sistema solare chiuso in un loop di 22 minuti, poi il Sole esplode e si ricomincia. L'unica cosa che porti con te è quello che hai capito.</p>
+    </div>
+    <div class="acts"><div class="gbtn primary"><span class="pad a">A</span>Gioca</div><div class="gbtn"><span class="pad y">Y</span>Scheda completa</div></div>
+    <div class="kpis"><div><b>31 h</b><small>giocate</small></div><div><b>3 giorni fa</b><small>ultima volta</small></div></div>
+  </div>`;
+
+/* ---------- F muro ---------- */
+const wall = [['w3','w22',112,'1/1'],['p5','w22',96,'1/3'],['rdr','w22',88,'1/5'],['h2','w21',74,'1/7'],['elden','w21',61,'2/7'],
+  ['hades','w21',61,'3/1'],['hk','w21',54,'4/1'],['bal','w12',48,'3/3'],['bg3','w12',42,'3/4'],['disco','w12',37,'3/5'],['ow','w12',31,'3/6'],['sek','w12',29,'3/7'],['celeste','w12',23,'3/8']];
+const wallImg = (k, c) => c==='w22' ? hero(G[k]) : c==='w21' ? header(G[k]) : cover(G[k]);
+document.getElementById('f-lib').innerHTML = `
+  ${ftop('Muro').replace('<span class="">Libreria</span>','<span class="on">Libreria</span>')}
+  <div class="sub2">412 giochi · la grandezza dei riquadri dipende dalle ore giocate</div>
+  <div class="sorts"><span class="on">Più giocati</span><span>Recenti</span><span>A–Z</span><span>Mai giocati · 143</span></div>
+  <div class="wall">${wall.map(([k,c,h,pos]) => `<div class="wt ${c} ${k==='bal'?'sel':''}" style="grid-row:${pos.split('/')[0]} / span ${c[2]};grid-column:${pos.split('/')[1]} / span ${c[1]};background-image:${wallImg(k,c)}">${c==='w22'?`<div class="lg2" style="background-image:${logo(G[k])}"></div>`:''}<span class="hrs">${h} h</span></div>`).join('')}</div>
+  <div class="selbar"><h6>Balatro</h6><span class="s">2024 · Roguelike di carte · 48 h · ultima volta ieri</span>
+    <div class="acts">${pad('a','Gioca')}${pad('y','Scheda')}${pad('x','Preferito')}</div></div>`;
+</script>
+</body>
+</html>

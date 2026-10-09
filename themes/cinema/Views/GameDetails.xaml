@@ -1,0 +1,183 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    mc:Ignorable="d">
+
+    <!--
+        Cinema / Game details
+        Same artwork as the main view, darker. Logo, metadata chips, actions and description on the left;
+        stat cards on the right. DataContext is the selected GamesCollectionViewEntry.
+    -->
+    <Style TargetType="{x:Type GameDetails}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GameDetails}">
+                    <Grid x:Name="PART_ViewHost" Background="#FF000000"
+                          d:DesignWidth="{StaticResource DesignWidth}"
+                          d:DesignHeight="{StaticResource DesignHeight}"
+                          d:DataContext="{x:Static DesignMainViewModel.DesignSelectedGameIntance}"
+                          KeyboardNavigation.DirectionalNavigation="Contained"
+                          KeyboardNavigation.TabNavigation="Cycle"
+                          KeyboardNavigation.ControlTabNavigation="Cycle">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="620" />
+                            <ColumnDefinition Width="82" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="110" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="80" />
+                        </Grid.RowDefinitions>
+
+                        <FadeImage x:Name="PART_ImageBackground" Grid.ColumnSpan="5" Grid.RowSpan="3"
+                                   Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Rectangle Grid.ColumnSpan="5" Grid.RowSpan="3">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="#EE000000" Offset="0" />
+                                    <GradientStop Color="#B3000000" Offset="0.5" />
+                                    <GradientStop Color="#40000000" Offset="1" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle Grid.ColumnSpan="5" Grid.RowSpan="3" Fill="{DynamicResource GameDetailsBackgroundBrush}" />
+
+                        <!-- Back hint -->
+                        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <ContentControl ContentTemplate="{DynamicResource ButtonPromptB}" Height="30" Focusable="False" />
+                            <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Margin="10,0,0,0" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource CinemaTextSoftBrush}"
+                                       Text="{DynamicResource LOCBackLabel}" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Left: identity, actions, description -->
+                        <DockPanel Grid.Column="1" Grid.Row="1">
+                            <Grid DockPanel.Dock="Top" Height="180" HorizontalAlignment="Left">
+                                <ContentControl x:Name="ExtraMetadataLoader_LogoLoaderControl"
+                                                MaxWidth="560" MaxHeight="180" Focusable="False"
+                                                HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                                <TextBlock Text="{Binding DisplayName}"
+                                           FontFamily="{DynamicResource CinemaFontDisplay}" FontWeight="Black" FontSize="76"
+                                           Foreground="{DynamicResource CinemaTextBrush}" TextWrapping="Wrap"
+                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{PluginSettings Plugin=ExtraMetadataLoader, Path=IsLogoAvailable}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+
+                            <!-- Chips -->
+                            <WrapPanel DockPanel.Dock="Top" Margin="0,28,0,0">
+                                <WrapPanel.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="BorderBrush" Value="#73FFFFFF" />
+                                        <Setter Property="BorderThickness" Value="1" />
+                                        <Setter Property="CornerRadius" Value="20" />
+                                        <Setter Property="Padding" Value="18,6,18,7" />
+                                        <Setter Property="Margin" Value="0,0,10,10" />
+                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+                                        <Setter Property="FontSize" Value="18" />
+                                        <Setter Property="Foreground" Value="{DynamicResource CinemaTextSoftBrush}" />
+                                    </Style>
+                                </WrapPanel.Resources>
+                                <Border><TextBlock Text="{Binding ReleaseYear}" /></Border>
+                                <Border><TextBlock Text="{Binding Genres, Converter={StaticResource ListToStringConverter}}" /></Border>
+                                <Border><TextBlock Text="{Binding Developers, Converter={StaticResource ListToStringConverter}}" /></Border>
+                                <Border><TextBlock Text="{Binding Platforms, Converter={StaticResource ListToStringConverter}}" /></Border>
+                                <Border><TextBlock Text="{Binding Source.Name}" /></Border>
+                            </WrapPanel>
+
+                            <!-- Actions -->
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,22,0,0">
+                                <ButtonEx x:Name="PART_ButtonContext" Style="{DynamicResource CinemaPillButton}" />
+                                <ButtonEx x:Name="PART_ButtonOptions" Style="{DynamicResource CinemaPillButton}"
+                                          Content="{DynamicResource LOCGameOptions}" />
+                            </StackPanel>
+
+                            <!-- Description -->
+                            <ScrollViewerEx x:Name="PART_ScrollHtmlDescription" Margin="0,34,0,0"
+                                            DockPanel.Dock="Top" CustomScrollAmount="42">
+                                <HtmlTextView x:Name="PART_HtmlDescription"
+                                              HtmlFontSize="19"
+                                              HtmlFontFamily="{DynamicResource CinemaFontBody}"
+                                              HtmlForeground="#D9FFFFFF"
+                                              LinkForeground="#FFFFFFFF"
+                                              FocusVisualStyle="{x:Null}" />
+                            </ScrollViewerEx>
+                        </DockPanel>
+
+                        <!-- Right: stat cards -->
+                        <UniformGrid Grid.Column="3" Grid.Row="1" Columns="2" VerticalAlignment="Top" Margin="0,0,-18,0">
+                            <Border Style="{DynamicResource CinemaStatCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{DynamicResource CinemaStatLabel}"
+                                               Text="{Binding Source={StaticResource LOCTimePlayed}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource CinemaStatValue}"
+                                               Text="{Binding Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{DynamicResource CinemaStatCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{DynamicResource CinemaStatLabel}"
+                                               Text="{Binding Source={StaticResource LOCLastPlayed}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource CinemaStatValue}"
+                                               Text="{Binding LastActivity, Converter={StaticResource DateTimeToLastPlayedConverter}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{DynamicResource CinemaStatCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{DynamicResource CinemaStatLabel}"
+                                               Text="{Binding Source={StaticResource LOCPlayCountLabel}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource CinemaStatValue}" Text="{Binding PlayCount}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{DynamicResource CinemaStatCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{DynamicResource CinemaStatLabel}"
+                                               Text="{Binding Source={StaticResource LOCCompletionStatus}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource CinemaStatValue}" FontSize="30"
+                                               Text="{Binding CompletionStatus.Name}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{DynamicResource CinemaStatCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{DynamicResource CinemaStatLabel}"
+                                               Text="{Binding Source={StaticResource LOCInstallSizeLabel}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource CinemaStatValue}" FontSize="30"
+                                               Text="{Binding InstallSize, Converter={StaticResource NullableUlongBytesSizeToStringConverter}}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{DynamicResource CinemaStatCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{DynamicResource CinemaStatLabel}"
+                                               Text="{Binding Source={StaticResource LOCDateAddedLabel}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource CinemaStatValue}" FontSize="30"
+                                               Text="{Binding Added, Converter={StaticResource NullableDateToStringConverter}}" />
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- Cover, small, under the cards -->
+                        <Border Grid.Column="3" Grid.Row="1" Width="200" Height="300" CornerRadius="14"
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom" ClipToBounds="True">
+                            <Image x:Name="PART_ImageCover" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="Fant"
+                                   OpacityMask="{DynamicResource RoundedTileMask}" />
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

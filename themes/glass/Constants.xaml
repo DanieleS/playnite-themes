@@ -1,0 +1,123 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Glass: frosted panels over the selected game's blurred artwork. -->
+
+    <Color x:Key="GlyphColor">#FFFFFFFF</Color>
+    <Color x:Key="GlyphLightColor">#FFE6E6F0</Color>
+    <Color x:Key="SelectionLightColor">#FF9A9AA8</Color>
+    <Color x:Key="OverlayColor">#B30B0B10</Color>
+    <Color x:Key="ControlBackgroundColor">#FF2A2A33</Color>
+    <Color x:Key="ControlBackgroundColorDark">#FF15151B</Color>
+    <Color x:Key="TextColor">#FFF5F5F7</Color>
+    <Color x:Key="TextColorDark">#FF8E8E99</Color>
+
+    <SolidColorBrush x:Key="MainBackgourndBrush" Color="#FF0B0B10" />
+    <SolidColorBrush x:Key="TopBarBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="BottomBarBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="SelectionBrush" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="GameDetailsBackgroundBrush" Color="Transparent" />
+
+    <LinearGradientBrush x:Key="OverlayMenuBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F2202028" Offset="0" />
+        <GradientStop Color="#F20E0E14" Offset="1" />
+    </LinearGradientBrush>
+
+    <FontFamily x:Key="GlassFont">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWeb">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWebLight">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWebBold">Segoe UI Variable Display Semibold, Segoe UI Semibold</FontFamily>
+
+    <sys:Double x:Key="FontSizeSmall">18</sys:Double>
+    <sys:Double x:Key="FontSize">22</sys:Double>
+
+    <SolidColorBrush x:Key="GlassTextBrush" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="GlassSoftBrush" Color="#D1FFFFFF" />
+    <SolidColorBrush x:Key="GlassMutedBrush" Color="#8CFFFFFF" />
+    <SolidColorBrush x:Key="GlassChipBrush" Color="#1FFFFFFF" />
+
+    <!-- The pane: a pale wash with a light top edge. WPF has no backdrop blur, so the artwork behind is pre-blurred. -->
+    <LinearGradientBrush x:Key="GlassPaneBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#2EFFFFFF" Offset="0" />
+        <GradientStop Color="#17FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="GlassEdgeBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#59FFFFFF" Offset="0" />
+        <GradientStop Color="#14FFFFFF" Offset="0.5" />
+        <GradientStop Color="#26FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <Style x:Key="GlassPane" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource GlassPaneBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GlassEdgeBrush}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="CornerRadius" Value="34" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="18" Direction="270" BlurRadius="60" Opacity="0.35" Color="#FF000000" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TextBlockBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{DynamicResource FontSize}" />
+        <Setter Property="FontFamily" Value="{DynamicResource GlassFont}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
+    <Style x:Key="GlassChip" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource GlassChipBrush}" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="Padding" Value="18,6,18,7" />
+        <Setter Property="Margin" Value="0,0,10,10" />
+    </Style>
+
+    <Style x:Key="GlassChipText" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Foreground" Value="{DynamicResource GlassSoftBrush}" />
+    </Style>
+
+    <Style x:Key="GlassKpiValue" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontSize" Value="36" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+
+    <Style x:Key="GlassKpiLabel" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource GlassMutedBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+
+    <!-- Focusable pill for actions in the detail window. -->
+    <Style x:Key="GlassButton" TargetType="ButtonEx">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Foreground" Value="{DynamicResource GlassTextBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource GlassFont}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="21" />
+        <Setter Property="MinWidth" Value="190" />
+        <Setter Property="Margin" Value="0,0,14,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ButtonEx">
+                    <Border x:Name="Body" Background="#24FFFFFF" BorderBrush="#2EFFFFFF" BorderThickness="1"
+                            CornerRadius="30" Padding="30,13,30,13">
+                        <ContentPresenter x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="Body" Property="Background" Value="#FFFFFFFF" />
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#FF000000" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Body" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

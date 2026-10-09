@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal — mosaico a schema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#121212; color:#eaeaea; font-family:"Inter Tight",system-ui,sans-serif; padding:40px 16px 80px; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  header.page h1 { font-size:28px; font-weight:800; letter-spacing:-.02em; }
+  header.page p { color:#bdbdbd; margin-top:8px; max-width:950px; line-height:1.6; font-size:15px; }
+  header.page p b { color:#fff; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px 16px; margin-top:32px; }
+  .grid .wide { grid-column:1 / -1; }
+  @media (max-width:1000px){ .grid { grid-template-columns:1fr; } }
+  figcaption { color:#8a8a8a; font-size:13px; margin-top:6px; line-height:1.45; }
+  figcaption b { color:#d0d0d0; font-weight:600; }
+
+  .frame { container-type:inline-size; aspect-ratio:16/9; position:relative; overflow:hidden; border-radius:8px; box-shadow:0 0 0 1px #2a2a2a; }
+  .frame > * { position:absolute; }
+  .pad { display:inline-grid; place-items:center; width:1.8cqw; height:1.8cqw; border-radius:50%; flex:none;
+         font:800 1cqw/1 "Inter Tight",sans-serif; color:#111; margin-right:.55cqw; }
+  .pad.a{background:#6cc04a} .pad.b{background:#e2453c;color:#fff} .pad.x{background:#3a8de0;color:#fff} .pad.y{background:#f2c230}
+  .pad.sh { border-radius:.45cqw; width:auto; padding:0 .55cqw; background:#2a2f39; color:#8b93a1; }
+
+  .F { --bg:#0f1115; --card:#171a20; --line:#262a33; --ink:#eef0f3; --soft:#8b93a1; --acc:#ff7a45;
+       background:var(--bg); color:var(--ink); font-family:"Geist",sans-serif; }
+  .F .top { top:2.4cqw; left:3.6cqw; right:3.6cqw; display:flex; justify-content:space-between; align-items:flex-start; }
+  .F .top h3 { font-family:"Instrument Serif",serif; font-style:italic; font-weight:400; font-size:3.4cqw; line-height:1; color:var(--acc); }
+  .F .top .sub { font-family:"Geist Mono",monospace; font-size:.9cqw; color:var(--soft); margin-top:.5cqw; }
+  .F .tabs { display:flex; gap:.4cqw; font-size:1.05cqw; font-weight:500; align-items:center; margin-top:.4cqw; }
+  .F .tabs span { padding:.5cqw 1.1cqw; border-radius:.6cqw; color:var(--soft); }
+  .F .tabs .on { background:var(--ink); color:var(--bg); }
+  .F .clock { font-family:"Geist Mono",monospace; font-size:1.1cqw; color:var(--soft); margin-top:.6cqw; }
+
+  .F .wall { left:3.6cqw; top:9.4cqw; height:31.2cqw; right:0; }
+  .F .t { position:absolute; border-radius:.9cqw; overflow:hidden; background-size:cover; background-position:center; }
+  .F .t::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(15,17,21,.75), transparent 40%); }
+  .F .t .lg { position:absolute; left:1.2cqw; bottom:1.2cqw; z-index:1; width:60%; height:34%; background-size:contain; background-repeat:no-repeat; background-position:left bottom; filter:drop-shadow(0 .2cqw .6cqw rgba(0,0,0,.7)); }
+  .F .t .n { position:absolute; left:.7cqw; bottom:.55cqw; z-index:1; font-size:.95cqw; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90%; }
+  .F .t.sel { z-index:3; overflow:visible; }
+  .F .t.sel::before { content:""; position:absolute; inset:-.45cqw; border:.28cqw solid var(--ink); border-radius:1.25cqw; z-index:2; }
+  .F .t .ord { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2; width:3.4cqw; height:3.4cqw; border-radius:50%; background:var(--acc);
+               display:grid; place-items:center; font-size:1.9cqw; font-weight:800; color:#0f1115; box-shadow:0 .3cqw 1cqw rgba(0,0,0,.5); }
+
+  .F .bar { left:3.6cqw; right:3.6cqw; bottom:5.8cqw; height:8cqw; background:var(--card); border:1px solid var(--line); border-radius:1.4cqw;
+            display:flex; align-items:center; justify-content:space-between; padding:0 2.2cqw; }
+  .F .bar h6 { font-size:2cqw; font-weight:700; letter-spacing:-.02em; display:flex; align-items:baseline; gap:1.2cqw; }
+  .F .bar h6 small { font-family:"Geist Mono",monospace; font-size:.9cqw; font-weight:400; color:var(--soft); }
+  .F .bar .acts { display:flex; gap:1.8cqw; margin-top:1cqw; font-size:1.1cqw; font-weight:600; }
+  .F .bar .acts span { display:flex; align-items:center; }
+  .F .bar .big { text-align:right; }
+  .F .bar .big b { display:block; font-size:3cqw; font-weight:700; letter-spacing:-.04em; color:var(--acc); line-height:1; }
+  .F .bar .big small { font-family:"Geist Mono",monospace; font-size:.85cqw; color:var(--soft); }
+  .F .foot { left:3.6cqw; right:3.6cqw; bottom:2cqw; display:flex; gap:2cqw; font-size:1cqw; font-weight:600; }
+  .F .foot span { display:flex; align-items:center; }
+
+  .how { margin-top:56px; max-width:950px; color:#bdbdbd; font-size:15px; line-height:1.6; }
+  .how h3 { color:#fff; font-size:17px; margin:18px 0 8px; }
+  .how li { margin-left:20px; margin-bottom:4px; }
+  .how b { color:#fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="page">
+  <h1>Journal — il mosaico si fa</h1>
+  <p>Il mosaico non dipende più dalle ore ma da uno <b>schema fisso che si ripete ogni 9 giochi</b>: un riquadro grande con artwork e logo, uno orizzontale, uno verticale, tre piccoli in colonna, e così via. Le forme dipendono solo dalla posizione del gioco nella lista, quindi il muro resta virtualizzato e regge qualsiasi libreria. Il ritmo è quello del mock: forme diverse incastrate, nessun buco, tre righe.</p>
+</header>
+
+<div class="grid">
+  <figure class="wide"><div class="frame F" id="m1"></div><figcaption><b>Inizio della libreria.</b> Il focus è su Balatro. Le frecce arancioni (solo qui, per spiegare) indicano dove va il focus: <b>su</b> → The Witcher 3, che sta sopra; <b>sinistra</b> → Elden Ring; <b>destra</b> → Outer Wilds. Il focus va al riquadro che sta davvero in quella direzione sullo schermo, come in una griglia normale.</figcaption></figure>
+  <figure><div class="frame F" id="m2"></div><figcaption><b>Più avanti.</b> Lo schema ricomincia, ma con altri giochi e artwork diversi non si percepisce come ripetitivo.</figcaption></figure>
+  <figure><div class="frame F" id="m3"></div><figcaption><b>Ordinata A–Z.</b> Cambiando ordinamento i giochi cambiano posto e il mosaico si ricompone: le forme restano, i contenuti scorrono dentro.</figcaption></figure>
+</div>
+
+<div class="how">
+  <h3>Come funziona (in breve)</h3>
+  <ul>
+    <li>È una fila orizzontale virtualizzata, come in Shelf. Alcuni riquadri si infilano sotto il precedente con un margine negativo e formano colonne di 2 o 3 riquadri.</li>
+    <li>La forma di ogni riquadro dipende dalla sua posizione nella lista, ripetuta ogni 9 giochi. Si fa tutto in XAML, senza estensioni.</li>
+    <li>I riquadri grandi e orizzontali usano il background del gioco, con il logo se c'è Extra Metadata Loader. Quelli verticali e piccoli usano la copertina.</li>
+  </ul>
+  <h3>Cosa tenere presente</h3>
+  <ul>
+    <li><b>Navigazione:</b> è spaziale, come nella griglia di Playnite. Le liste WPF scelgono il riquadro successivo in base alla posizione sullo schermo, non all'ordine nella lista. Da un riquadro grande, destra porta al riquadro più vicino nella colonna dopo, allineato al punto in cui sei.</li>
+    <li><b>Scorrimento:</b> il muro scorre quando il focus arriva al bordo, come la riga di Cinema.</li>
+    <li><b>Da verificare su Windows:</b> la navigazione geometrica verso riquadri appena fuori schermo e la virtualizzazione con riquadri sovrapposti. Tengo pronta una pagina di riquadri oltre il bordo per dare alla navigazione qualcosa da trovare. Aggiungo anche un test automatico nella CI su Windows che controlla le direzioni.</li>
+  </ul>
+</div>
+</div>
+
+<script>
+const S = 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/';
+const cover = id => `url(${S}${id}/library_600x900.jpg)`, hero = id => `url(${S}${id}/library_hero.jpg)`, logo = id => `url(${S}${id}/logo.png)`;
+const L = [
+  [1145350,'Hades II',74],[1245620,'Elden Ring',61],[292030,'The Witcher 3',212],[2379780,'Balatro',48],[413150,'Stardew Valley',0],
+  [646570,'Slay the Spire',9],[753640,'Outer Wilds',31],[588650,'Dead Cells',18],[1687950,'Persona 5 Royal',146],[367520,'Hollow Knight',54],
+  [1086940,"Baldur's Gate 3",42],[504230,'Celeste',23],[105600,'Terraria',3],[1174180,'Red Dead Redemption 2',118],[1145360,'Hades',61],
+  [632470,'Disco Elysium',37],[814380,'Sekiro',29],[1817070,'Spider-Man',19],[620,'Portal 2',14],[990080,'Hogwarts Legacy',12],
+  [1091500,'Cyberpunk 2077',6],[1030300,'Hollow Knight: Silksong',0]
+];
+// Pattern repeating every 9 items, in units: [col, row, w, h, art]. One group = one column block.
+const U = 10.0, G = .6; // unit width/height in cqw, gap
+const P = [
+  [0,0,2,2,'hero'],[0,2,2,1,'hero'],      // group 1 (2 wide): big + wide below
+  [2,0,1,2,'cover'],[2,2,1,1,'cover'],    // group 2 (1 wide): tall + small
+  [3,0,1,1,'cover'],[3,1,1,1,'cover'],[3,2,1,1,'cover'], // group 3: three small
+  [4,0,2,1,'hero'],[4,1,2,2,'hero'],      // group 4 (2 wide): wide + big
+];
+const PW = 6; // pattern width in units
+const pad = (k, t) => `<span><span class="pad ${k}">${k.toUpperCase()}</span>${t}</span>`;
+const hdr = on => `<div class="top"><div><h3>Libreria</h3><div class="sub">412 giochi</div></div>
+  <div style="display:flex;gap:2cqw;align-items:flex-start"><div class="tabs"><span class="pad sh">LB</span>${['Recenti','Più giocati','A–Z','Mai giocati'].map(t => `<span class="${t===on?'on':''}">${t}</span>`).join('')}<span class="pad sh" style="margin-left:.4cqw">RB</span></div><div class="clock">21:47</div></div></div>`;
+function mosaic(el, list, on, selName, startIndex, showOrder) {
+  const cells = [];
+  const xShift = Math.floor(startIndex / 9) * PW;
+  for (let i = startIndex; i < startIndex + 27 && i < startIndex + list.length; i++) {
+    const g = list[i % list.length], p = P[i % 9], rep = Math.floor(i / 9);
+    const x = (rep * PW + p[0] - xShift) * (U + G), y = p[1] * (U + G);
+    const w = p[2] * U + (p[2] - 1) * G, h = p[3] * U + (p[3] - 1) * G;
+    if (x > 100) break;
+    const isHero = p[4] === 'hero', big = p[2] === 2 && p[3] === 2;
+    cells.push(`<div class="t ${g[1]===selName?'sel':''}" style="left:${x}cqw;top:${y}cqw;width:${w}cqw;height:${h}cqw;background-image:${isHero?hero(g[0]):cover(g[0])}">
+      ${isHero && big ? `<div class="lg" style="background-image:${logo(g[0])}"></div>` : `<span class="n">${p[2]===1 && p[3]===1 ? '' : g[1]}</span>`}
+      ${showOrder && showOrder[g[1]] ? `<span class="ord">${showOrder[g[1]]}</span>` : ''}</div>`);
+  }
+  const sel = list.find(g => g[1]===selName);
+  el.innerHTML = hdr(on) + `<div class="wall">${cells.join('')}</div>
+    <div class="bar"><div><h6>${sel[1]}<small>${sel[2] ? sel[2] + ' h giocate · ultima volta ieri' : 'mai giocato'}</small></h6>
+    <div class="acts">${pad('a','Dettagli')}${pad('x','Gioca')}${pad('y','Cerca')}</div></div>
+    <div class="big"><b>${sel[2] ? sel[2] + ' h' : '—'}</b><small>giocate</small></div></div>
+    <div class="foot">${pad('b','Indietro')}<span style="color:#8b93a1;font-weight:500;margin-left:auto">LT/RT salta lettera</span></div>`;
+}
+mosaic(document.getElementById('m1'), L, 'Recenti', 'Balatro', 0, {'The Witcher 3':'↑', 'Elden Ring':'←', 'Outer Wilds':'→'});
+mosaic(document.getElementById('m2'), L, 'Recenti', 'Hades', 9, false);
+mosaic(document.getElementById('m3'), [...L].sort((a,b) => a[1].localeCompare(b[1])), 'A–Z', 'Celeste', 0, false);
+</script>
+</body>
+</html>

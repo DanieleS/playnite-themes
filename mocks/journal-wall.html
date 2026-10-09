@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal — il muro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#121212; color:#eaeaea; font-family:"Inter Tight",system-ui,sans-serif; padding:40px 16px 80px; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  header.page h1 { font-size:28px; font-weight:800; letter-spacing:-.02em; }
+  header.page p { color:#8a8a8a; margin-top:6px; max-width:900px; line-height:1.55; font-size:15px; }
+  section.variant { margin-top:56px; }
+  section.variant h2 { font-size:22px; font-weight:800; display:flex; gap:12px; align-items:baseline; }
+  section.variant h2 .tag { font-size:13px; font-weight:700; background:#fff; color:#000; border-radius:4px; padding:2px 8px; }
+  section.variant h2 .rec { font-size:12px; font-weight:700; background:#ff7a45; color:#111; border-radius:4px; padding:2px 8px; }
+  .pitch { color:#bdbdbd; margin:8px 0 16px; font-size:15px; max-width:950px; line-height:1.6; }
+  .pitch b { color:#fff; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px 16px; }
+  .grid .wide { grid-column:1 / -1; }
+  @media (max-width:1000px){ .grid { grid-template-columns:1fr; } }
+  figcaption { color:#8a8a8a; font-size:13px; margin-top:6px; line-height:1.45; }
+  figcaption b { color:#d0d0d0; font-weight:600; }
+  .pros { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; max-width:1100px; }
+  @media (max-width:800px){ .pros { grid-template-columns:1fr; } }
+  .pros div { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:14px 16px; font-size:14px; line-height:1.55; color:#c8c8c8; }
+  .pros h4 { font-size:12px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:6px; }
+  .pros .p h4 { color:#7ad39a; } .pros .c h4 { color:#ff9b7a; }
+  .pros ul { margin-left:18px; }
+
+  .frame { container-type:inline-size; aspect-ratio:16/9; position:relative; overflow:hidden; border-radius:8px; box-shadow:0 0 0 1px #2a2a2a; }
+  .frame > * { position:absolute; }
+  .pad { display:inline-grid; place-items:center; width:1.8cqw; height:1.8cqw; border-radius:50%; flex:none;
+         font:800 1cqw/1 "Inter Tight",sans-serif; color:#111; margin-right:.55cqw; }
+  .pad.a{background:#6cc04a} .pad.b{background:#e2453c;color:#fff} .pad.x{background:#3a8de0;color:#fff} .pad.y{background:#f2c230}
+  .pad.sh { border-radius:.45cqw; width:auto; padding:0 .55cqw; background:#2a2f39; color:#8b93a1; }
+
+  .F { --bg:#0f1115; --card:#171a20; --line:#262a33; --ink:#eef0f3; --soft:#8b93a1; --acc:#ff7a45;
+       background:var(--bg); color:var(--ink); font-family:"Geist",sans-serif; }
+  .F .top { top:2.4cqw; left:3.6cqw; right:3.6cqw; display:flex; justify-content:space-between; align-items:flex-start; }
+  .F .top h3 { font-family:"Instrument Serif",serif; font-style:italic; font-weight:400; font-size:3.4cqw; line-height:1; color:var(--acc); }
+  .F .top .sub { font-family:"Geist Mono",monospace; font-size:.9cqw; color:var(--soft); margin-top:.5cqw; }
+  .F .tabs { display:flex; gap:.4cqw; font-size:1.05cqw; font-weight:500; align-items:center; margin-top:.4cqw; }
+  .F .tabs span { padding:.5cqw 1.1cqw; border-radius:.6cqw; color:var(--soft); }
+  .F .tabs .on { background:var(--ink); color:var(--bg); }
+  .F .clock { font-family:"Geist Mono",monospace; font-size:1.1cqw; color:var(--soft); margin-top:.6cqw; }
+
+  /* option 1: uniform grid, cover scales with hours */
+  .F .g1 { left:3.6cqw; right:3.6cqw; top:9.6cqw; height:30cqw; display:grid; grid-template-columns:repeat(9,1fr); grid-template-rows:1fr 1fr; gap:.6cqw .8cqw; }
+  .F .slot { position:relative; display:grid; place-items:center; }
+  .F .cov { position:relative; height:100%; aspect-ratio:2/3; border-radius:.7cqw; background-size:cover; background-position:center;
+            box-shadow:0 .6cqw 1.2cqw rgba(0,0,0,.45); }
+  .F .cov::after { content:""; position:absolute; inset:0; border-radius:.7cqw; background:linear-gradient(0deg, rgba(15,17,21,.9), transparent 42%); }
+  .F .cov .h { position:absolute; left:.6cqw; bottom:.45cqw; z-index:1; font-family:"Geist Mono",monospace; font-size:.85cqw; color:#fff; white-space:nowrap; }
+  .F .t100 .cov { height:100%; box-shadow:0 0 0 .2cqw var(--acc), 0 .8cqw 1.6cqw rgba(0,0,0,.5); }
+  .F .t100 .cov .h { color:var(--acc); font-weight:500; }
+  .F .t10 .cov { height:82%; }
+  .F .t1 .cov { height:66%; }
+  .F .t0 .cov { height:52%; opacity:.5; }
+  .F .t0 .cov .h { display:none; }
+  .F .slot.sel .cov { opacity:1; box-shadow:0 0 0 .22cqw var(--bg), 0 0 0 .45cqw var(--ink), 0 .8cqw 1.6cqw rgba(0,0,0,.5); }
+  .F .slot.sel.t100 .cov { box-shadow:0 0 0 .2cqw var(--acc), 0 0 0 .42cqw var(--bg), 0 0 0 .65cqw var(--ink); }
+  .F .legend { left:3.6cqw; top:40.6cqw; display:flex; gap:1.6cqw; font-family:"Geist Mono",monospace; font-size:.85cqw; color:var(--soft); align-items:center; }
+  .F .legend i { display:inline-block; border-radius:.2cqw; background:#3a404b; vertical-align:middle; margin-right:.4cqw; }
+
+  /* option 2: skyline, one virtualized row with variable widths */
+  .F .sky { left:3.6cqw; right:0; top:9.6cqw; height:27cqw; display:flex; gap:.7cqw; align-items:stretch; }
+  .F .st { position:relative; flex:none; height:100%; border-radius:.8cqw; overflow:hidden; background-size:cover; background-position:center; }
+  .F .st::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(15,17,21,.92), transparent 45%); }
+  .F .st .h { position:absolute; left:.8cqw; bottom:.7cqw; z-index:1; font-family:"Geist Mono",monospace; font-size:.95cqw; color:#fff; white-space:nowrap; }
+  .F .st .lg { position:absolute; left:1.4cqw; bottom:2.6cqw; z-index:1; width:55%; height:30%; background-size:contain; background-repeat:no-repeat; background-position:left bottom; filter:drop-shadow(0 .2cqw .6cqw rgba(0,0,0,.7)); }
+  .F .st.w100 { width:34cqw; }
+  .F .st.w100 .h { color:var(--acc); font-size:1.1cqw; }
+  .F .st.w10 { width:18cqw; }
+  .F .st.w1 { width:11.5cqw; }
+  .F .st.w0 { width:4.6cqw; opacity:.55; }
+  .F .st.w0 .h { display:none; }
+  .F .st.w0 .nm { position:absolute; left:50%; top:1.2cqw; z-index:1; transform:translateX(-50%) rotate(180deg); writing-mode:vertical-rl;
+                  font-size:.95cqw; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#fff; white-space:nowrap; }
+  .F .st.sel { box-shadow:inset 0 0 0 .3cqw var(--ink); }
+  .F .st.sel::before { content:""; position:absolute; inset:0; z-index:2; border-radius:.8cqw; box-shadow:inset 0 0 0 .3cqw var(--ink); }
+  .F .axis { left:3.6cqw; right:3.6cqw; top:38.2cqw; height:.25cqw; background:var(--line); border-radius:1cqw; }
+  .F .axis i { position:absolute; left:0; top:0; height:100%; width:9%; background:var(--acc); border-radius:1cqw; }
+
+  .F .bar { left:3.6cqw; right:3.6cqw; bottom:6.4cqw; height:8.2cqw; background:var(--card); border:1px solid var(--line); border-radius:1.4cqw;
+            display:flex; align-items:center; justify-content:space-between; padding:0 2.2cqw; }
+  .F .bar h6 { font-size:2cqw; font-weight:700; letter-spacing:-.02em; display:flex; align-items:baseline; gap:1.2cqw; }
+  .F .bar h6 small { font-family:"Geist Mono",monospace; font-size:.9cqw; font-weight:400; color:var(--soft); }
+  .F .bar .acts { display:flex; gap:1.8cqw; margin-top:1cqw; font-size:1.1cqw; font-weight:600; }
+  .F .bar .acts span { display:flex; align-items:center; }
+  .F .bar .big { text-align:right; }
+  .F .bar .big b { display:block; font-size:3.2cqw; font-weight:700; letter-spacing:-.04em; color:var(--acc); line-height:1; }
+  .F .bar .big small { font-family:"Geist Mono",monospace; font-size:.85cqw; color:var(--soft); }
+  .F .foot { left:3.6cqw; right:3.6cqw; bottom:2.2cqw; display:flex; gap:2cqw; font-size:1cqw; font-weight:600; color:var(--ink); }
+  .F .foot span { display:flex; align-items:center; }
+
+  .notes { margin-top:64px; border-top:1px solid #2a2a2a; padding-top:24px; color:#bdbdbd; font-size:15px; line-height:1.6; max-width:950px; }
+  .notes h3 { color:#fff; font-size:17px; margin-bottom:8px; }
+  .notes li { margin-left:20px; margin-bottom:4px; }
+  table.cmp { border-collapse:collapse; margin-top:12px; font-size:14px; width:100%; max-width:950px; }
+  table.cmp th, table.cmp td { text-align:left; padding:8px 10px; border-bottom:1px solid #2a2a2a; vertical-align:top; }
+  table.cmp th { color:#8a8a8a; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+  table.cmp td:first-child { color:#fff; font-weight:600; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="page">
+  <h1>Journal — come diventa il muro</h1>
+  <p>Il mosaico del mock (riquadri 2×2, 2×1, 1×2 incastrati) in WPF non si può virtualizzare: con una libreria vera caricherebbe tutte le copertine in memoria. Qui ci sono due modi per tenere l'idea, cioè "i giochi in cui hai messo più ore si vedono di più", senza quel problema. Il secondo è nuovo.</p>
+</header>
+
+<section class="variant">
+  <h2><span class="tag">1</span> Griglia viva</h2>
+  <p class="pitch">Le caselle sono tutte uguali, ma <b>la copertina dentro cresce con le ore</b>. Da lontano sembra un grafico a bolle fatto di giochi: i titoli da 100 ore e oltre riempiono la casella e hanno il bordo arancione, quelli mai aperti sono piccoli e sbiaditi. Il vuoto attorno alle copertine piccole <b>è l'informazione</b>: ti dice a colpo d'occhio dove sono andate le tue serate. È ordinata, si legge benissimo dal divano e con il pad si naviga come una griglia normale, quindi non sbagli mai direzione.</p>
+  <div class="grid">
+    <figure class="wide"><div class="frame F" id="g-hours"></div><figcaption><b>Ordinata per ore giocate.</b> In alto a sinistra i grandi, poi tutto si rimpicciolisce: il muro racconta la tua storia da sinistra a destra.</figcaption></figure>
+    <figure><div class="frame F" id="g-recent"></div><figcaption><b>Ordinata per "recenti".</b> Le taglie si mescolano e diventa un ritmo, simile a un mosaico, senza buchi irregolari.</figcaption></figure>
+    <figure><div class="frame F" id="g-az"></div><figcaption><b>A–Z.</b> Anche in ordine alfabetico vedi subito quali giochi "contano".</figcaption></figure>
+  </div>
+  <div class="pros">
+    <div class="p"><h4>Pro</h4><ul><li>Nessun problema di memoria, anche con 2.000 giochi</li><li>Usa la griglia nativa di Playnite: righe, colonne e ordinamenti funzionano come ci si aspetta</li><li>È la più semplice da fare bene</li></ul></div>
+    <div class="c"><h4>Contro</h4><ul><li>Solo quattro taglie, non una scala continua</li><li>Nessun riquadro orizzontale con l'artwork grande</li></ul></div>
+  </div>
+</section>
+
+<section class="variant">
+  <h2><span class="tag">2</span> Skyline <span class="rec">secondo me questa</span></h2>
+  <p class="pitch">Una sola fila alta che scorre in orizzontale, dove <b>la larghezza è il tempo</b>. I giochi da 100 ore e oltre diventano riquadri cinematografici con artwork e logo, quelli da 10–100 ore sono copertine piene, quelli da poche ore sono strette, quelli mai giocati sono sottili come dorsi. Niente buchi: i riquadri sono incastrati come gli edifici di uno skyline. È la cosa più vicina al mosaico che hai visto, ma <b>regge librerie enormi</b>, perché in memoria tiene solo i giochi a schermo.</p>
+  <div class="grid">
+    <figure class="wide"><div class="frame F" id="s-start"></div><figcaption><b>Inizio della fila, ordinata per ore.</b> I giochi della tua vita aprono lo skyline in formato cinema, poi la fila si stringe man mano che le ore calano.</figcaption></figure>
+    <figure><div class="frame F" id="s-mid"></div><figcaption><b>Più avanti nella fila.</b> Copertine strette e dorsi: centinaia di giochi poco giocati occupano poco spazio e si scorrono in un attimo.</figcaption></figure>
+    <figure><div class="frame F" id="s-recent"></div><figcaption><b>Ordinata per "recenti".</b> Larghezze miste e ritmo irregolare: è qui che sembra davvero un mosaico.</figcaption></figure>
+  </div>
+  <div class="pros">
+    <div class="p"><h4>Pro</h4><ul><li>Riquadri grandi con artwork e logo, come nel mock</li><li>Nessun vuoto: tutto incastrato</li><li>Virtualizzata come Shelf: regge qualsiasi libreria</li><li>Si naviga solo con sinistra/destra, impossibile perdersi</li></ul></div>
+    <div class="c"><h4>Contro</h4><ul><li>Una sola fila, non un muro su più righe</li><li>Il contenuto scorre quando il focus arriva al bordo (come la riga di Cinema, non come un carosello: niente giostra né elemento fisso al centro)</li></ul></div>
+  </div>
+</section>
+
+<div class="notes">
+  <h3>Confronto</h3>
+  <table class="cmp">
+    <tr><th></th><th>Mosaico del mock</th><th>1 · Griglia viva</th><th>2 · Skyline</th></tr>
+    <tr><td>Taglie diverse</td><td>Sì, forme diverse</td><td>Sì, quattro scale nella casella</td><td>Sì, quattro larghezze</td></tr>
+    <tr><td>Buchi</td><td>No</td><td>Aria attorno ai piccoli</td><td>No</td></tr>
+    <tr><td>Artwork orizzontale</td><td>Sì</td><td>No</td><td>Sì, per i giochi da 100 ore e oltre</td></tr>
+    <tr><td>Librerie grandi</td><td>No (tutto in memoria)</td><td>Sì</td><td>Sì</td></tr>
+    <tr><td>Righe</td><td>Quattro</td><td>Da impostazioni (consigliate due)</td><td>Una</td></tr>
+  </table>
+  <h3 style="margin-top:20px">E il mosaico vero?</h3>
+  <ul>
+    <li>Si può fare, ma non con un tema da solo: servirebbe una piccola estensione C# di supporto che fornisca un pannello "mosaico" virtualizzato, che poi il tema usa. È un progetto a parte: lo terrei per una versione 2 di Journal, se dopo averlo usato ti manca.</li>
+  </ul>
+</div>
+</div>
+
+<script>
+const S = 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/';
+const cover = id => `url(${S}${id}/library_600x900.jpg)`, hero = id => `url(${S}${id}/library_hero.jpg)`, logo = id => `url(${S}${id}/logo.png)`;
+const L = [ // id, name, hours, last-played order (lower = more recent)
+  [292030,'The Witcher 3',212,3],[1687950,'Persona 5 Royal',146,9],[1174180,'Red Dead Redemption 2',118,14],[1145350,'Hades II',74,1],
+  [1245620,'Elden Ring',61,2],[1145360,'Hades',61,15],[367520,'Hollow Knight',54,10],[2379780,'Balatro',48,4],[1086940,"Baldur's Gate 3",42,11],
+  [632470,'Disco Elysium',37,16],[753640,'Outer Wilds',31,7],[814380,'Sekiro',29,17],[504230,'Celeste',23,12],[1817070,'Spider-Man',19,18],
+  [588650,'Dead Cells',18,8],[620,'Portal 2',14,19],[990080,'Hogwarts Legacy',12,20],[646570,'Slay the Spire',9,6],[1091500,'Cyberpunk 2077',6,21],
+  [105600,'Terraria',3,13],[413150,'Stardew Valley',0,5],[1030300,'Hollow Knight: Silksong',0,22]
+];
+const tier = h => h >= 100 ? 't100' : h >= 10 ? 't10' : h > 0 ? 't1' : 't0';
+const wtier = h => h >= 100 ? 'w100' : h >= 10 ? 'w10' : h > 0 ? 'w1' : 'w0';   // skyline: cinema tiles for the very top
+const fmt = h => h ? `${h} h` : '';
+const pad = (k, t) => `<span><span class="pad ${k}">${k.toUpperCase()}</span>${t}</span>`;
+const hdr = (on, sub) => `<div class="top"><div><h3>Libreria</h3><div class="sub">412 giochi · ${sub}</div></div>
+  <div style="display:flex;gap:2cqw;align-items:flex-start"><div class="tabs"><span class="pad sh">LB</span>${['Più giocati','Recenti','A–Z','Mai giocati'].map(t => `<span class="${t===on?'on':''}">${t}</span>`).join('')}<span class="pad sh" style="margin-left:.4cqw">RB</span></div><div class="clock">21:47</div></div></div>`;
+const bar = g => `<div class="bar"><div><h6>${g[1]}<small>ultima volta ieri</small></h6>
+  <div class="acts">${pad('a','Dettagli')}${pad('x','Gioca')}${pad('y','Cerca')}</div></div>
+  <div class="big"><b>${g[2] ? g[2] + ' h' : '—'}</b><small>giocate</small></div></div>`;
+const foot = `<div class="foot">${pad('b','Indietro')}<span style="color:#8b93a1;font-weight:500;margin-left:auto">LT/RT salta lettera</span></div>`;
+
+function gridFrame(el, list, on, selName) {
+  const tiles = list.slice(0, 18).map(g => `<div class="slot ${tier(g[2])} ${g[1]===selName?'sel':''}"><div class="cov" style="background-image:${cover(g[0])}"><span class="h">${fmt(g[2])}</span></div></div>`).join('');
+  el.innerHTML = hdr(on, 'la grandezza della copertina dipende dalle ore giocate') +
+    `<div class="g1">${tiles}</div>
+     <div class="legend"><span><i style="width:.7cqw;height:1.05cqw;outline:.15cqw solid #ff7a45"></i>100 h +</span><span><i style="width:.58cqw;height:.86cqw"></i>10–100 h</span><span><i style="width:.46cqw;height:.7cqw"></i>meno di 10 h</span><span><i style="width:.37cqw;height:.55cqw;opacity:.5"></i>mai giocato</span></div>` +
+    bar(list.find(g => g[1]===selName)) + foot;
+}
+function skyFrame(el, list, on, selName, offset, axisPos) {
+  let w = 0; const out = [];
+  for (const g of list.slice(offset)) {
+    const c = wtier(g[2]);
+    const img = c === 'w100' ? hero(g[0]) : cover(g[0]);
+    out.push(`<div class="st ${c} ${g[1]===selName?'sel':''}" style="background-image:${img}">${c==='w100'?`<div class="lg" style="background-image:${logo(g[0])}"></div>`:''}${c==='w0'?`<span class="nm">${g[1]}</span>`:''}<span class="h">${fmt(g[2])}</span></div>`);
+    w += c==='w100'?34:c==='w10'?18:c==='w1'?11.5:4.6; if (w > 110) break;
+  }
+  el.innerHTML = hdr(on, 'la larghezza dipende dalle ore giocate') +
+    `<div class="sky">${out.join('')}</div><div class="axis"><i style="left:${axisPos}%"></i></div>` +
+    bar(list.find(g => g[1]===selName)) + foot;
+}
+const byHours = [...L].sort((a,b) => b[2]-a[2]);
+const byRecent = [...L].sort((a,b) => a[3]-b[3]);
+const byAz = [...L].sort((a,b) => a[1].localeCompare(b[1]));
+gridFrame(document.getElementById('g-hours'), byHours, 'Più giocati', 'Balatro');
+gridFrame(document.getElementById('g-recent'), byRecent, 'Recenti', 'Hades II');
+gridFrame(document.getElementById('g-az'), byAz, 'A–Z', 'Celeste');
+skyFrame(document.getElementById('s-start'), byHours, 'Più giocati', 'Persona 5 Royal', 0, 0);
+skyFrame(document.getElementById('s-mid'), byHours, 'Più giocati', 'Slay the Spire', 13, 62);
+skyFrame(document.getElementById('s-recent'), byRecent, 'Recenti', 'Elden Ring', 0, 0);
+</script>
+</body>
+</html>

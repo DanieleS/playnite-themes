@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playnite Fullscreen v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#121212; color:#eaeaea; font-family:"Inter Tight",system-ui,sans-serif; padding:40px 16px 80px; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  header.page h1 { font-size:28px; font-weight:800; letter-spacing:-.02em; }
+  header.page p { color:#8a8a8a; margin-top:6px; max-width:900px; line-height:1.5; font-size:15px; }
+  section.variant { margin-top:56px; }
+  section.variant h2 { font-size:22px; font-weight:800; display:flex; gap:12px; align-items:baseline; }
+  section.variant h2 .tag { font-size:13px; font-weight:700; background:#fff; color:#000; border-radius:4px; padding:2px 8px; }
+  section.variant > p { color:#8a8a8a; margin:6px 0 16px; font-size:15px; max-width:950px; line-height:1.5; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px 16px; }
+  .grid .wide { grid-column:1 / -1; }
+  @media (max-width:1000px){ .grid { grid-template-columns:1fr; } }
+  figcaption { color:#8a8a8a; font-size:13px; margin-top:6px; line-height:1.45; }
+  figcaption b { color:#d0d0d0; font-weight:600; }
+
+  .frame { container-type:inline-size; aspect-ratio:16/9; position:relative; overflow:hidden; border-radius:8px; box-shadow:0 0 0 1px #2a2a2a; }
+  .frame > * { position:absolute; }
+  .img { background-size:cover; background-position:center; }
+
+  .pad { display:inline-grid; place-items:center; width:1.8cqw; height:1.8cqw; border-radius:50%; flex:none;
+         font:800 1cqw/1 "Inter Tight",sans-serif; color:#111; margin-right:.55cqw; }
+  .pad.a{background:#6cc04a} .pad.b{background:#e2453c;color:#fff} .pad.x{background:#3a8de0;color:#fff} .pad.y{background:#f2c230}
+  .pad.sh { border-radius:.45cqw; width:auto; padding:0 .55cqw; background:rgba(255,255,255,.85); }
+
+  /* ============================ A — CINEMA ============================ */
+  .A { background:#000; color:#fff; font-family:"Inter Tight",sans-serif; }
+  .A .bg { inset:0; }
+  .A .veil { inset:0; background:
+      linear-gradient(90deg, rgba(0,0,0,.9) 0, rgba(0,0,0,.55) 38%, transparent 70%),
+      linear-gradient(0deg, #000 0, rgba(0,0,0,.75) 30%, transparent 58%); }
+  .A .top { top:2.6cqw; left:4cqw; right:4cqw; display:flex; justify-content:space-between; align-items:center; font-size:1.2cqw; z-index:2; }
+  .A .top nav { display:flex; gap:.6cqw; font-weight:600; }
+  .A .top nav span { padding:.5cqw 1.1cqw; border-radius:10cqw; color:rgba(255,255,255,.6); }
+  .A .top nav .on { background:rgba(255,255,255,.95); color:#000; }
+  .A .top .sys { display:flex; gap:1.6cqw; align-items:center; color:rgba(255,255,255,.85); font-weight:500; }
+  .A .top .sys svg { width:1.6cqw; height:1.6cqw; }
+  .A .hero { left:4cqw; top:9.5cqw; width:40cqw; }
+  .A .logo { width:30cqw; height:11cqw; background-size:contain; background-repeat:no-repeat; background-position:left bottom; filter:drop-shadow(0 .3cqw 1cqw rgba(0,0,0,.6)); }
+  .A .eyebrow { font-size:1cqw; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.7); font-weight:700; margin-top:1.6cqw; }
+  .A .meta { font-size:1.2cqw; color:rgba(255,255,255,.85); display:flex; gap:.9cqw; align-items:center; margin-top:.8cqw; flex-wrap:wrap; }
+  .A .meta i { width:.3cqw; height:.3cqw; background:rgba(255,255,255,.5); border-radius:50%; }
+  .A .meta .badge { border:1px solid rgba(255,255,255,.45); border-radius:.3cqw; padding:0 .45cqw; font-size:.95cqw; font-weight:700; }
+  .A .desc { font-size:1.25cqw; line-height:1.5; color:rgba(255,255,255,.8); margin-top:1cqw; }
+  .A .btns { margin-top:1.6cqw; display:flex; gap:1cqw; font-size:1.2cqw; font-weight:700; }
+  .A .btn { display:flex; align-items:center; padding:.75cqw 1.5cqw .75cqw .9cqw; border-radius:10cqw; background:rgba(255,255,255,.16); backdrop-filter:blur(10px); }
+  .A .btn.primary { background:#fff; color:#000; }
+  .A .row { left:4cqw; right:0; }
+  .A .row .label { font-size:1.15cqw; font-weight:700; margin-bottom:.9cqw; color:rgba(255,255,255,.85); display:flex; gap:1cqw; align-items:baseline; }
+  .A .row .label small { font-weight:500; color:rgba(255,255,255,.45); font-size:1cqw; }
+  .A .tiles { display:flex; gap:1.1cqw; align-items:flex-start; }
+  .A .tile { width:14cqw; aspect-ratio:460/215; border-radius:.7cqw; flex:none; position:relative; overflow:hidden; }
+  .A .tile.sel { width:17.5cqw; box-shadow:0 0 0 .25cqw #000, 0 0 0 .5cqw #fff, 0 1.5cqw 3cqw rgba(0,0,0,.6); }
+  .A .tile .prog { position:absolute; left:0; right:0; bottom:0; height:.35cqw; background:rgba(255,255,255,.25); }
+  .A .tile .prog span { display:block; height:100%; background:#fff; }
+  /* A grid */
+  .A .blur { inset:-3cqw; filter:blur(2.2cqw) brightness(.45) saturate(1.2); }
+  .A .gridinfo { left:4cqw; top:8cqw; right:4cqw; display:flex; align-items:flex-end; justify-content:space-between; }
+  .A .gridinfo h3 { font-size:3cqw; font-weight:800; letter-spacing:-.03em; line-height:1; }
+  .A .filters { display:flex; gap:.6cqw; font-size:1.05cqw; font-weight:600; }
+  .A .filters span { padding:.4cqw .9cqw; border-radius:10cqw; border:1px solid rgba(255,255,255,.25); color:rgba(255,255,255,.75); }
+  .A .filters .on { border-color:#fff; color:#fff; background:rgba(255,255,255,.12); }
+  .A .covers { left:4cqw; right:4cqw; top:16.5cqw; display:grid; grid-template-columns:repeat(8, 1fr); gap:1.3cqw 1.1cqw; }
+  .A .cover { aspect-ratio:2/3; border-radius:.6cqw; box-shadow:0 .6cqw 1.4cqw rgba(0,0,0,.5); position:relative; }
+  .A .cover.sel { transform:scale(1.1); z-index:2; box-shadow:0 0 0 .22cqw #000, 0 0 0 .45cqw #fff, 0 1.5cqw 3cqw rgba(0,0,0,.7); }
+  .A .cover .inst { position:absolute; right:.5cqw; top:.5cqw; width:.8cqw; height:.8cqw; border-radius:50%; background:#6cc04a; box-shadow:0 0 0 .2cqw rgba(0,0,0,.5); }
+  /* A detail */
+  .A.detail .veil { background:
+      linear-gradient(90deg, rgba(0,0,0,.93) 0, rgba(0,0,0,.7) 48%, rgba(0,0,0,.2) 100%),
+      linear-gradient(0deg, #000 0, rgba(0,0,0,.6) 32%, transparent 55%); }
+  .A .back { top:2.8cqw; left:4cqw; font-size:1.1cqw; color:rgba(255,255,255,.75); display:flex; align-items:center; font-weight:600; }
+  .A .dleft { left:4cqw; top:7cqw; width:44cqw; }
+  .A .dleft .logo { width:26cqw; height:9cqw; }
+  .A .stats { right:4cqw; top:7cqw; width:29cqw; display:grid; grid-template-columns:1fr 1fr; gap:1cqw; }
+  .A .stat { background:rgba(20,20,20,.55); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.08); border-radius:1cqw; padding:1.2cqw 1.3cqw; }
+  .A .stat small { font-size:.85cqw; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); font-weight:700; }
+  .A .stat b { display:block; font-size:2.3cqw; font-weight:800; letter-spacing:-.03em; margin-top:.3cqw; }
+  .A .stat em { font-style:normal; font-size:1cqw; color:rgba(255,255,255,.55); font-weight:500; }
+  .A .bar { height:.4cqw; background:rgba(255,255,255,.15); border-radius:1cqw; margin-top:.7cqw; overflow:hidden; }
+  .A .bar span { display:block; height:100%; background:#fff; }
+  .A .shots { left:4cqw; right:4cqw; bottom:3cqw; }
+  .A .shots .tiles .tile { width:auto; flex:1; aspect-ratio:16/9; }
+
+  /* ============================ B — LA COLLEZIONE ============================ */
+  .B { --paper:#ece6da; --ink:#1d1b17; --soft:#5b554a; --acc:#b4442c; --plank:#2b241b;
+       background:var(--paper); color:var(--ink); font-family:"Space Grotesk",sans-serif; }
+  .B.night { --paper:#17120e; --ink:#f1e9dc; --soft:#a89a86; --acc:#e0a458; --plank:#5a4029; }
+  .B .light { inset:0; background:radial-gradient(ellipse at 40% -10%, rgba(255,255,255,.65), transparent 60%); }
+  .B.night .light { background:radial-gradient(ellipse 45% 70% at 31% 0%, rgba(255,214,150,.22), transparent 70%); }
+  .B .top { top:2.8cqw; left:4cqw; right:4cqw; display:flex; justify-content:space-between; align-items:flex-end; }
+  .B .top h3 { font-family:"DM Serif Display",serif; font-weight:400; font-size:3.2cqw; line-height:1; }
+  .B .top h3 em { color:var(--acc); }
+  .B .top .right { font-size:1.1cqw; display:flex; gap:1.6cqw; align-items:center; color:var(--soft); }
+  .B .top .right b { color:var(--ink); }
+  .B .shelf { left:4cqw; right:2cqw; top:9cqw; height:30.5cqw; display:flex; align-items:flex-end; gap:.3cqw; }
+  .B .spine { width:3.2cqw; flex:none; position:relative; overflow:hidden; border-radius:.2cqw .2cqw 0 0;
+              background-size:auto 100%; box-shadow:inset -.3cqw 0 .3cqw rgba(0,0,0,.35), inset .15cqw 0 0 rgba(255,255,255,.2); }
+  .B .spine::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,.15) 40%, rgba(0,0,0,.5)); }
+  .B .spine span { position:absolute; inset:1.1cqw 0 3cqw; writing-mode:vertical-rl; transform:rotate(180deg); display:flex; align-items:center; justify-content:flex-end;
+                   color:#fff; font-weight:700; font-size:1cqw; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-shadow:0 1px 3px rgba(0,0,0,.8); }
+  .B .spine small { position:absolute; left:0; right:0; bottom:0; height:2.4cqw; display:grid; place-items:center; background:rgba(0,0,0,.65); color:rgba(255,255,255,.85); font-size:.7cqw; font-weight:700; letter-spacing:.05em; }
+  .B .box { flex:none; margin:0 1.4cqw 0 .9cqw; height:30.5cqw; aspect-ratio:2/3; position:relative; transform-style:preserve-3d;
+            transform:perspective(60cqw) rotateY(14deg) translateY(-1.4cqw); transform-origin:left center; }
+  .B .box .front { position:absolute; inset:0; border-radius:.2cqw; background-size:cover;
+                   box-shadow:1.6cqw 2cqw 2.6cqw -1cqw rgba(30,20,5,.55); }
+  .B .box .front::after { content:""; position:absolute; inset:0; background:linear-gradient(100deg, rgba(255,255,255,.22), transparent 30%); border-radius:.2cqw; }
+  .B .box .side { position:absolute; top:0; bottom:0; left:0; width:3.2cqw; transform-origin:left center; transform:rotateY(90deg); background-size:auto 100%; filter:brightness(.55); }
+  .B .plank { left:2.5cqw; right:2.5cqw; top:39.5cqw; height:.9cqw; background:var(--plank); border-radius:.2cqw; box-shadow:0 .8cqw 1.2cqw -.4cqw rgba(0,0,0,.4); }
+  .B .info { left:4cqw; top:42.6cqw; right:4cqw; display:flex; gap:3cqw; align-items:center; }
+  .B .info h4 { font-family:"DM Serif Display",serif; font-weight:400; font-size:2.7cqw; line-height:1; white-space:nowrap; }
+  .B .info .m { font-size:1.1cqw; color:var(--soft); margin-top:.5cqw; }
+  .B .info .acts { display:flex; gap:1.6cqw; font-size:1.1cqw; font-weight:700; align-items:center; }
+  .B .info .acts > span { display:flex; align-items:center; }
+  .B .az { right:4cqw; bottom:2.8cqw; display:flex; gap:.5cqw; font-size:.95cqw; font-weight:700; color:var(--soft); opacity:.75; }
+  .B .az b { color:#fff; background:var(--acc); border-radius:.3cqw; padding:0 .4cqw; opacity:1; }
+  .B.night .az b { color:#17120e; }
+  .B .hint { left:4cqw; bottom:2.8cqw; font-size:.95cqw; color:var(--soft); display:flex; gap:1.6cqw; align-items:center; }
+  /* B detail */
+  .B .bigbox { left:4cqw; top:4.5cqw; height:43cqw; aspect-ratio:2/3; transform:perspective(60cqw) rotateY(10deg); transform-origin:left center; transform-style:preserve-3d; }
+  .B .bigbox .front { position:absolute; inset:0; background-size:cover; border-radius:.25cqw; box-shadow:2cqw 2.4cqw 3cqw -1cqw rgba(30,20,5,.55); }
+  .B .bigbox .front::after { content:""; position:absolute; inset:0; background:linear-gradient(100deg, rgba(255,255,255,.2), transparent 30%); }
+  .B .back { left:37cqw; top:4cqw; right:4cqw; }
+  .B .back .kicker { font-size:1cqw; letter-spacing:.22em; text-transform:uppercase; color:var(--acc); font-weight:700; }
+  .B .back .blogo { height:7cqw; width:30cqw; background-size:contain; background-repeat:no-repeat; background-position:left center; margin:.8cqw 0 .6cqw; filter:brightness(0) saturate(100%) invert(8%) sepia(9%) saturate(800%) hue-rotate(5deg); }
+  .B .back .tagline { font-family:"DM Serif Display",serif; font-style:italic; font-size:1.7cqw; color:var(--soft); }
+  .B .cols { columns:2; column-gap:2.2cqw; font-size:1.12cqw; line-height:1.55; margin-top:1.4cqw; color:#3a352d; }
+  .B .bshots { display:flex; gap:1cqw; margin-top:1.6cqw; }
+  .B .bshots div { flex:1; aspect-ratio:16/9; background-size:cover; background-position:center; border:.35cqw solid #fff; box-shadow:0 .4cqw .8cqw rgba(0,0,0,.18); }
+  .B .bshots div:nth-child(1){ transform:rotate(-1.5deg); } .B .bshots div:nth-child(3){ transform:rotate(1.2deg); }
+  .B .specs { margin-top:1.6cqw; width:56%; font-size:1.08cqw; }
+  .B .specs div { display:flex; gap:.6cqw; padding:.3cqw 0; }
+  .B .specs div span { flex:1; border-bottom:.15cqw dotted #a59d8e; transform:translateY(-.35cqw); }
+  .B .stamp { right:5.5cqw; top:38.5cqw; width:11cqw; height:11cqw; border-radius:50%; border:.35cqw solid var(--acc); color:var(--acc);
+              display:grid; place-items:center; text-align:center; transform:rotate(-12deg); font-weight:700; font-size:.95cqw; letter-spacing:.15em; line-height:1.3; }
+  .B .stamp big { display:block; font-family:"DM Serif Display",serif; font-size:3.3cqw; letter-spacing:0; line-height:1; font-weight:400; }
+  .B .dacts { left:37cqw; bottom:2.8cqw; display:flex; gap:1.6cqw; font-size:1.1cqw; font-weight:700; }
+  .B .dacts > span { display:flex; align-items:center; }
+
+  .notes { margin-top:64px; border-top:1px solid #2a2a2a; padding-top:24px; color:#bdbdbd; font-size:15px; line-height:1.6; max-width:950px; }
+  .notes h3 { color:#fff; font-size:17px; margin-bottom:8px; }
+  .notes li { margin-left:20px; margin-bottom:4px; }
+  .notes a { color:#9ecbff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="page">
+  <h1>Playnite Fullscreen — A e B, versione 2</h1>
+  <p>Giochi, artwork e metadati veri: sono le stesse immagini che Playnite scarica da Steam (background, cover, logo). Ogni variante mostra tre schermate.</p>
+</header>
+
+<!-- ============================== A ============================== -->
+<section class="variant">
+  <h2><span class="tag">A</span> Cinema</h2>
+  <p>Come la home di Netflix e Paramount+: al posto del titolo scritto c'è il <b>logo del gioco</b> sopra l'artwork a tutto schermo. In basso una riga orizzontale, e sotto spunta già la riga successiva per far capire che si può scendere.</p>
+  <div class="grid">
+    <figure class="wide">
+      <div class="frame A" id="a-home"></div>
+      <figcaption><b>Home.</b> Il gioco selezionato nella riga prende il background e il logo. Le barre bianche sotto i riquadri mostrano l'avanzamento (achievement).</figcaption>
+    </figure>
+    <figure>
+      <div class="frame A" id="a-grid"></div>
+      <figcaption><b>Libreria completa.</b> Griglia di cover 2:3, filtri a pillola. Lo sfondo è il background del gioco selezionato, sfocato. Il pallino verde indica i giochi installati.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame A detail" id="a-detail"></div>
+      <figcaption><b>Dettaglio.</b> Logo, metadati, descrizione, card con le statistiche e screenshot veri.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================== B ============================== -->
+<section class="variant">
+  <h2><span class="tag">B</span> La Collezione</h2>
+  <p>Ispirata all'app <i>Shelf</i>: i giochi sono oggetti fisici. I dorsi sono ricavati dalla cover stessa (Playnite non ha immagini di dorsi), quello selezionato esce dallo scaffale in prospettiva. Il dettaglio è il retro della scatola, con gli screenshot "stampati". C'è anche una versione notturna per giocare al buio.</p>
+  <div class="grid">
+    <figure>
+      <div class="frame B" id="b-shelf"></div>
+      <figcaption><b>Scaffale.</b> ←/→ scorre, LT/RT salta di lettera (scrubber A–Z), LB/RB cambia piattaforma.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame B" id="b-back"></div>
+      <figcaption><b>Retro della scatola.</b> Logo in inchiostro, tagline, screenshot ruotati come stampati, specifiche puntinate, timbro con il completamento.</figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="frame B night" id="b-night"></div>
+      <figcaption><b>Variante notte.</b> Stessa struttura su legno scuro, con un faretto caldo sul gioco selezionato. Si può legare all'orario o a un toggle.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<div class="notes">
+  <h3>Cosa ho preso da Mobbin</h3>
+  <ul>
+    <li><a href="https://mobbin.com/screens/651b69e1-68af-49a9-9b27-687559314100">Netflix</a> e <a href="https://mobbin.com/screens/4da1bff9-46b1-4335-994c-298cdf989d54">Paramount+</a>: il logo come titolo, la descrizione di due righe nel blocco hero, la riga successiva che sbuca in basso.</li>
+    <li><a href="https://mobbin.com/screens/b5fd4558-aafb-4469-b451-a17b8c0b3c2e">Paramount+ (dettaglio)</a>: riga di metadati in maiuscoletto con badge, azioni circolari secondarie.</li>
+    <li><a href="https://mobbin.com/screens/82a3c58f-34a9-41c4-b7d0-7075f0b99e55">Disney+</a>: il menu in alto a pillola.</li>
+    <li><a href="https://mobbin.com/screens/844f92c3-b626-4342-8ea9-91798788a228">Shelf</a>: i giochi come oggetti fisici in 3D, da cui le scatole in prospettiva di B.</li>
+  </ul>
+  <h3 style="margin-top:16px">Note per Playnite</h3>
+  <ul>
+    <li>Il logo non fa parte dei metadati base: serve l'estensione <i>Extra Metadata Loader</i>, che scarica i logo da Steam e SteamGridDB. Se manca il logo, si ripiega sul titolo scritto.</li>
+    <li>La prospettiva 3D di B in WPF si fa con una trasformazione (skew/scale) sull'immagine: è una finta prospettiva, ma l'effetto è identico.</li>
+  </ul>
+</div>
+</div>
+
+<script>
+const S = 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/';
+const hero = id => `url(${S}${id}/library_hero.jpg)`;
+const cover = id => `url(${S}${id}/library_600x900.jpg)`;
+const logo = id => `url(${S}${id}/logo.png)`;
+const header = id => `url(${S}${id}/header.jpg)`;
+const shot = (id, h) => `url(${S}${id}/${h}.600x338.jpg)`;
+const G = {
+  elden:{id:1245620, t:'Elden Ring'}, hades:{id:1145360, t:'Hades'}, hk:{id:367520, t:'Hollow Knight'},
+  disco:{id:632470, t:'Disco Elysium'}, bg3:{id:1086940, t:"Baldur's Gate 3"}, cp:{id:1091500, t:'Cyberpunk 2077'},
+  ow:{id:753640, t:'Outer Wilds'}, celeste:{id:504230, t:'Celeste'}, rdr:{id:1174180, t:'Red Dead Redemption 2'},
+  bal:{id:2379780, t:'Balatro'}, sek:{id:814380, t:'Sekiro: Shadows Die Twice'}, h2:{id:1145350, t:'Hades II'},
+  sdv:{id:413150, t:'Stardew Valley'}, hog:{id:990080, t:'Hogwarts Legacy'}, spm:{id:1817070, t:"Marvel's Spider-Man Remastered"}, portal:{id:620, t:'Portal 2'}, w3:{id:292030, t:'The Witcher 3: Wild Hunt'}, dc:{id:588650, t:'Dead Cells'}, sts:{id:646570, t:'Slay the Spire'}, p5:{id:1687950, t:'Persona 5 Royal'}
+};
+const SH = {
+  elden:['ss_943bf6fe62352757d9070c1d33e50b92fe8539f1','ss_dcdac9e4b26ac0ee5248bfd2967d764fd00cdb42','ss_3c41384a24d86dddd58a8f61db77f9dc0bfda8b5','ss_e0316c76f8197405c1312d072b84331dd735d60b'],
+  hk:['ss_5384f9f8b96a0b9934b2bc35a4058376211636d2','ss_d5b6edd94e77ba6db31c44d8a3c09d807ab27751','ss_a81e4231cc8d55f58b51a4a938898af46503cae5']
+};
+const pad = (k, txt) => `<span style="display:flex;align-items:center"><span class="pad ${k}">${k.toUpperCase()}</span>${txt}</span>`;
+const sys = `<div class="sys"><span>412 giochi</span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
+  <span>Ven 9 ott · 21:47</span></div>`;
+const nav = on => `<div class="top"><nav>${['Home','Libreria','Installati','Collezioni','Cerca'].map(n => `<span class="${n===on?'on':''}">${n}</span>`).join('')}</nav>${sys}</div>`;
+
+/* ---------- A home ---------- */
+const row1 = [['elden',81,1],['hades',64],['bg3',22],['hk',100],['ow',45],['cp',38],['celeste',90]];
+const row2 = ['bal','h2','sdv','sek','rdr','disco','spm'];
+document.getElementById('a-home').innerHTML = `
+  <div class="bg img" style="background-image:${hero(G.elden.id)};background-position:70% 30%"></div><div class="veil"></div>
+  ${nav('Home')}
+  <div class="hero">
+    <div class="logo" style="background-image:${logo(G.elden.id)}"></div>
+    <div class="eyebrow">Continua · ultima sessione ieri, 1 h 52 min</div>
+    <div class="meta"><span>2022</span><i></i><span>Azione, GDR</span><i></i><span>FromSoftware</span><i></i><span>128 h</span><span class="badge">PEGI 16</span></div>
+    <div class="desc">Nell'Interregno l'Anello ancestrale è andato in frantumi. Un mondo aperto sterminato, semidei da abbattere e nessuno che ti dica dove andare.</div>
+    <div class="btns"><div class="btn primary"><span class="pad a">A</span>Gioca</div><div class="btn"><span class="pad y">Y</span>Dettagli</div><div class="btn"><span class="pad x">X</span>Preferito</div></div>
+  </div>
+  <div class="row" style="bottom:7.2cqw">
+    <div class="label">Continua a giocare <small>7 giochi</small></div>
+    <div class="tiles">${row1.map(([k,p,s]) => `<div class="tile img ${s?'sel':''}" style="background-image:${header(G[k].id)}"><div class="prog"><span style="width:${p}%"></span></div></div>`).join('')}</div>
+  </div>
+  <div class="row" style="bottom:-4.4cqw">
+    <div class="label">Aggiunti di recente</div>
+    <div class="tiles">${row2.map(k => `<div class="tile img" style="background-image:${header(G[k].id)};opacity:.6"></div>`).join('')}</div>
+  </div>`;
+
+/* ---------- A grid ---------- */
+const gridGames = ['bg3','bal','cp','celeste','disco','elden','hades','h2','hk','hog','spm','ow','rdr','sek','sdv','portal'];
+const installed = new Set(['bg3','bal','elden','hades','h2','hk','ow','sdv']);
+document.getElementById('a-grid').innerHTML = `
+  <div class="blur img" style="background-image:${hero(G.hades.id)}"></div>
+  ${nav('Libreria')}
+  <div class="gridinfo">
+    <div><h3>Hades</h3><div class="meta" style="font-size:1.1cqw;margin-top:.6cqw"><span>2020</span><i></i><span>Roguelike</span><i></i><span>61 h</span><i></i><span>Steam</span></div></div>
+    <div class="filters"><span class="on">Tutti · 412</span><span>Installati · 86</span><span>Preferiti · 24</span><span>A–Z ▾</span></div>
+  </div>
+  <div class="covers">${gridGames.map(k => `<div class="cover img ${k==='hades'?'sel':''}" style="background-image:${cover(G[k].id)}">${installed.has(k)?'<span class="inst"></span>':''}</div>`).join('')}</div>`;
+
+/* ---------- A detail ---------- */
+document.getElementById('a-detail').innerHTML = `
+  <div class="bg img" style="background-image:${hero(G.elden.id)};background-position:70% 30%"></div><div class="veil"></div>
+  <div class="back"><span class="pad b">B</span>Indietro</div>
+  <div class="dleft">
+    <div class="logo" style="background-image:${logo(G.elden.id)}"></div>
+    <div class="meta" style="margin-top:1.4cqw"><span>2022</span><i></i><span>Azione, GDR</span><i></i><span>FromSoftware</span><span class="badge">PEGI 16</span><span class="badge">STEAM</span></div>
+    <div class="desc">Nell'Interregno l'Anello ancestrale è andato in frantumi e i semidei se ne sono spartiti i frammenti. Esplora un mondo aperto sterminato e dungeon intricati, crea la tua build e affronta boss che non perdonano.</div>
+    <div class="btns"><div class="btn primary"><span class="pad a">A</span>Gioca</div><div class="btn"><span class="pad y">Y</span>Achievement</div><div class="btn"><span class="pad x">X</span>Opzioni</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><small>Tempo giocato</small><b>128 h <em>40 min</em></b></div>
+    <div class="stat"><small>Ultima sessione</small><b>Ieri</b></div>
+    <div class="stat"><small>Achievement</small><b>34<em> / 42</em></b><div class="bar"><span style="width:81%"></span></div></div>
+    <div class="stat"><small>Spazio</small><b>60,2 <em>GB</em></b></div>
+  </div>
+  <div class="shots"><div class="row" style="position:static"><div class="label">Screenshot</div>
+    <div class="tiles">${SH.elden.map(h => `<div class="tile img" style="background-image:${shot(G.elden.id,h)}"></div>`).join('')}</div></div></div>`;
+
+/* ---------- B ---------- */
+const spine = (k, h, plat) => `<div class="spine" style="height:${h}cqw;background-image:${cover(G[k].id)};background-position:${(G[k].id%7)*14}% 0"><span>${G[k].t}</span><small>${plat}</small></div>`;
+const box = k => `<div class="box"><div class="side" style="background-image:${cover(G[k].id)}"></div><div class="front" style="background-image:${cover(G[k].id)}"></div></div>`;
+const btop = (tit, right) => `<div class="top"><h3>${tit}</h3><div class="right">${right}</div></div>`;
+const tabs = `<span><b>412</b> giochi</span><span>Ordine: <b>ultima sessione</b></span><span style="display:flex;align-items:center"><span class="pad sh">LB</span>Tutti · PC · Retro<span class="pad sh" style="margin-left:.55cqw">RB</span></span>`;
+const az = sel => `<div class="az">${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(c => c===sel?`<b>${c}</b>`:`<span>${c}</span>`).join('')}</div>`;
+
+document.getElementById('b-shelf').innerHTML = `
+  <div class="light"></div>
+  ${btop('La <em>collezione</em>', tabs)}
+  <div class="shelf">
+    ${spine('bg3',28.5,'STEAM')}${spine('bal',26,'STEAM')}${spine('celeste',27.5,'STEAM')}${spine('cp',29.5,'GOG')}${spine('disco',28,'GOG')}
+    ${box('elden')}
+    ${spine('hades',27,'STEAM')}${spine('h2',28,'STEAM')}${spine('hk',26.5,'STEAM')}${spine('hog',29,'EPIC')}${spine('ow',27,'EPIC')}${spine('rdr',30,'STEAM')}${spine('sek',28,'STEAM')}${spine('sdv',26,'STEAM')}${spine('spm',29,'STEAM')}${spine('sts',27,'STEAM')}${spine('w3',29.5,'GOG')}${spine('p5',28,'STEAM')}${spine('portal',26.5,'STEAM')}${spine('dc',27.5,'STEAM')}
+  </div>
+  <div class="plank"></div>
+  <div class="info">
+    <div><h4>Elden Ring</h4><div class="m">2022 · Azione, GDR · FromSoftware · 128 h</div></div>
+    <div class="acts">${pad('a','Gioca')}${pad('y','Retro della scatola')}</div>
+  </div>
+  ${az('E')}`;
+
+document.getElementById('b-back').innerHTML = `
+  <div class="light"></div>
+  <div class="bigbox"><div class="front" style="background-image:${cover(G.hk.id)}"></div></div>
+  <div class="back">
+    <div class="kicker">Metroidvania · 2017 · Team Cherry</div>
+    <div class="blogo" style="background-image:${logo(G.hk.id)}"></div>
+    <div class="tagline">Sotto Dirtmouth c'è un regno intero che aspetta di essere mappato.</div>
+    <div class="cols">Scendi nelle rovine di Hallownest, un regno di insetti caduto in disgrazia. Caverne contorte, città dimenticate e terre infestate, da esplorare con il Chiodo e una manciata di incantesimi. Più di 150 nemici, oltre 30 boss e una mappa che si disegna solo se ti ricordi di comprare la penna.</div>
+    <div class="bshots">${SH.hk.map(h => `<div style="background-image:${shot(G.hk.id,h)}"></div>`).join('')}</div>
+    <div class="specs">
+      <div><b>Tempo giocato</b><span></span>54 h 12 min</div>
+      <div><b>Ultima sessione</b><span></span>12 settembre</div>
+      <div><b>Achievement</b><span></span>63 / 63</div>
+      <div><b>Piattaforma</b><span></span>Steam · installato</div>
+    </div>
+  </div>
+  <div class="stamp"><div>COMPLETATO<big>106%</big></div></div>
+  <div class="dacts">${pad('a','Gioca')}${pad('x','Opzioni')}${pad('b','Torna allo scaffale')}</div>`;
+
+document.getElementById('b-night').innerHTML = `
+  <div class="light"></div>
+  ${btop('La <em>collezione</em>', tabs)}
+  <div class="shelf">
+    ${spine('bg3',28.5,'STEAM')}${spine('bal',26,'STEAM')}${spine('celeste',27.5,'STEAM')}${spine('cp',29.5,'GOG')}
+    ${box('disco')}
+    ${spine('elden',28,'STEAM')}${spine('hades',27,'STEAM')}${spine('h2',28,'STEAM')}${spine('hk',26.5,'STEAM')}${spine('hog',29,'EPIC')}${spine('ow',27,'EPIC')}${spine('rdr',30,'STEAM')}${spine('sek',28,'STEAM')}${spine('sdv',26,'STEAM')}${spine('spm',29,'STEAM')}${spine('sts',27,'STEAM')}${spine('w3',29.5,'GOG')}${spine('p5',28,'STEAM')}${spine('portal',26.5,'STEAM')}${spine('dc',27.5,'STEAM')}
+  </div>
+  <div class="plank"></div>
+  <div class="info">
+    <div><h4>Disco Elysium</h4><div class="m">2019 · GDR · ZA/UM · 37 h · GOG</div></div>
+    <div class="acts">${pad('a','Gioca')}${pad('y','Retro della scatola')}</div>
+  </div>
+  ${az('D')}`;
+</script>
+</body>
+</html>

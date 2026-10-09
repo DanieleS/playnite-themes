@@ -1,0 +1,18 @@
+AddonId: DanieleS_Glass_Fullscreen
+Type: ThemeFullscreen
+InstallerManifestUrl: https://raw.githubusercontent.com/DanieleS/playnite-themes/main/themes/glass/installer.yaml
+Name: Glass
+Author: Davide Specchia
+ShortDescription: "Frosted glass panes over the selected game's blurred artwork: a still list on the left, a large preview on the right."
+Description: "Glass is inspired by spatial interfaces. The selected game's artwork, heavily blurred, lights the whole room; on top of it float frosted panes: a calm list where only the highlight moves, and a large preview with artwork, logo, chips and numbers. The details view is two glass windows tilted towards you."
+Tags:
+  - Modern
+  - Glass
+  - Dark
+  - Logos
+SourceUrl: https://github.com/DanieleS/playnite-themes
+Links:
+  GitHub: https://github.com/DanieleS/playnite-themes/tree/main/themes/glass
+  Issues: https://github.com/DanieleS/playnite-themes/issues
+# Screenshots are required before submitting to the add-on database (1920x1080 PNG/JPG, plus thumbnails).
+Screenshots: []

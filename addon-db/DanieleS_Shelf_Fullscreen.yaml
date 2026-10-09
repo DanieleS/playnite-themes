@@ -1,0 +1,17 @@
+AddonId: DanieleS_Shelf_Fullscreen
+Type: ThemeFullscreen
+InstallerManifestUrl: https://raw.githubusercontent.com/DanieleS/playnite-themes/main/themes/shelf/installer.yaml
+Name: Shelf
+Author: Davide Specchia
+ShortDescription: 'Your library as a shelf of game boxes on warm paper; the selected game is pulled out, its details are the back of the box.'
+Description: "Shelf is a light, collector's-cabinet theme. Every game is a spine made from its own cover art, standing on a wooden plank; the selected game slides out and shows its full box. The details view is the back of the box: big cover, kicker, title, dotted-leader specs and a rubber stamp with your completion status."
+Tags:
+  - Light
+  - Unique
+  - Collection
+SourceUrl: https://github.com/DanieleS/playnite-themes
+Links:
+  GitHub: https://github.com/DanieleS/playnite-themes/tree/main/themes/shelf
+  Issues: https://github.com/DanieleS/playnite-themes/issues
+# Screenshots are required before submitting to the add-on database (1920x1080 PNG/JPG, plus thumbnails).
+Screenshots: []

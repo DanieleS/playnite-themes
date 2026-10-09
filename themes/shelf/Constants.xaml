@@ -1,0 +1,119 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Shelf: warm paper, ink, one brick-red accent. -->
+
+    <Color x:Key="ShelfPaperColor">#FFECE6DA</Color>
+    <Color x:Key="ShelfInkColor">#FF1D1B17</Color>
+    <Color x:Key="ShelfAccentColor">#FFB4442C</Color>
+
+    <!-- Default palette overrides: stock menus become paper-and-ink too. -->
+    <Color x:Key="GlyphColor">#FFB4442C</Color>
+    <Color x:Key="GlyphLightColor">#FFD0654B</Color>
+    <Color x:Key="SelectionLightColor">#FFA59D8E</Color>
+    <Color x:Key="OverlayColor">#B31D1B17</Color>
+    <Color x:Key="ControlBackgroundColor">#FFDDD5C6</Color>
+    <Color x:Key="ControlBackgroundColorDark">#FFCFC6B5</Color>
+    <Color x:Key="TextColor">#FF1D1B17</Color>
+    <Color x:Key="TextColorDark">#FF7A7366</Color>
+
+    <SolidColorBrush x:Key="MainBackgourndBrush" Color="#FFECE6DA" />
+    <SolidColorBrush x:Key="TopBarBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="BottomBarBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="SelectionBrush" Color="#FFB4442C" />
+    <SolidColorBrush x:Key="OverlayMenuBackgroundBrush" Color="#FFF3EEE4" />
+    <SolidColorBrush x:Key="GameDetailsBackgroundBrush" Color="#FFECE6DA" />
+
+    <SolidColorBrush x:Key="ShelfInkBrush" Color="#FF1D1B17" />
+    <SolidColorBrush x:Key="ShelfSoftBrush" Color="#FF5B554A" />
+    <SolidColorBrush x:Key="ShelfMutedBrush" Color="#FFA59D8E" />
+    <SolidColorBrush x:Key="ShelfAccentBrush" Color="#FFB4442C" />
+    <SolidColorBrush x:Key="ShelfPlankBrush" Color="#FF2B241B" />
+
+    <RadialGradientBrush x:Key="ShelfLightBrush" Center="0.4,-0.1" GradientOrigin="0.4,-0.1" RadiusX="0.7" RadiusY="0.9">
+        <GradientStop Color="#A6FFFFFF" Offset="0" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </RadialGradientBrush>
+
+    <!-- Fonts shipped with Windows: Georgia for display, Bahnschrift for UI. -->
+    <FontFamily x:Key="ShelfFontDisplay">Georgia</FontFamily>
+    <FontFamily x:Key="ShelfFontBody">Bahnschrift, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWeb">Bahnschrift, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWebLight">Bahnschrift Light, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWebBold">Bahnschrift SemiBold, Segoe UI Semibold</FontFamily>
+
+    <sys:Double x:Key="FontSizeSmall">18</sys:Double>
+    <sys:Double x:Key="FontSize">22</sys:Double>
+
+    <Style x:Key="TextBlockBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{DynamicResource FontSize}" />
+        <Setter Property="FontFamily" Value="{DynamicResource ShelfFontBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
+    <Style x:Key="ShelfDisplay" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontFamily" Value="{DynamicResource ShelfFontDisplay}" />
+        <Setter Property="Foreground" Value="{DynamicResource ShelfInkBrush}" />
+    </Style>
+
+    <Style x:Key="ShelfKicker" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource ShelfAccentBrush}" />
+    </Style>
+
+    <!-- Focusable action in the "back of the box" view: ink outline, filled with ink when focused. -->
+    <Style x:Key="ShelfActionButton" TargetType="ButtonEx">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Foreground" Value="{DynamicResource ShelfInkBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource ShelfFontBody}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="MinWidth" Value="200" />
+        <Setter Property="Margin" Value="0,0,16,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ButtonEx">
+                    <Border x:Name="Body" BorderBrush="{DynamicResource ShelfInkBrush}" BorderThickness="2"
+                            CornerRadius="4" Padding="30,12,30,12" Background="Transparent">
+                        <ContentPresenter x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="Body" Property="Background" Value="{DynamicResource ShelfInkBrush}" />
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#FFECE6DA" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Body" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Dotted-leader spec row: label .......... value -->
+    <Style x:Key="ShelfSpecLabel" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Foreground" Value="{DynamicResource ShelfInkBrush}" />
+    </Style>
+    <Style x:Key="ShelfSpecValue" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Foreground" Value="{DynamicResource ShelfInkBrush}" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="MaxWidth" Value="380" />
+    </Style>
+    <Style x:Key="ShelfLeader" TargetType="Line">
+        <Setter Property="X1" Value="0" />
+        <Setter Property="X2" Value="2000" />
+        <Setter Property="Stroke" Value="{DynamicResource ShelfMutedBrush}" />
+        <Setter Property="StrokeThickness" Value="2" />
+        <Setter Property="StrokeDashArray" Value="1 2" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Margin" Value="10,0,10,6" />
+        <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+</ResourceDictionary>

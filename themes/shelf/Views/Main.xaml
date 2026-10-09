@@ -1,0 +1,358 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:pin="clr-namespace:Playnite.Input;assembly=Playnite"
+                    mc:Ignorable="d">
+
+    <!--
+        Shelf / Main
+        The library is a shelf of spines. Spines are a vertical slice of each game's cover; the selected game is
+        pulled out and shown as its full box. The list is our own ListBoxEx (not PART_ListGameItems), because the
+        stock list always uses the tile grid panel; selection, focus and input are wired to the view model here.
+    -->
+
+    <!-- One shelf slot: spine when not selected, full box when selected. -->
+    <Style x:Key="ShelfItemStyle" TargetType="ListBoxItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Margin" Value="0,0,5,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Grid>
+                        <!-- Spine -->
+                        <Grid x:Name="Spine" Width="62" Height="470" VerticalAlignment="Bottom" ClipToBounds="True">
+                            <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
+                                   HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="Fant" />
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#80000000" Offset="0" />
+                                        <GradientStop Color="#26000000" Offset="0.4" />
+                                        <GradientStop Color="#8C000000" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Width="3" HorizontalAlignment="Left" Fill="#33FFFFFF" />
+                            <TextBlock Text="{Binding DisplayName, Converter={StaticResource StringToUpperCaseConverter}}"
+                                       FontFamily="{DynamicResource ShelfFontBody}" FontWeight="Bold" FontSize="19"
+                                       Foreground="#FFFFFFFF" TextTrimming="CharacterEllipsis" Width="380"
+                                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+                                <TextBlock.LayoutTransform>
+                                    <RotateTransform Angle="-90" />
+                                </TextBlock.LayoutTransform>
+                                <TextBlock.Effect>
+                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.8" Color="#FF000000" />
+                                </TextBlock.Effect>
+                            </TextBlock>
+                            <Border Height="46" VerticalAlignment="Bottom" Background="#A6000000">
+                                <TextBlock Text="{Binding Source.Name, Converter={StaticResource StringToUpperCaseConverter}}"
+                                           FontFamily="{DynamicResource ShelfFontBody}" FontWeight="Bold" FontSize="12"
+                                           Foreground="#D9FFFFFF" TextTrimming="CharacterEllipsis"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,0,4,0" />
+                            </Border>
+                            <Border x:Name="Darken" Background="#66000000" Visibility="Collapsed" />
+                        </Grid>
+
+                        <!-- Box -->
+                        <Grid x:Name="Box" Width="314" Height="470" Margin="18,0,30,0" Visibility="Collapsed"
+                              VerticalAlignment="Bottom" RenderTransformOrigin="0.5,1">
+                            <Grid.RenderTransform>
+                                <TranslateTransform Y="-22" />
+                            </Grid.RenderTransform>
+                            <Border Background="#FF1D1B17" CornerRadius="3">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="22" Direction="300" BlurRadius="40" Opacity="0.45" Color="#FF3C2805" />
+                                </Border.Effect>
+                            </Border>
+                            <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
+                                   RenderOptions.BitmapScalingMode="Fant" Margin="4" />
+                            <Rectangle Margin="4">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.4">
+                                        <GradientStop Color="#38FFFFFF" Offset="0" />
+                                        <GradientStop Color="#00FFFFFF" Offset="0.35" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Width="10" Margin="4" HorizontalAlignment="Left" Fill="#40000000" />
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Spine" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Box" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsInstalled}" Value="False" />
+                                <Condition Binding="{Settings Fullscreen.DarkenUninstalledGamesGrid}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="Darken" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Main}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Main}">
+                    <Grid x:Name="PART_MainHost"
+                          d:DesignWidth="{StaticResource DesignWidth}"
+                          d:DesignHeight="{StaticResource DesignHeight}"
+                          d:DataContext="{x:Static DesignMainViewModel.DesignIntance}">
+                        <Grid x:Name="PART_ViewHost" Background="{DynamicResource MainBackgourndBrush}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="140" />
+                                <RowDefinition Height="530" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="90" />
+                            </Grid.RowDefinitions>
+
+                            <Rectangle Grid.RowSpan="5" Fill="{DynamicResource ShelfLightBrush}" />
+
+                            <!-- Header -->
+                            <Grid Grid.Row="0" Margin="80,0,80,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Orientation="Horizontal">
+                                    <TextBlock Style="{DynamicResource ShelfDisplay}" FontSize="58"
+                                               Text="{DynamicResource LOCDS_Shelf_Title}" VerticalAlignment="Center" />
+                                    <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Margin="26,14,0,0" FontSize="20"
+                                               Foreground="{DynamicResource ShelfSoftBrush}" VerticalAlignment="Center"
+                                               Text="{Binding Items.Count, ElementName=ShelfList}" />
+                                </StackPanel>
+
+                                <FilterPresetSelector x:Name="PART_FilterPresetSelector" Grid.Column="1"
+                                                      HorizontalAlignment="Right" Margin="0,0,30,0" />
+
+                                <ContentControl x:Name="PART_ElemBatteryStatus" Focusable="False" FontSize="32"
+                                                VerticalAlignment="Center" Margin="10,0,6,0" Grid.Column="2">
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="Foreground" Value="{DynamicResource ShelfInkBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding PowerStatus.Charge}" Value="Critical">
+                                                    <Setter Property="Content" Value="{DynamicResource BatteryStatusCritical}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource ShelfAccentBrush}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PowerStatus.Charge}" Value="Low">
+                                                    <Setter Property="Content" Value="{DynamicResource BatteryStatusLow}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PowerStatus.Charge}" Value="Medium">
+                                                    <Setter Property="Content" Value="{DynamicResource BatteryStatusMedium}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PowerStatus.Charge}" Value="High">
+                                                    <Setter Property="Content" Value="{DynamicResource BatteryStatusHigh}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PowerStatus.IsCharging}" Value="True">
+                                                    <Setter Property="Content" Value="{DynamicResource BatteryStatusCharging}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+                                <TextBlock x:Name="PART_TextBatteryPercentage" Grid.Column="3" Margin="0,0,16,0"
+                                           Style="{DynamicResource TextBlockBaseStyle}" VerticalAlignment="Center" />
+                                <TextBlock x:Name="PART_TextClock" Grid.Column="4" Margin="10,0,20,0" FontWeight="SemiBold"
+                                           Style="{DynamicResource TextBlockBaseStyle}" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <ButtonEx x:Name="PART_ButtonProgramUpdate" Margin="4,0,4,0" Height="48" MinWidth="48"
+                                              Style="{DynamicResource ButtonTopMenu}">
+                                        <TextBlock Text="&#xef08;" FontFamily="{StaticResource FontIcoFont}" FontSize="28"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource ShelfInkBrush}" />
+                                    </ButtonEx>
+                                    <ButtonEx x:Name="PART_ButtonNotifications" Margin="4,0,4,0" Height="48" MinWidth="48">
+                                        <Grid>
+                                            <TextBlock Text="&#xeea3;" FontFamily="{StaticResource FontIcoFont}" FontSize="28"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource ShelfInkBrush}" />
+                                            <Ellipse Width="12" Height="12" Fill="{DynamicResource ShelfAccentBrush}"
+                                                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,0" />
+                                        </Grid>
+                                        <ButtonEx.Style>
+                                            <Style TargetType="ButtonEx" BasedOn="{StaticResource ButtonTopMenu}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Api Notifications.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ButtonEx.Style>
+                                    </ButtonEx>
+                                </StackPanel>
+                                <ButtonEx x:Name="PART_ButtonMainMenu" Grid.Column="6" VerticalAlignment="Center"
+                                          Style="{DynamicResource ButtonTopMenu}" Margin="4,0,0,0" Height="48" MinWidth="48">
+                                    <Image RenderOptions.BitmapScalingMode="Fant" Margin="2"
+                                           Source="{ThemeFile 'Images/applogo_clean.png'}" />
+                                </ButtonEx>
+                            </Grid>
+
+                            <!-- The shelf -->
+                            <DockPanel Grid.Row="1">
+                                <Filters x:Name="PART_ElemFilters" DockPanel.Dock="Left" Focusable="False" />
+                                <FiltersAdditional x:Name="PART_ElemFiltersAdditional" DockPanel.Dock="Left" Focusable="False" />
+                                <ContentControl x:Name="PART_ContentFilterItems" DockPanel.Dock="Left" Focusable="False" />
+                                <ListBoxEx x:Name="ShelfList" Margin="70,0,40,0" DockPanel.Dock="Right"
+                                           Background="Transparent" BorderThickness="0" Padding="0"
+                                           ItemsSource="{Binding GamesView.CollectionView}"
+                                           SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                                           Visibility="{Binding GameListVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           FocusBahaviors.FocusBinding="{Binding GameListFocused}"
+                                           ItemContainerStyle="{StaticResource ShelfItemStyle}"
+                                           KeyboardNavigation.DirectionalNavigation="Once"
+                                           ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                           ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                           ScrollViewer.CanContentScroll="True"
+                                           VirtualizingPanel.IsVirtualizing="True"
+                                           VirtualizingPanel.VirtualizationMode="Recycling"
+                                           VirtualizingPanel.ScrollUnit="Pixel">
+                                    <ListBoxEx.Template>
+                                        <ControlTemplate TargetType="ListBoxEx">
+                                            <ScrollViewer Focusable="False" Padding="0"
+                                                          HorizontalScrollBarVisibility="Hidden"
+                                                          VerticalScrollBarVisibility="Disabled"
+                                                          CanContentScroll="True">
+                                                <ItemsPresenter />
+                                            </ScrollViewer>
+                                        </ControlTemplate>
+                                    </ListBoxEx.Template>
+                                    <ListBoxEx.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel Orientation="Horizontal" VerticalAlignment="Bottom" />
+                                        </ItemsPanelTemplate>
+                                    </ListBoxEx.ItemsPanel>
+                                    <ListBoxEx.InputBindings>
+                                        <KeyBinding Key="A" Command="{Binding ToggleGameDetailsCommand}" />
+                                        <KeyBinding Key="X" Command="{Binding OpenGameMenuCommand}" />
+                                        <KeyBinding Key="Enter" Command="{Binding ActivateSelectedCommand}" />
+                                        <pin:GameControllerInputBinding Button="A" Command="{Binding ToggleGameDetailsCommand}" />
+                                        <pin:GameControllerInputBinding Button="X" Command="{Binding ActivateSelectedCommand}" />
+                                        <pin:GameControllerInputBinding Button="Start" Command="{Binding OpenGameMenuCommand}" />
+                                    </ListBoxEx.InputBindings>
+                                </ListBoxEx>
+                            </DockPanel>
+
+                            <TextBlock Grid.Row="1" FontSize="30" Text="{DynamicResource LOCNoGamesFound}"
+                                       TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Items.Count, ElementName=ShelfList}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <!-- Plank -->
+                            <Border Grid.Row="2" Height="18" Margin="48,0,48,0" VerticalAlignment="Top"
+                                    Background="{DynamicResource ShelfPlankBrush}" CornerRadius="3">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="10" Direction="270" BlurRadius="20" Opacity="0.4" Color="#FF000000" />
+                                </Border.Effect>
+                            </Border>
+
+                            <!-- Selected game -->
+                            <Grid Grid.Row="3" Margin="80,30,80,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Top">
+                                    <TextBlock Style="{DynamicResource ShelfDisplay}" FontSize="52"
+                                               Text="{Binding SelectedGame.DisplayName}" TextTrimming="CharacterEllipsis" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                                   Text="{Binding SelectedGame.ReleaseYear}" />
+                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                                   Text="  ·  " />
+                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                                   MaxWidth="420" TextTrimming="CharacterEllipsis"
+                                                   Text="{Binding SelectedGame.Genres, Converter={StaticResource ListToStringConverter}}" />
+                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                                   Text="  ·  " />
+                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                                   Text="{Binding SelectedGame.Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,28,0,0">
+                                        <ButtonEx x:Name="PART_ButtonInstall" Style="{DynamicResource ButtonBottomMenu}"
+                                                  Content="{DynamicResource LOCInstallGame}" />
+                                        <ButtonEx x:Name="PART_ButtonPlay" Style="{DynamicResource ButtonBottomMenu}"
+                                                  Content="{DynamicResource LOCPlayGame}" />
+                                        <ButtonEx x:Name="PART_ButtonDetails" Style="{DynamicResource ButtonBottomMenu}"
+                                                  Content="{DynamicResource LOCDS_Shelf_BackOfBox}" />
+                                        <ButtonEx x:Name="PART_ButtonGameOptions" Style="{DynamicResource ButtonBottomMenu}"
+                                                  Content="{DynamicResource LOCGameOptions}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Current letter, a quiet index marker -->
+                                <TextBlock Grid.Column="1" Style="{DynamicResource ShelfDisplay}" FontSize="150"
+                                           Foreground="{DynamicResource ShelfAccentBrush}" Opacity="0.9"
+                                           VerticalAlignment="Top" Margin="0,-30,0,0"
+                                           Text="{Binding SelectedGame.NameGroup}" />
+                            </Grid>
+
+                            <!-- Footer -->
+                            <Grid Grid.Row="4" Margin="80,0,80,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <ButtonEx x:Name="PART_ButtonSearch" Style="{DynamicResource ButtonBottomMenu}"
+                                              Content="{DynamicResource LOCSearchLabel}" />
+                                    <ButtonEx x:Name="PART_ButtonFilter" Style="{DynamicResource ButtonBottomMenu}"
+                                              Content="{DynamicResource LOCFilter}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" x:Name="PART_ElemSearchActive" VerticalAlignment="Center">
+                                    <TextBlock FontSize="16" TextAlignment="Center" Style="{DynamicResource TextBlockBaseStyle}"
+                                               Foreground="{DynamicResource ShelfSoftBrush}"
+                                               Text="{DynamicResource LOCGameListSearchResults}" />
+                                    <TextBlock TextAlignment="Center" Style="{DynamicResource TextBlockBaseStyle}"
+                                               Text="{Binding AppSettings.Fullscreen.FilterSettings.Name}" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" x:Name="PART_ElemExtraFilterActive" FontSize="18"
+                                           VerticalAlignment="Center" TextAlignment="Center"
+                                           Style="{DynamicResource TextBlockBaseStyle}"
+                                           Foreground="{DynamicResource ShelfSoftBrush}"
+                                           Text="{DynamicResource LOCGameListExtraFiltered}" />
+                                <StackPanel x:Name="PART_ElemProgressIndicator" Grid.Column="2"
+                                            Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock x:Name="PART_TextProgressTooltip" Margin="0,0,15,0" FontSize="18"
+                                               VerticalAlignment="Center" Style="{DynamicResource TextBlockBaseStyle}" />
+                                    <ContentControl Style="{DynamicResource ProgressIndicator}" Focusable="False"
+                                                    Height="34" Width="34" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+
+                        <GameDetails x:Name="PART_ElemGameDetails"
+                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        <GameStatus x:Name="PART_ElemGameStatus"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,208 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    mc:Ignorable="d">
+
+    <!--
+        Glass / Game details
+        Two glass windows tilted slightly towards the viewer: the game card (artwork, logo, chips, description,
+        actions, numbers) and a side window with the cover and the facts.
+    -->
+    <Style TargetType="{x:Type GameDetails}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GameDetails}">
+                    <Grid x:Name="PART_ViewHost" Background="{DynamicResource MainBackgourndBrush}" ClipToBounds="True"
+                          d:DesignWidth="{StaticResource DesignWidth}"
+                          d:DesignHeight="{StaticResource DesignHeight}"
+                          d:DataContext="{x:Static DesignMainViewModel.DesignSelectedGameIntance}"
+                          KeyboardNavigation.DirectionalNavigation="Contained"
+                          KeyboardNavigation.TabNavigation="Cycle"
+                          KeyboardNavigation.ControlTabNavigation="Cycle">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="480" />
+                            <ColumnDefinition Width="90" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="70" />
+                        </Grid.RowDefinitions>
+
+                        <FadeImage x:Name="PART_ImageBackground" Grid.ColumnSpan="5" Grid.RowSpan="3" Margin="-120"
+                                   Stretch="UniformToFill" IsBlurEnabled="True" BlurAmount="80" HighQualityBlur="False" />
+                        <Rectangle Grid.ColumnSpan="5" Grid.RowSpan="3" Fill="#66000000" />
+
+                        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <ContentControl ContentTemplate="{DynamicResource ButtonPromptB}" Height="30" Focusable="False" />
+                            <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Margin="10,0,0,0" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource GlassSoftBrush}" VerticalAlignment="Center"
+                                       Text="{DynamicResource LOCBackLabel}" />
+                        </StackPanel>
+
+                        <!-- Main window -->
+                        <Border Grid.Column="1" Grid.Row="1" Style="{DynamicResource GlassPane}" Padding="20"
+                                RenderTransformOrigin="1,0.5">
+                            <Border.RenderTransform>
+                                <SkewTransform AngleY="1.2" />
+                            </Border.RenderTransform>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="400" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Border Grid.Row="0" CornerRadius="26">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding DisplayBackgroundImageObject}" Stretch="UniformToFill" />
+                                    </Border.Background>
+                                </Border>
+                                <Border Grid.Row="0" CornerRadius="26">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                            <GradientStop Color="#00000000" Offset="0.4" />
+                                            <GradientStop Color="#A6000000" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Grid Grid.Row="0" Margin="40,0,40,28" Height="150" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                                    <ContentControl x:Name="ExtraMetadataLoader_LogoLoaderControl" Focusable="False"
+                                                    MaxWidth="480" MaxHeight="150"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{Binding DisplayName}" FontFamily="{DynamicResource GlassFont}"
+                                               FontWeight="Bold" FontSize="60" Foreground="#FFFFFFFF"
+                                               TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxWidth="900"
+                                               VerticalAlignment="Bottom">
+                                        <TextBlock.Effect>
+                                            <DropShadowEffect ShadowDepth="0" BlurRadius="24" Opacity="0.6" Color="#FF000000" />
+                                        </TextBlock.Effect>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{PluginSettings Plugin=ExtraMetadataLoader, Path=IsLogoAvailable}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+
+                                <WrapPanel Grid.Row="1" Margin="22,26,22,0">
+                                    <Border Style="{DynamicResource GlassChip}">
+                                        <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding ReleaseYear}" />
+                                    </Border>
+                                    <Border Style="{DynamicResource GlassChip}">
+                                        <TextBlock Style="{DynamicResource GlassChipText}"
+                                                   Text="{Binding Genres, Converter={StaticResource ListToStringConverter}}" />
+                                    </Border>
+                                    <Border Style="{DynamicResource GlassChip}">
+                                        <TextBlock Style="{DynamicResource GlassChipText}"
+                                                   Text="{Binding Developers, Converter={StaticResource ListToStringConverter}}" />
+                                    </Border>
+                                    <Border Style="{DynamicResource GlassChip}">
+                                        <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding Source.Name}" />
+                                    </Border>
+                                </WrapPanel>
+
+                                <ScrollViewerEx Grid.Row="2" x:Name="PART_ScrollHtmlDescription" Margin="22,14,22,14"
+                                                CustomScrollAmount="42">
+                                    <HtmlTextView x:Name="PART_HtmlDescription"
+                                                  HtmlFontSize="19"
+                                                  HtmlFontFamily="{DynamicResource GlassFont}"
+                                                  HtmlForeground="#D9FFFFFF"
+                                                  LinkForeground="#FFFFFFFF"
+                                                  FocusVisualStyle="{x:Null}" />
+                                </ScrollViewerEx>
+
+                                <Grid Grid.Row="3" Margin="22,0,22,8">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                        <ButtonEx x:Name="PART_ButtonContext" Style="{DynamicResource GlassButton}" />
+                                        <ButtonEx x:Name="PART_ButtonOptions" Style="{DynamicResource GlassButton}"
+                                                  Content="{DynamicResource LOCGameOptions}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                                        <StackPanel Margin="0,0,40,0">
+                                            <TextBlock Style="{DynamicResource GlassKpiValue}"
+                                                       Text="{Binding Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
+                                            <TextBlock Style="{DynamicResource GlassKpiLabel}" Text="{DynamicResource LOCTimePlayed}" />
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <TextBlock Style="{DynamicResource GlassKpiValue}"
+                                                       Text="{Binding LastActivity, Converter={StaticResource DateTimeToLastPlayedConverter}}" />
+                                            <TextBlock Style="{DynamicResource GlassKpiLabel}" Text="{DynamicResource LOCLastPlayed}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- Side window -->
+                        <Border Grid.Column="3" Grid.Row="1" Style="{DynamicResource GlassPane}" Padding="22"
+                                VerticalAlignment="Top" Margin="0,30,0,0" RenderTransformOrigin="0,0.5">
+                            <Border.RenderTransform>
+                                <SkewTransform AngleY="-2.5" />
+                            </Border.RenderTransform>
+                            <StackPanel>
+                                <Border Height="520" CornerRadius="20" ClipToBounds="True">
+                                    <Image x:Name="PART_ImageCover" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="Fant">
+                                        <Image.OpacityMask>
+                                            <VisualBrush Stretch="Fill">
+                                                <VisualBrush.Visual>
+                                                    <Border Width="200" Height="300" CornerRadius="10" Background="#FF000000" />
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Image.OpacityMask>
+                                    </Image>
+                                </Border>
+                                <Grid Margin="8,22,8,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38" />
+                                        <RowDefinition Height="38" />
+                                        <RowDefinition Height="38" />
+                                        <RowDefinition Height="38" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.Resources>
+                                        <Style x:Key="FactLabel" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+                                            <Setter Property="FontSize" Value="18" />
+                                            <Setter Property="Foreground" Value="{DynamicResource GlassMutedBrush}" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                        <Style x:Key="FactValue" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+                                            <Setter Property="FontSize" Value="18" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="20,0,0,0" />
+                                        </Style>
+                                    </Grid.Resources>
+                                    <TextBlock Grid.Row="0" Style="{StaticResource FactLabel}" Text="{DynamicResource LOCPlayCountLabel}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource FactValue}" Text="{Binding PlayCount}" />
+                                    <TextBlock Grid.Row="1" Style="{StaticResource FactLabel}" Text="{DynamicResource LOCCompletionStatus}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource FactValue}" Text="{Binding CompletionStatus.Name}" />
+                                    <TextBlock Grid.Row="2" Style="{StaticResource FactLabel}" Text="{DynamicResource LOCInstallSizeLabel}" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource FactValue}"
+                                               Text="{Binding InstallSize, Converter={StaticResource NullableUlongBytesSizeToStringConverter}}" />
+                                    <TextBlock Grid.Row="3" Style="{StaticResource FactLabel}" Text="{DynamicResource LOCGamePlatformTitle}" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource FactValue}"
+                                               Text="{Binding Platforms, Converter={StaticResource ListToStringConverter}}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

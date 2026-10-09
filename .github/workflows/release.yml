@@ -1,0 +1,98 @@
+name: Release
+
+# Bump Version in themes/<theme>/theme.yaml, push, then run this workflow.
+# For each selected theme whose version has no release yet it creates the tag <theme>-v<version>,
+# a GitHub release with the .pthm package, and adds the package to themes/<theme>/installer.yaml
+# (the installer manifest Playnite reads to install and update the theme).
+
+on:
+  workflow_dispatch:
+    inputs:
+      theme:
+        description: Theme to release
+        type: choice
+        options: [all, cinema, shelf, glass, journal]
+        default: all
+      changelog:
+        description: Changelog lines, separated by |
+        type: string
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      PLAYNITE_VERSION: "10.62"
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate
+        run: |
+          curl -fsSL -o LocSource.xaml "https://raw.githubusercontent.com/JosefNemec/Playnite/${PLAYNITE_VERSION}/source/Playnite/Localization/LocSource.xaml"
+          python scripts/build.py validate --loc-source LocSource.xaml
+
+      - name: Release
+        env:
+          THEME: ${{ inputs.theme }}
+          CHANGELOG: ${{ inputs.changelog }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ "$THEME" = "all" ]; then themes="cinema shelf glass journal"; else themes="$THEME"; fi
+
+          changelog_args=()
+          notes="Changes:"
+          if [ -n "$CHANGELOG" ]; then
+            IFS='|' read -ra lines <<< "$CHANGELOG"
+            for line in "${lines[@]}"; do
+              line="$(echo "$line" | xargs)"
+              [ -z "$line" ] && continue
+              changelog_args+=(--changelog "$line")
+              notes="$notes"$'\n'"- $line"
+            done
+          else
+            notes="See the commit history for this theme."
+          fi
+
+          released=()
+          for t in $themes; do
+            version="$(python scripts/build.py version "$t")"
+            tag="$t-v$version"
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              echo "::notice::$tag already released, skipping $t (bump Version in themes/$t/theme.yaml)"
+              continue
+            fi
+            package="$(python scripts/build.py build "$t" --out dist | tail -n 1)"
+            file="$(basename "$package")"
+            name="$(grep '^Name:' "themes/$t/theme.yaml" | cut -d: -f2- | xargs)"
+            gh release create "$tag" "$package" --target main --title "$name $version" --notes "$notes"
+            url="https://github.com/${GITHUB_REPOSITORY}/releases/download/$tag/$file"
+            python scripts/build.py installer-entry "$t" --url "$url" "${changelog_args[@]}"
+            released+=("$tag")
+          done
+
+          if [ ${#released[@]} -eq 0 ]; then
+            echo "::warning::Nothing to release"
+            exit 0
+          fi
+
+          git add themes/*/installer.yaml
+          git commit -m "release: ${released[*]}"
+          git push origin HEAD:main

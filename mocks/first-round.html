@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playnite Fullscreen — proposte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;700;800;900&family=DM+Serif+Display:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root { --page:#121212; --ink:#eaeaea; --muted:#8a8a8a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--page); color:var(--ink); font-family:"Inter Tight",system-ui,sans-serif; padding:40px 16px 80px; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  header.page h1 { font-size:28px; font-weight:800; letter-spacing:-.02em; }
+  header.page p { color:var(--muted); margin-top:6px; max-width:860px; line-height:1.5; font-size:15px; }
+  section.variant { margin-top:56px; }
+  section.variant h2 { font-size:22px; font-weight:800; display:flex; gap:12px; align-items:baseline; }
+  section.variant h2 .tag { font-size:13px; font-weight:700; background:#fff; color:#000; border-radius:4px; padding:2px 8px; }
+  section.variant > p { color:var(--muted); margin:6px 0 16px; font-size:15px; max-width:900px; line-height:1.5; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:1000px){ .pair { grid-template-columns:1fr; } }
+  figure figcaption { color:var(--muted); font-size:13px; margin-top:6px; }
+
+  /* ---------- frame (TV 16:9, everything in cqw so it scales) ---------- */
+  .frame { container-type:inline-size; aspect-ratio:16/9; position:relative; overflow:hidden; border-radius:8px; box-shadow:0 0 0 1px #2a2a2a; }
+  .frame > * { position:absolute; }
+  .art { position:relative; overflow:hidden; }
+
+  /* ---------- fake game art ---------- */
+  .g-neon { background:
+      radial-gradient(circle at 68% 52%, #ffd166 0 8%, #ff2e88 15.5%, transparent 16%),
+      linear-gradient(#0d0221, #3a0ca3 48%, #ff2e88 64%, #1a0030 64%); }
+  .g-neon::after { content:""; position:absolute; left:-50%; right:-50%; bottom:0; height:36%;
+      background: repeating-linear-gradient(90deg, rgba(255,46,136,.7) 0 1px, transparent 1px 5%),
+                  repeating-linear-gradient(0deg, rgba(255,46,136,.7) 0 1px, transparent 1px 16%);
+      transform:perspective(200px) rotateX(55deg); transform-origin:bottom; }
+  .g-hollow { background:
+      radial-gradient(circle at 74% 26%, #f3e3c3 0 7%, rgba(243,227,195,.15) 7.5% 14%, transparent 14.5%),
+      linear-gradient(175deg, transparent 62%, #08141a 62.5%),
+      linear-gradient(185deg, transparent 54%, #10252e 54.5%),
+      linear-gradient(170deg,#0f2027,#203a43 50%,#2c5364); }
+  .g-salt { background:
+      radial-gradient(ellipse at 50% 41%, #ffe8a3 0 6%, transparent 6.5%),
+      linear-gradient(180deg,#f4a261 0 40%, #e76f51 40% 46%, #2a9d8f 46% 60%, #264653 60%); }
+  .g-quiet { background:
+      linear-gradient(160deg, transparent 70%, #4a5d66 70.5%),
+      linear-gradient(200deg, transparent 64%, #6f8691 64.5%),
+      linear-gradient(180deg,#eef2f3,#b5c6cc 60%,#8ea3ac); }
+  .g-iron { background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,.12) 0 2px, transparent 2px 8px),
+      conic-gradient(from 30deg at 50% 60%, #7a2e1d, #c9a227, #3b3b3b, #7a2e1d); }
+  .g-comet { background:
+      radial-gradient(circle at 72% 22%, #fff 0 1.6%, transparent 2%),
+      linear-gradient(205deg, transparent 20%, rgba(255,255,255,.35) 21%, transparent 24%),
+      linear-gradient(200deg,#1b1b3a,#693668 70%, #a74482); }
+  .g-drift { background: linear-gradient(135deg,#00b4d8 0 33%, #0077b6 33% 66%, #03045e 66%); }
+  .g-moss { background:
+      radial-gradient(circle at 30% 80%, #a3b18a 0 25%, transparent 26%),
+      radial-gradient(circle at 75% 30%, #588157 0 18%, transparent 19%),
+      linear-gradient(#344e41,#1b2a22); }
+
+  /* gamepad glyphs */
+  .pad { display:inline-grid; place-items:center; width:1.9cqw; height:1.9cqw; border-radius:50%;
+         font:800 1.05cqw/1 "Inter Tight",sans-serif; color:#111; vertical-align:middle; margin-right:.5cqw; }
+  .pad.a{background:#6cc04a} .pad.b{background:#e2453c;color:#fff} .pad.x{background:#3a8de0;color:#fff} .pad.y{background:#f2c230}
+  .pad.sh { border-radius:.5cqw; width:auto; padding:0 .55cqw; background:#ddd; }
+
+  /* =====================================================================
+     A — CINEMA
+     ===================================================================== */
+  .A { background:#000; color:#fff; font-family:"Inter Tight",sans-serif; }
+  .A .bg { inset:0; position:absolute; }
+  .A .veil { inset:0; background:
+      linear-gradient(90deg, rgba(0,0,0,.88) 0, rgba(0,0,0,.45) 45%, transparent 75%),
+      linear-gradient(0deg, rgba(0,0,0,.95) 0, rgba(0,0,0,.2) 45%, transparent 60%); }
+  .A .top { top:3cqw; left:4cqw; right:4cqw; display:flex; justify-content:space-between; align-items:center; font-size:1.25cqw; }
+  .A .top nav { display:flex; gap:2.4cqw; color:rgba(255,255,255,.55); font-weight:500; }
+  .A .top nav b { color:#fff; font-weight:700; border-bottom:.2cqw solid #fff; padding-bottom:.4cqw; }
+  .A .top .sys { display:flex; gap:1.6cqw; align-items:center; color:rgba(255,255,255,.8); font-weight:500; }
+  .A .hero { left:4cqw; top:12.5cqw; width:50cqw; }
+  .A .eyebrow { font-size:1.1cqw; letter-spacing:.25em; text-transform:uppercase; color:rgba(255,255,255,.65); font-weight:700; }
+  .A h1 { font-size:7.6cqw; line-height:.86; font-weight:900; letter-spacing:-.045em; margin:1.2cqw 0 1.4cqw; text-transform:uppercase; }
+  .A .meta { font-size:1.35cqw; color:rgba(255,255,255,.8); display:flex; gap:1cqw; align-items:center; }
+  .A .meta i { width:.35cqw; height:.35cqw; background:rgba(255,255,255,.5); border-radius:50%; }
+  .A .btns { margin-top:2.2cqw; display:flex; gap:1.2cqw; font-size:1.25cqw; font-weight:700; }
+  .A .btn { display:flex; align-items:center; padding:.8cqw 1.6cqw .8cqw 1cqw; border-radius:10cqw; background:rgba(255,255,255,.14); backdrop-filter:blur(8px); }
+  .A .btn.primary { background:#fff; color:#000; }
+  .A .row { left:4cqw; right:0; bottom:3.2cqw; }
+  .A .row .label { font-size:1.15cqw; font-weight:700; margin-bottom:1cqw; color:rgba(255,255,255,.75); }
+  .A .tiles { display:flex; gap:1.2cqw; align-items:flex-end; }
+  .A .tile { width:15cqw; aspect-ratio:16/9; border-radius:.8cqw; flex:none; opacity:.7; }
+  .A .tile.sel { width:20cqw; opacity:1; box-shadow:0 0 0 .3cqw #000, 0 0 0 .55cqw #fff, 0 1.5cqw 3cqw rgba(0,0,0,.6); }
+  .A .tile .t { position:absolute; left:1cqw; bottom:.8cqw; font-weight:800; font-size:1.2cqw; text-shadow:0 1px 6px rgba(0,0,0,.7); }
+  .A .progress { position:absolute; left:0; bottom:0; height:.35cqw; background:#fff; }
+  /* detail */
+  .A.detail .veil { background:
+      linear-gradient(90deg, rgba(0,0,0,.92) 0, rgba(0,0,0,.7) 50%, rgba(0,0,0,.25) 100%),
+      linear-gradient(0deg, rgba(0,0,0,.9) 0, transparent 40%); }
+  .A .back { top:3cqw; left:4cqw; font-size:1.15cqw; color:rgba(255,255,255,.7); display:flex; align-items:center; }
+  .A .dleft { left:4cqw; top:8cqw; width:46cqw; }
+  .A.detail h1 { font-size:5.4cqw; margin:.8cqw 0 1.2cqw; }
+  .A .chips { display:flex; gap:.6cqw; flex-wrap:wrap; }
+  .A .chip { font-size:1.05cqw; padding:.35cqw .9cqw; border:1px solid rgba(255,255,255,.3); border-radius:10cqw; color:rgba(255,255,255,.85); }
+  .A .desc { font-size:1.3cqw; line-height:1.55; color:rgba(255,255,255,.78); margin-top:1.6cqw; }
+  .A .stats { right:4cqw; top:8cqw; width:30cqw; display:grid; grid-template-columns:1fr 1fr; gap:1.2cqw; }
+  .A .stat { background:rgba(255,255,255,.08); backdrop-filter:blur(10px); border-radius:1cqw; padding:1.3cqw 1.4cqw; }
+  .A .stat small { font-size:.95cqw; letter-spacing:.15em; text-transform:uppercase; color:rgba(255,255,255,.55); font-weight:700; }
+  .A .stat b { display:block; font-size:2.6cqw; font-weight:800; letter-spacing:-.03em; margin-top:.3cqw; }
+  .A .bar { height:.45cqw; background:rgba(255,255,255,.15); border-radius:1cqw; margin-top:.8cqw; overflow:hidden; }
+  .A .bar span { display:block; height:100%; background:#fff; }
+  .A .shots { left:4cqw; right:4cqw; bottom:3.2cqw; display:flex; gap:1.2cqw; }
+  .A .shots .tile { width:auto; flex:1; opacity:.85; }
+
+  /* =====================================================================
+     B — LA COLLEZIONE (paper / shelf)
+     ===================================================================== */
+  .B { background:#ece6da; color:#1d1b17; font-family:"Space Grotesk",sans-serif; }
+  .B .grain { inset:0; background:radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.6), transparent 60%); }
+  .B .top { top:3cqw; left:4cqw; right:4cqw; display:flex; justify-content:space-between; align-items:flex-end; }
+  .B .top h3 { font-family:"DM Serif Display",serif; font-weight:400; font-size:3.4cqw; letter-spacing:-.01em; line-height:1; }
+  .B .top h3 em { color:#b4442c; }
+  .B .top .right { font-size:1.15cqw; display:flex; gap:1.6cqw; align-items:center; color:#5b554a; }
+  .B .top .right b { color:#1d1b17; }
+  .B .shelf { left:4cqw; right:4cqw; top:9.5cqw; height:30cqw; display:flex; align-items:flex-end; gap:.35cqw; }
+  .B .spine { width:3.1cqw; flex:none; border-radius:.25cqw .25cqw 0 0; position:relative; color:#fff;
+              writing-mode:vertical-rl; transform:rotate(180deg); display:flex; align-items:center; justify-content:space-between;
+              padding:1cqw 0; font-weight:700; font-size:1.05cqw; letter-spacing:.06em; text-transform:uppercase;
+              box-shadow:inset -.25cqw 0 0 rgba(0,0,0,.18), inset .2cqw 0 0 rgba(255,255,255,.15); }
+  .B .spine small { font-weight:500; font-size:.8cqw; opacity:.75; }
+  .B .cover { width:20cqw; height:30cqw; flex:none; margin:0 .9cqw; border-radius:.3cqw; transform:translateY(-1.6cqw);
+              box-shadow:0 2.2cqw 2.6cqw -1cqw rgba(60,40,10,.45), 0 0 0 .25cqw #1d1b17; }
+  .B .cover .ct { position:absolute; left:1.4cqw; right:1.4cqw; bottom:1.4cqw; color:#fff; font-family:"DM Serif Display",serif; font-size:2.6cqw; line-height:.95; text-shadow:0 2px 12px rgba(0,0,0,.5); }
+  .B .plank { left:2.5cqw; right:2.5cqw; top:39.5cqw; height:.9cqw; background:#2b241b; border-radius:.2cqw; box-shadow:0 .8cqw 1.2cqw -0.4cqw rgba(0,0,0,.35); }
+  .B .info { left:4cqw; top:43cqw; display:flex; gap:3cqw; align-items:center; }
+  .B .info h4 { font-family:"DM Serif Display",serif; font-weight:400; font-size:2.8cqw; line-height:1; }
+  .B .info .m { font-size:1.15cqw; color:#5b554a; margin-top:.5cqw; }
+  .B .info .acts { display:flex; gap:1.6cqw; font-size:1.15cqw; font-weight:700; }
+  .B .az { right:4cqw; bottom:3cqw; display:flex; gap:.55cqw; font-size:1cqw; font-weight:700; color:#a59d8e; }
+  .B .az b { color:#fff; background:#b4442c; border-radius:.3cqw; padding:0 .4cqw; }
+  .B .hint { left:4cqw; bottom:3cqw; font-size:1cqw; color:#7a7366; display:flex; gap:1.6cqw; align-items:center; }
+  /* detail: retro della scatola */
+  .B .bigcover { left:4cqw; top:4cqw; width:28cqw; height:42cqw; border-radius:.4cqw; box-shadow:0 2.4cqw 3cqw -1cqw rgba(60,40,10,.5), 0 0 0 .3cqw #1d1b17; }
+  .B .back { left:36cqw; top:4cqw; right:4cqw; }
+  .B .back .kicker { font-size:1.05cqw; letter-spacing:.25em; text-transform:uppercase; color:#b4442c; font-weight:700; }
+  .B .back h3 { font-family:"DM Serif Display",serif; font-weight:400; font-size:5cqw; line-height:.95; margin:.6cqw 0 .8cqw; }
+  .B .back .tagline { font-family:"DM Serif Display",serif; font-style:italic; font-size:1.7cqw; color:#5b554a; }
+  .B .cols { columns:2; column-gap:2.4cqw; font-size:1.2cqw; line-height:1.55; margin-top:1.8cqw; color:#3a352d; }
+  .B .specs { margin-top:2cqw; width:58%; font-size:1.15cqw; }
+  .B .specs div { display:flex; gap:.6cqw; padding:.35cqw 0; }
+  .B .specs div span:nth-child(2) { flex:1; border-bottom:.15cqw dotted #a59d8e; transform:translateY(-.35cqw); }
+  .B .specs b { font-weight:700; }
+  .B .stamp { right:6cqw; top:33cqw; width:12cqw; height:12cqw; border-radius:50%; border:.35cqw solid #b4442c; color:#b4442c;
+              display:grid; place-items:center; text-align:center; transform:rotate(-12deg); font-weight:700; font-size:1cqw; letter-spacing:.15em; line-height:1.3; }
+  .B .stamp big { display:block; font-family:"DM Serif Display",serif; font-size:3.6cqw; letter-spacing:0; line-height:1; font-weight:400; }
+  .B .dacts { left:36cqw; bottom:3cqw; display:flex; gap:1.6cqw; font-size:1.15cqw; font-weight:700; }
+
+  /* =====================================================================
+     C — INDEX (editorial)
+     ===================================================================== */
+  .C { background:#0b0b0b; color:#f2f0ea; font-family:"Instrument Serif",serif; --acc:#d4ff3a; }
+  .C .mono { font-family:"JetBrains Mono",monospace; }
+  .C .top { top:3cqw; left:4cqw; right:4cqw; display:flex; justify-content:space-between; font-family:"JetBrains Mono",monospace; font-size:1cqw; letter-spacing:.08em; color:#8d8b85; text-transform:uppercase; }
+  .C .top b { color:var(--acc); font-weight:400; }
+  .C .list { left:4cqw; width:58cqw; top:7cqw; bottom:6cqw; display:flex; flex-direction:column; justify-content:center;
+             -webkit-mask-image:linear-gradient(transparent, #000 22%, #000 78%, transparent); mask-image:linear-gradient(transparent, #000 22%, #000 78%, transparent); }
+  .C .r { display:grid; grid-template-columns:5cqw 1fr auto; align-items:baseline; gap:1.4cqw; padding:.55cqw 0; border-top:1px solid #262626; color:#6f6d68; }
+  .C .r .n, .C .r .g { font-family:"JetBrains Mono",monospace; font-size:1cqw; }
+  .C .r .t { font-size:3.3cqw; line-height:1.05; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .C .r.sel { color:#f2f0ea; border-top-color:var(--acc); padding:1.2cqw 0; }
+  .C .r.sel .t { font-size:6.2cqw; font-style:italic; color:var(--acc); line-height:1; }
+  .C .r.sel .n { color:var(--acc); }
+  .C .r.sel .g { color:#f2f0ea; }
+  .C .preview { right:4cqw; top:8cqw; width:26cqw; }
+  .C .preview .art { width:100%; aspect-ratio:3/4; }
+  .C .preview .cap { font-family:"JetBrains Mono",monospace; font-size:1cqw; color:#8d8b85; margin-top:1cqw; display:flex; justify-content:space-between; text-transform:uppercase; letter-spacing:.06em; }
+  .C .preview .cap b { color:#f2f0ea; font-weight:400; }
+  .C .foot { left:4cqw; right:4cqw; bottom:3cqw; display:flex; gap:2cqw; font-family:"JetBrains Mono",monospace; font-size:1cqw; color:#8d8b85; text-transform:uppercase; letter-spacing:.06em; align-items:center; }
+  .C .foot .pad { filter:grayscale(1) brightness(1.3); }
+  /* detail */
+  .C .dtitle { left:4cqw; top:6.5cqw; width:60cqw; font-size:10cqw; line-height:.82; letter-spacing:-.02em; }
+  .C .dtitle em { color:var(--acc); }
+  .C .dtext { left:4cqw; top:29cqw; width:50cqw; font-family:"Inter Tight",sans-serif; font-size:1.5cqw; line-height:1.6; color:#b9b6ae; }
+  .C .dtext::first-letter { font-family:"Instrument Serif",serif; float:left; font-size:5.2cqw; line-height:.8; padding:.4cqw .6cqw 0 0; color:var(--acc); }
+  .C .nums { right:4cqw; top:6.5cqw; width:26cqw; }
+  .C .num { border-top:1px solid #333; padding:1cqw 0 1.4cqw; display:flex; justify-content:space-between; align-items:flex-end; }
+  .C .num big { font-size:7cqw; line-height:.85; }
+  .C .num span { font-family:"JetBrains Mono",monospace; font-size:1cqw; color:#8d8b85; text-transform:uppercase; letter-spacing:.06em; text-align:right; }
+  .C .num.hl big { color:var(--acc); font-style:italic; }
+
+  /* =====================================================================
+     D — CRT / ARCADE
+     ===================================================================== */
+  .D { background:#0a0703; color:#ffb000; font-family:"VT323",monospace; --dim:#a06e00; }
+  .D .glow { inset:0; text-shadow:0 0 .5cqw rgba(255,176,0,.55); }
+  .D .scan { inset:0; pointer-events:none; z-index:5;
+             background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 2px, transparent 2px 4px),
+                         radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.75) 100%); }
+  .D .bar { position:absolute; top:2.6cqw; left:3.5cqw; right:3.5cqw; display:flex; justify-content:space-between; font-size:2cqw; border-bottom:.2cqw solid var(--dim); padding-bottom:.6cqw; }
+  .D .sys { position:absolute; left:3.5cqw; top:8cqw; width:17cqw; font-size:2.3cqw; line-height:1.45; }
+  .D .sys div { padding:0 .8cqw; color:var(--dim); }
+  .D .sys .on { background:#ffb000; color:#0a0703; text-shadow:none; }
+  .D .sys small { font-size:1.6cqw; }
+  .D .games { position:absolute; left:23cqw; top:8cqw; width:36cqw; font-size:2.6cqw; line-height:1.38; }
+  .D .games div { white-space:nowrap; color:var(--dim); }
+  .D .games .on { color:#ffb000; }
+  .D .games .on::before { content:"▶ "; }
+  .D .games div:not(.on)::before { content:"  "; white-space:pre; }
+  .D .box { position:absolute; right:3.5cqw; top:8cqw; width:31cqw; border:.35cqw double #ffb000; padding:1cqw; }
+  .D .box .art { width:100%; aspect-ratio:4/3; filter:sepia(1) saturate(3) hue-rotate(-10deg) contrast(1.1) brightness(.85); image-rendering:pixelated; }
+  .D .box .meta { font-size:1.9cqw; line-height:1.25; margin-top:.8cqw; display:grid; grid-template-columns:auto 1fr; column-gap:1.4cqw; }
+  .D .box .meta span:nth-child(odd) { color:var(--dim); }
+  .D .press { position:absolute; left:0; right:0; bottom:6.4cqw; text-align:center; font-size:3.2cqw; letter-spacing:.12em; animation:blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .D .foot { position:absolute; left:3.5cqw; right:3.5cqw; bottom:2.6cqw; display:flex; justify-content:space-between; font-size:1.8cqw; color:var(--dim); border-top:.2cqw solid var(--dim); padding-top:.6cqw; }
+  /* detail */
+  .D .dname { position:absolute; left:3.5cqw; top:8cqw; font-size:6.4cqw; line-height:.9; }
+  .D .dsub { position:absolute; left:3.5cqw; top:14.5cqw; font-size:2.2cqw; color:var(--dim); }
+  .D .bars { position:absolute; left:3.5cqw; top:20cqw; width:52cqw; font-size:2.3cqw; line-height:1.5; }
+  .D .bars div { display:grid; grid-template-columns:15cqw 1fr auto; gap:1cqw; }
+  .D .bars .lbl { color:var(--dim); }
+  .D .dlore { position:absolute; left:3.5cqw; top:36cqw; width:52cqw; font-size:1.9cqw; line-height:1.2; color:#d99600; }
+  .D .dbox { position:absolute; right:3.5cqw; top:8cqw; width:31cqw; border:.35cqw double #ffb000; padding:1cqw; }
+  .D .dbox .art { width:100%; aspect-ratio:3/4; filter:sepia(1) saturate(3) hue-rotate(-10deg) contrast(1.1) brightness(.85); }
+
+  .notes { margin-top:64px; border-top:1px solid #2a2a2a; padding-top:24px; color:#bdbdbd; font-size:15px; line-height:1.6; max-width:900px; }
+  .notes h3 { color:#fff; font-size:17px; margin-bottom:8px; }
+  .notes li { margin-left:20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="page">
+  <h1>Playnite Fullscreen — 4 direzioni</h1>
+  <p>Ogni proposta mostra la schermata libreria (sinistra) e il dettaglio gioco (destra) a 16:9, come su una TV. Copertine e titoli sono finti, le "artwork" sono gradienti CSS: nel tema vero arrivano dai metadati di Playnite (cover, background, logo).</p>
+</header>
+
+<!-- ============================== A ============================== -->
+<section class="variant">
+  <h2><span class="tag">A</span> Cinema</h2>
+  <p>Stile streaming/console moderna: il background del gioco selezionato riempie lo schermo, titolo enorme, una sola riga di tile in basso. Massimo impatto, poca densità: perfetto con librerie curate e buoni background.</p>
+  <div class="pair">
+    <figure>
+      <div class="frame A">
+        <div class="bg art g-neon"></div><div class="veil"></div>
+        <div class="top">
+          <nav><b>Libreria</b><span>Installati</span><span>Recenti</span><span>Emulatori</span><span>Collezioni</span></nav>
+          <div class="sys"><span>412 giochi</span><span>🎮 ▮▮▮▯</span><span>21:47</span></div>
+        </div>
+        <div class="hero">
+          <div class="eyebrow">Ultimo giocato · 3 giorni fa</div>
+          <h1>Neon<br>Oracle</h1>
+          <div class="meta">2023 <i></i> Action RPG <i></i> 42 h giocate <i></i> Steam</div>
+          <div class="btns"><div class="btn primary"><span class="pad a">A</span>Gioca</div><div class="btn"><span class="pad y">Y</span>Dettagli</div><div class="btn"><span class="pad x">X</span>Preferito</div></div>
+        </div>
+        <div class="row">
+          <div class="label">Continua a giocare</div>
+          <div class="tiles">
+            <div class="tile art g-neon sel"><span class="t">Neon Oracle</span><span class="progress" style="width:68%"></span></div>
+            <div class="tile art g-hollow"><span class="progress" style="width:30%"></span></div>
+            <div class="tile art g-salt"><span class="progress" style="width:92%"></span></div>
+            <div class="tile art g-drift"></div>
+            <div class="tile art g-comet"></div>
+            <div class="tile art g-moss"></div>
+          </div>
+        </div>
+      </div>
+      <figcaption>Libreria — LB/RB cambia categoria, frecce scorrono la riga, il background cambia con la selezione.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame A detail">
+        <div class="bg art g-neon"></div><div class="veil"></div>
+        <div class="back"><span class="pad b">B</span>Indietro</div>
+        <div class="dleft">
+          <div class="eyebrow">Steam · Installato · 38,4 GB</div>
+          <h1>Neon Oracle</h1>
+          <div class="chips"><span class="chip">Action RPG</span><span class="chip">Cyberpunk</span><span class="chip">Single player</span><span class="chip">Controller ✓</span></div>
+          <p class="desc">Una città che sogna in sintetico. Hacka oracoli, riscrivi profezie e decidi chi sopravvive al prossimo blackout. Combattimento in tempo reale, scelte che si propagano su tre finali.</p>
+          <div class="btns"><div class="btn primary"><span class="pad a">A</span>Gioca</div><div class="btn"><span class="pad x">X</span>Opzioni</div><div class="btn"><span class="pad y">Y</span>Achievement</div></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><small>Tempo giocato</small><b>42h 18m</b></div>
+          <div class="stat"><small>Ultima sessione</small><b>Ieri</b></div>
+          <div class="stat"><small>Completamento</small><b>68%</b><div class="bar"><span style="width:68%"></span></div></div>
+          <div class="stat"><small>Achievement</small><b>31/48</b><div class="bar"><span style="width:64%"></span></div></div>
+        </div>
+        <div class="shots">
+          <div class="tile art g-neon"></div><div class="tile art g-comet"></div><div class="tile art g-drift"></div><div class="tile art g-iron"></div>
+        </div>
+      </div>
+      <figcaption>Dettaglio — stesso background scurito, stat in card vetro, screenshot in basso.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================== B ============================== -->
+<section class="variant">
+  <h2><span class="tag">B</span> La Collezione</h2>
+  <p>Tema chiaro "da collezionista": la libreria è uno scaffale di dorsi colorati, quello selezionato si sfila e mostra la copertina. Il dettaglio è il retro della scatola. Il più originale dei quattro, valorizza librerie grandi.</p>
+  <div class="pair">
+    <figure>
+      <div class="frame B">
+        <div class="grain"></div>
+        <div class="top">
+          <h3>La <em>collezione</em></h3>
+          <div class="right"><span><b>412</b> giochi</span><span>Ordine: <b>ultimo giocato</b></span><span><span class="pad sh">LB</span>Tutti · PC · Retro<span class="pad sh" style="margin-left:.5cqw">RB</span></span></div>
+        </div>
+        <div class="shelf">
+          <div class="spine" style="height:27cqw;background:#2c5364">Hollow Meridian<small>PC</small></div>
+          <div class="spine" style="height:29cqw;background:#e76f51">Saltwater Kings<small>PC</small></div>
+          <div class="spine" style="height:26cqw;background:#8ea3ac">The Long Quiet<small>GOG</small></div>
+          <div class="cover art g-neon"><div class="ct">Neon<br>Oracle</div></div>
+          <div class="spine" style="height:28cqw;background:#7a2e1d">Ironvale Tactics<small>PC</small></div>
+          <div class="spine" style="height:24cqw;background:#693668">Pale Comet<small>SNES</small></div>
+          <div class="spine" style="height:29.5cqw;background:#0077b6">Drift Protocol<small>PS1</small></div>
+          <div class="spine" style="height:26.5cqw;background:#344e41">Moss &amp; Marrow<small>PC</small></div>
+          <div class="spine" style="height:28cqw;background:#c9a227;color:#1d1b17">Ashen Crown II<small>PC</small></div>
+          <div class="spine" style="height:25cqw;background:#1d1b17">Kestrel Run<small>GBA</small></div>
+          <div class="spine" style="height:27.5cqw;background:#b4442c">Glasshouse<small>PC</small></div>
+          <div class="spine" style="height:29cqw;background:#3a0ca3">Overclocked Saints<small>PC</small></div>
+          <div class="spine" style="height:26cqw;background:#5e7480">Quarry 12<small>N64</small></div>
+        </div>
+        <div class="plank"></div>
+        <div class="info">
+          <div><h4>Neon Oracle</h4><div class="m">2023 · Action RPG · 42 h · Steam</div></div>
+          <div class="acts"><span><span class="pad a">A</span>Gioca</span><span><span class="pad y">Y</span>Retro scatola</span></div>
+        </div>
+        <div class="hint"></div>
+        <div class="az">A B C D E F G H I J K L M <b>N</b> O P Q R S T U V W X Y Z</div>
+      </div>
+      <figcaption>Libreria — ←/→ scorre lo scaffale, i trigger saltano di lettera (scrubber A–Z in basso).</figcaption>
+    </figure>
+    <figure>
+      <div class="frame B">
+        <div class="grain"></div>
+        <div class="bigcover art g-hollow"><div class="cover" style="all:unset"></div></div>
+        <div class="back">
+          <div class="kicker">Metroidvania · 2019 · GOG</div>
+          <h3>Hollow Meridian</h3>
+          <div class="tagline">Sotto la luna fredda, la mappa si ricorda di te.</div>
+          <div class="cols">Esplora un regno sommerso dove ogni stanza cambia con le maree. Recupera i frammenti del meridiano, sblocca nuovi movimenti e torna dove eri già stato per scoprire ciò che prima era fuori portata. Oltre 30 boss, una mappa che si riscrive e un finale nascosto per chi completa il bestiario.</div>
+          <div class="specs">
+            <div><b>Sviluppatore</b><span></span>Lowtide Works</div>
+            <div><b>Tempo giocato</b><span></span>27 h 05 m</div>
+            <div><b>Ultima sessione</b><span></span>2 ottobre</div>
+            <div><b>Achievement</b><span></span>22 / 40</div>
+          </div>
+        </div>
+        <div class="stamp"><div>COMPLETATO<big>68%</big></div></div>
+        <div class="dacts"><span><span class="pad a">A</span>Gioca</span><span><span class="pad x">X</span>Opzioni</span><span><span class="pad b">B</span>Torna allo scaffale</span></div>
+      </div>
+      <figcaption>Dettaglio — "retro della scatola": copertina grande, tagline, specifiche con puntini, timbro di completamento.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================== C ============================== -->
+<section class="variant">
+  <h2><span class="tag">C</span> Index</h2>
+  <p>Editoriale/rivista: niente griglia di copertine, la libreria è un indice tipografico gigante con un solo colore accento. Elegante, velocissimo da navigare con il pad, regge bene anche giochi senza artwork.</p>
+  <div class="pair">
+    <figure>
+      <div class="frame C">
+        <div class="top"><span>Index — <b>412 titoli</b> / A→Z / Filtro: tutti</span><span>Ven 09.10 — 21:47</span></div>
+        <div class="list">
+          <div class="r"><span class="n">011</span><span class="t">Kestrel Run</span><span class="g">GBA · 6h</span></div>
+          <div class="r"><span class="n">012</span><span class="t">Moss &amp; Marrow</span><span class="g">Roguelite · 19h</span></div>
+          <div class="r"><span class="n">013</span><span class="t">Hollow Meridian</span><span class="g">Metroidvania · 27h</span></div>
+          <div class="r sel"><span class="n">014</span><span class="t">Neon Oracle</span><span class="g">Action RPG · 42h</span></div>
+          <div class="r"><span class="n">015</span><span class="t">Overclocked Saints</span><span class="g">Shooter · 3h</span></div>
+          <div class="r"><span class="n">016</span><span class="t">Pale Comet</span><span class="g">SNES · 11h</span></div>
+          <div class="r"><span class="n">017</span><span class="t">Quarry 12</span><span class="g">N64 · —</span></div>
+        </div>
+        <div class="preview">
+          <div class="art g-neon"></div>
+          <div class="cap"><span>Steam · <b>installato</b></span><span>68% completo</span></div>
+        </div>
+        <div class="foot"><span><span class="pad a">A</span>Gioca</span><span><span class="pad y">Y</span>Leggi</span><span><span class="pad x">X</span>Filtri</span><span style="margin-left:auto">LT/RT salta lettera</span></div>
+      </div>
+      <figcaption>Libreria — la riga selezionata esplode in corsivo accento, le altre sfumano sopra e sotto.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame C">
+        <div class="top"><span>014 / <b>Neon Oracle</b></span><span>Steam — 2023 — Action RPG</span></div>
+        <div class="dtitle">Neon<br><em>Oracle</em></div>
+        <div class="dtext">Una città che sogna in sintetico. Hacka oracoli, riscrivi profezie e decidi chi sopravvive al prossimo blackout. Combattimento in tempo reale, scelte che si propagano su tre finali e una colonna sonora synth che cambia con il quartiere in cui ti trovi. Sviluppato da Halcyon Byte, pubblicato nel marzo 2023.</div>
+        <div class="nums">
+          <div class="num hl"><big>42</big><span>ore<br>giocate</span></div>
+          <div class="num"><big>68%</big><span>completo</span></div>
+          <div class="num"><big>31</big><span>di 48<br>trofei</span></div>
+        </div>
+        <div class="foot"><span><span class="pad a">A</span>Gioca</span><span><span class="pad x">X</span>Opzioni</span><span><span class="pad b">B</span>Indice</span><span style="margin-left:auto">Ultima sessione: ieri, 1h 52m</span></div>
+      </div>
+      <figcaption>Dettaglio — impaginato come un articolo: capolettera, colonne, numeri giganti.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================== D ============================== -->
+<section class="variant">
+  <h2><span class="tag">D</span> Phosphor</h2>
+  <p>Monitor CRT ambra, scanline, testo che "brucia". Pensato per chi usa Playnite soprattutto con emulatori: lista sistemi a sinistra, giochi al centro, box art filtrata in monocromo. Tutto testo, quindi leggibilissimo dal divano.</p>
+  <div class="pair">
+    <figure>
+      <div class="frame D">
+        <div class="glow">
+          <div class="bar"><span>PLAYNITE://LIBRARY</span><span>412 GAMES  ─  21:47</span></div>
+          <div class="sys">
+            <div>PC <small>214</small></div>
+            <div class="on">SNES <small>61</small></div>
+            <div>MEGA DRIVE <small>38</small></div>
+            <div>PS1 <small>44</small></div>
+            <div>GBA <small>29</small></div>
+            <div>N64 <small>26</small></div>
+          </div>
+          <div class="games">
+            <div>ASHEN CROWN II</div>
+            <div>GLASSHOUSE</div>
+            <div>KESTREL RUN</div>
+            <div class="on">PALE COMET</div>
+            <div>QUARRY 12</div>
+            <div>SALTWATER KINGS</div>
+            <div>STAR BRAWLER '94</div>
+          </div>
+          <div class="box">
+            <div class="art g-neon"></div>
+            <div class="meta"><span>YEAR</span><span>1994</span><span>GENRE</span><span>SHMUP</span><span>PLAYED</span><span>11H 40M</span><span>CORE</span><span>SNES9X</span></div>
+          </div>
+          <div class="press">PRESS Ⓐ TO START</div>
+          <div class="foot"><span>Ⓑ BACK  Ⓧ FAV  Ⓨ INFO</span><span>LB/RB SYSTEM</span></div>
+        </div>
+        <div class="scan"></div>
+      </div>
+      <figcaption>Libreria — tre colonne: sistema / gioco / anteprima. "PRESS A TO START" lampeggia.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame D">
+        <div class="glow">
+          <div class="bar"><span>PLAYNITE://STATUS</span><span>SNES  ─  61/412</span></div>
+          <div class="dname">PALE COMET</div>
+          <div class="dsub">1994 · SHMUP · 1-2 PLAYERS · SNES9X</div>
+          <div class="bars">
+            <div><span class="lbl">PLAYTIME</span><span>██████████░░░░░░</span><span>11:40</span></div>
+            <div><span class="lbl">SESSIONS</span><span>███████░░░░░░░░░</span><span>037</span></div>
+            <div><span class="lbl">COMPLETE</span><span>███████████░░░░░</span><span>68%</span></div>
+            <div><span class="lbl">RATING</span><span>★★★★☆</span><span></span></div>
+          </div>
+          <div class="dlore">&gt; Una cometa pallida attraversa il sistema Vega. Sei l'ultimo pilota rimasto. 7 livelli, 2 finali, nessun continue._</div>
+          <div class="dbox"><div class="art g-neon"></div></div>
+          <div class="foot"><span>Ⓐ START  Ⓧ SAVE STATES  Ⓑ BACK</span><span>LAST PLAYED 04.10.26</span></div>
+        </div>
+        <div class="scan"></div>
+      </div>
+      <figcaption>Dettaglio — schermata "status" con barre a blocchi, lore in stile terminale.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<div class="notes">
+  <h3>Note pratiche</h3>
+  <ul>
+    <li>I temi Fullscreen di Playnite sono XAML/WPF, non HTML: questi mock fissano la direzione, poi il tema va scritto in XAML partendo dal Default Fullscreen generato con Toolbox.</li>
+    <li>Gradienti, blur, layout e animazioni (ad esempio il dorso che si sfila in B o il blink in D) in WPF si fanno senza problemi. Le scanline di D si ottengono con un'immagine sovrapposta.</li>
+    <li>Fattibilità con le sole viste standard di Playnite: A e C facili, D media, B la più complessa (lo scaffale richiede un ItemsPanel custom con template diversi per l'elemento selezionato).</li>
+  </ul>
+</div>
+</div>
+</body>
+</html>

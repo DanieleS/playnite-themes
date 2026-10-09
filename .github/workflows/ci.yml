@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # Playnite release the themes are checked against (ThemeApiVersion 2.10.0).
+  PLAYNITE_VERSION: "10.62"
+
+jobs:
+  validate:
+    name: Validate and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch Playnite's string keys
+        run: curl -fsSL -o LocSource.xaml "https://raw.githubusercontent.com/JosefNemec/Playnite/${PLAYNITE_VERSION}/source/Playnite/Localization/LocSource.xaml"
+
+      - name: Validate themes
+        run: python scripts/build.py validate --loc-source LocSource.xaml
+
+      - name: Build packages
+        run: python scripts/build.py build --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: themes
+          path: dist/*.pthm
+          if-no-files-found: error
+
+  xaml:
+    name: Load XAML with Playnite (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Playnite portable
+        shell: pwsh
+        run: |
+          gh release download $env:PLAYNITE_VERSION --repo JosefNemec/Playnite --pattern "$env:PLAYNITE_VERSION.7z" --dir playnite-dl
+          7z x "playnite-dl/$env:PLAYNITE_VERSION.7z" -oplaynite -y | Out-Null
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Parse every theme file
+        shell: powershell
+        run: ./scripts/ci/parse-xaml.ps1 -PlayniteDir playnite -ThemesDir themes
+
+  mosaic-navigation:
+    name: Journal mosaic navigation (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Run navigation test
+        run: dotnet run --project tests/MosaicNavigation -c Release -- themes/journal/Views/Main.xaml

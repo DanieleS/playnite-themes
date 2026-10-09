@@ -1,0 +1,18 @@
+AddonId: DanieleS_Cinema_Fullscreen
+Type: ThemeFullscreen
+InstallerManifestUrl: https://raw.githubusercontent.com/DanieleS/playnite-themes/main/themes/cinema/installer.yaml
+Name: Cinema
+Author: Davide Specchia
+ShortDescription: "Streaming-style home: the selected game's artwork fills the screen, its logo on the left, one row of covers below."
+Description: "Cinema turns Playnite's fullscreen mode into a streaming-service home screen. The background art of the selected game fills the TV, the game's logo (via Extra Metadata Loader) or its title sits on the left with release year, genres, developer and time played, and your library is a single row of covers at the bottom. The details view keeps the artwork and adds stat cards for time played, last played, sessions, completion, size and date added."
+Tags:
+  - Modern
+  - Minimal
+  - Dark
+  - Logos
+SourceUrl: https://github.com/DanieleS/playnite-themes
+Links:
+  GitHub: https://github.com/DanieleS/playnite-themes/tree/main/themes/cinema
+  Issues: https://github.com/DanieleS/playnite-themes/issues
+# Screenshots are required before submitting to the add-on database (1920x1080 PNG/JPG, plus thumbnails).
+Screenshots: []

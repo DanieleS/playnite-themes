@@ -1,0 +1,176 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    mc:Ignorable="d">
+
+    <!--
+        Journal / Game details: a bento of tiles.
+        Artwork + logo + actions take the big tile; numbers (time played, last played, sessions, completion,
+        added, size), the cover and the description fill the rest.
+    -->
+    <Style TargetType="{x:Type GameDetails}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GameDetails}">
+                    <Grid x:Name="PART_ViewHost" Background="{DynamicResource MainBackgourndBrush}"
+                          d:DesignWidth="{StaticResource DesignWidth}"
+                          d:DesignHeight="{StaticResource DesignHeight}"
+                          d:DataContext="{x:Static DesignMainViewModel.DesignSelectedGameIntance}"
+                          KeyboardNavigation.DirectionalNavigation="Contained"
+                          KeyboardNavigation.TabNavigation="Cycle"
+                          KeyboardNavigation.ControlTabNavigation="Cycle">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="130" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="60" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Title row -->
+                        <Grid Grid.Row="0" Margin="70,0,70,0">
+                            <TextBlock FontFamily="{DynamicResource JournalFontDisplay}" FontSize="52" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource JournalInkBrush}" TextTrimming="CharacterEllipsis" Margin="0,0,300,0"
+                                       Text="{Binding DisplayName}" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <ContentControl ContentTemplate="{DynamicResource ButtonPromptB}" Height="28" Focusable="False" />
+                                <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Margin="10,0,0,0" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Text="{DynamicResource LOCBackLabel}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Bento -->
+                        <Grid Grid.Row="1" Margin="61,0,61,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5*" />
+                                <ColumnDefinition Width="5*" />
+                                <ColumnDefinition Width="4*" />
+                                <ColumnDefinition Width="4*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Hero tile -->
+                            <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="2" Margin="9" CornerRadius="22">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding DisplayBackgroundImageObject}" Stretch="UniformToFill" />
+                                </Border.Background>
+                                <Grid>
+                                    <Border CornerRadius="22">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                                <GradientStop Color="#000F1115" Offset="0.2" />
+                                                <GradientStop Color="#F20F1115" Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Bottom" Margin="36,0,36,30">
+                                        <ContentControl x:Name="ExtraMetadataLoader_LogoLoaderControl" Focusable="False"
+                                                        MaxWidth="460" MaxHeight="150" HorizontalAlignment="Left" Margin="0,0,0,20" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Style="{DynamicResource JournalLabel}" Foreground="#D9FFFFFF" Text="{Binding ReleaseYear}" />
+                                            <TextBlock Style="{DynamicResource JournalLabel}" Foreground="#D9FFFFFF" Text="  ·  " />
+                                            <TextBlock Style="{DynamicResource JournalLabel}" Foreground="#D9FFFFFF" MaxWidth="420"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Text="{Binding Genres, Converter={StaticResource ListToStringConverter}}" />
+                                            <TextBlock Style="{DynamicResource JournalLabel}" Foreground="#D9FFFFFF" Text="  ·  " />
+                                            <TextBlock Style="{DynamicResource JournalLabel}" Foreground="#D9FFFFFF" MaxWidth="300"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Text="{Binding Developers, Converter={StaticResource ListToStringConverter}}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+                                            <ButtonEx x:Name="PART_ButtonContext" Style="{DynamicResource JournalButton}" />
+                                            <ButtonEx x:Name="PART_ButtonOptions" Style="{DynamicResource JournalButton}"
+                                                      Content="{DynamicResource LOCGameOptions}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Time played -->
+                            <Border Grid.Column="2" Grid.Row="0" Style="{DynamicResource JournalTile}">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Top" Style="{DynamicResource JournalLabel}"
+                                               Text="{Binding Source={StaticResource LOCTimePlayed}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource JournalBigNumber}" Foreground="{DynamicResource JournalAccentBrush}"
+                                               Text="{Binding Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Sessions -->
+                            <Border Grid.Column="3" Grid.Row="0" Style="{DynamicResource JournalTile}">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Top" Style="{DynamicResource JournalLabel}"
+                                               Text="{Binding Source={StaticResource LOCPlayCountLabel}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource JournalBigNumber}" Text="{Binding PlayCount}" />
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Last played -->
+                            <Border Grid.Column="2" Grid.Row="1" Style="{DynamicResource JournalTile}">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Top" Style="{DynamicResource JournalLabel}"
+                                               Text="{Binding Source={StaticResource LOCLastPlayed}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource JournalBigNumber}" FontSize="38" TextWrapping="Wrap"
+                                               Text="{Binding LastActivity, Converter={StaticResource DateTimeToLastPlayedConverter}}" />
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Completion -->
+                            <Border Grid.Column="3" Grid.Row="1" Style="{DynamicResource JournalTile}">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Top" Style="{DynamicResource JournalLabel}"
+                                               Text="{Binding Source={StaticResource LOCCompletionStatus}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource JournalBigNumber}" FontSize="38" TextWrapping="Wrap"
+                                               Text="{Binding CompletionStatus.Name}" />
+                                </DockPanel>
+                            </Border>
+
+                            <!-- Description -->
+                            <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Style="{DynamicResource JournalTile}" Padding="30,24,20,20">
+                                <ScrollViewerEx x:Name="PART_ScrollHtmlDescription" CustomScrollAmount="42">
+                                    <HtmlTextView x:Name="PART_HtmlDescription"
+                                                  HtmlFontSize="18"
+                                                  HtmlFontFamily="{DynamicResource JournalFontBody}"
+                                                  HtmlForeground="#FFB9BEC7"
+                                                  LinkForeground="#FFFF7A45"
+                                                  FocusVisualStyle="{x:Null}" />
+                                </ScrollViewerEx>
+                            </Border>
+
+                            <!-- Added / size -->
+                            <Border Grid.Column="2" Grid.Row="2" Style="{DynamicResource JournalTile}">
+                                <StackPanel VerticalAlignment="Bottom">
+                                    <TextBlock Style="{DynamicResource JournalLabel}"
+                                               Text="{Binding Source={StaticResource LOCDateAddedLabel}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource TextBlockBaseStyle}" FontSize="28" FontWeight="Bold" Margin="0,4,0,14"
+                                               Text="{Binding Added, Converter={StaticResource NullableDateToStringConverter}}" />
+                                    <TextBlock Style="{DynamicResource JournalLabel}"
+                                               Text="{Binding Source={StaticResource LOCInstallSizeLabel}, Converter={StaticResource StringToUpperCaseConverter}}" />
+                                    <TextBlock Style="{DynamicResource TextBlockBaseStyle}" FontSize="28" FontWeight="Bold" Margin="0,4,0,0"
+                                               Text="{Binding InstallSize, Converter={StaticResource NullableUlongBytesSizeToStringConverter}}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Cover -->
+                            <Border Grid.Column="3" Grid.Row="2" Margin="9" CornerRadius="22" ClipToBounds="True"
+                                    Background="{DynamicResource JournalCardBrush}">
+                                <Image x:Name="PART_ImageCover" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="Fant">
+                                    <Image.OpacityMask>
+                                        <VisualBrush Stretch="Fill">
+                                            <VisualBrush.Visual>
+                                                <Border Width="300" Height="200" CornerRadius="22" Background="#FF000000" />
+                                            </VisualBrush.Visual>
+                                        </VisualBrush>
+                                    </Image.OpacityMask>
+                                </Image>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

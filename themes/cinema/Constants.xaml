@@ -1,0 +1,129 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Cinema: black, white and the game's own artwork. -->
+
+    <!-- Overrides of the default palette, so stock menus and dialogs match the theme. -->
+    <Color x:Key="GlyphColor">#FFFFFFFF</Color>
+    <Color x:Key="GlyphLightColor">#FFD9D9D9</Color>
+    <Color x:Key="SelectionLightColor">#FF8A8A8A</Color>
+    <Color x:Key="OverlayColor">#CC000000</Color>
+    <Color x:Key="ControlBackgroundColor">#FF262626</Color>
+    <Color x:Key="ControlBackgroundColorDark">#FF0D0D0D</Color>
+    <Color x:Key="TextColor">#FFF2F2F2</Color>
+    <Color x:Key="TextColorDark">#FF8A8A8A</Color>
+
+    <SolidColorBrush x:Key="MainBackgourndBrush" Color="#FF000000" />
+    <SolidColorBrush x:Key="TopBarBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="BottomBarBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="SelectionBrush" Color="#FFFFFFFF" />
+
+    <LinearGradientBrush x:Key="OverlayMenuBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF161616" Offset="0" />
+        <GradientStop Color="#FF050505" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="GameDetailsBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#00000000" Offset="0" />
+        <GradientStop Color="#EE000000" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Fonts shipped with Windows 10/11; the list falls back when the first is missing. -->
+    <FontFamily x:Key="CinemaFontBody">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="CinemaFontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWeb">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWebLight">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontTitilliumWebBold">Segoe UI Variable Display Semibold, Segoe UI Semibold</FontFamily>
+
+    <sys:Double x:Key="FontSizeSmall">18</sys:Double>
+    <sys:Double x:Key="FontSize">22</sys:Double>
+
+    <SolidColorBrush x:Key="CinemaTextBrush" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="CinemaTextSoftBrush" Color="#CCFFFFFF" />
+    <SolidColorBrush x:Key="CinemaTextMutedBrush" Color="#8CFFFFFF" />
+    <SolidColorBrush x:Key="CinemaPillBrush" Color="#29FFFFFF" />
+    <SolidColorBrush x:Key="CinemaCardBrush" Color="#8C141414" />
+    <SolidColorBrush x:Key="CinemaCardBorderBrush" Color="#14FFFFFF" />
+
+    <Style x:Key="TextBlockBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{DynamicResource FontSize}" />
+        <Setter Property="FontFamily" Value="{DynamicResource CinemaFontBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
+    <Style x:Key="CinemaEyebrow" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource CinemaTextSoftBrush}" />
+    </Style>
+
+    <Style x:Key="CinemaMeta" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="Foreground" Value="{DynamicResource CinemaTextSoftBrush}" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
+    <Style x:Key="CinemaDot" TargetType="Ellipse">
+        <Setter Property="Width" Value="5" />
+        <Setter Property="Height" Value="5" />
+        <Setter Property="Fill" Value="{DynamicResource CinemaTextMutedBrush}" />
+        <Setter Property="Margin" Value="14,0,14,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Focusable pill used for the actions in the game details view. -->
+    <Style x:Key="CinemaPillButton" TargetType="ButtonEx">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Foreground" Value="{DynamicResource CinemaTextBrush}" />
+        <Setter Property="Background" Value="{DynamicResource CinemaPillBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource CinemaFontBody}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="Padding" Value="34,14,34,14" />
+        <Setter Property="Margin" Value="0,0,16,0" />
+        <Setter Property="MinWidth" Value="200" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ButtonEx">
+                    <Border x:Name="Body" Background="{TemplateBinding Background}" CornerRadius="32"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="Body" Property="Background" Value="#FFFFFFFF" />
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#FF000000" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Body" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CinemaStatCard" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource CinemaCardBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CinemaCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="Padding" Value="26,22,26,22" />
+        <Setter Property="Margin" Value="0,0,18,18" />
+    </Style>
+
+    <Style x:Key="CinemaStatLabel" TargetType="TextBlock" BasedOn="{StaticResource CinemaEyebrow}">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Foreground" Value="{DynamicResource CinemaTextMutedBrush}" />
+    </Style>
+
+    <Style x:Key="CinemaStatValue" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="FontFamily" Value="{DynamicResource CinemaFontDisplay}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="40" />
+        <Setter Property="Margin" Value="0,6,0,0" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+</ResourceDictionary>
