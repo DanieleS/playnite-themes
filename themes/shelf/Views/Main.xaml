@@ -78,8 +78,11 @@
                             </Ellipse>
                             <Viewport3D ClipToBounds="False" IsHitTestVisible="False">
                                 <Viewport3D.Camera>
-                                    <PerspectiveCamera Position="0,0.08,7.4" LookDirection="0,0,-1" UpDirection="0,1,0"
-                                                       FieldOfView="28" />
+                                    <!-- WPF's FieldOfView is horizontal. At distance 5 a 29 degree view spans ~2.6 units,
+                                         so the 2-unit-wide box fills most of the 380px slot; the camera sits a bit high
+                                         so the box rests near the bottom (on the plank) and its top is seen slightly from above. -->
+                                    <PerspectiveCamera Position="0,0.24,5" LookDirection="0,0,-1" UpDirection="0,1,0"
+                                                       FieldOfView="29" />
                                 </Viewport3D.Camera>
                                 <ModelVisual3D>
                                     <ModelVisual3D.Content>
