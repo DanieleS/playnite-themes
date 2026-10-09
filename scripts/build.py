@@ -4,12 +4,14 @@
   python3 scripts/build.py validate [--loc-source LocSource.xaml]
   python3 scripts/build.py build [theme ...] [--out dist]
   python3 scripts/build.py version <theme>
+  python3 scripts/build.py bump <theme>
   python3 scripts/build.py installer-entry <theme> --url URL [--changelog TEXT ...]
 
 No third-party dependencies: runs on any Python 3.9+.
 """
 import argparse
 import datetime
+import json
 import re
 import subprocess
 import sys
@@ -192,6 +194,18 @@ def cmd_version(args):
     return 0
 
 
+def cmd_bump(args):
+    """Increment the PATCH part of Version in themes/<theme>/theme.yaml and print the new version."""
+    theme = theme_dirs([args.theme])[0]
+    path = theme / "theme.yaml"
+    major, minor, patch = parse_version(read_manifest(theme)["Version"])
+    new = f"{major}.{minor}.{patch + 1}"
+    text = re.sub(r"^(Version:\s*).*$", rf"\g<1>{new}", path.read_text(encoding="utf-8-sig"), count=1, flags=re.M)
+    path.write_text(text, encoding="utf-8")
+    print(new)
+    return 0
+
+
 def cmd_installer_entry(args):
     """Prepend a package to themes/<theme>/installer.yaml (Playnite add-on installer manifest)."""
     theme = theme_dirs([args.theme])[0]
@@ -207,7 +221,8 @@ def cmd_installer_entry(args):
         f"    ReleaseDate: {datetime.date.today().isoformat()}",
         f"    PackageUrl: {args.url}",
         "    Changelog:",
-        *[f"      - {line}" for line in changelog],
+        # JSON strings are valid YAML scalars: safe for commit messages with ':', '#', quotes...
+        *[f"      - {json.dumps(line)}" for line in changelog],
     ]
     text = f"AddonId: {m['Id']}\nPackages:\n" + "\n".join(entry) + "\n" + packages.lstrip("\n")
     path.write_text(text, encoding="utf-8")
@@ -228,6 +243,9 @@ def main():
     p = sub.add_parser("version")
     p.add_argument("theme")
     p.set_defaults(fn=cmd_version)
+    p = sub.add_parser("bump")
+    p.add_argument("theme")
+    p.set_defaults(fn=cmd_bump)
     p = sub.add_parser("installer-entry")
     p.add_argument("theme")
     p.add_argument("--url", required=True)
