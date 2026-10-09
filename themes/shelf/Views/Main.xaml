@@ -56,28 +56,50 @@
                             <Border x:Name="Darken" Background="#66000000" Visibility="Collapsed" />
                         </Grid>
 
-                        <!-- Box -->
-                        <Grid x:Name="Box" Width="314" Height="470" Margin="18,0,30,0" Visibility="Collapsed"
-                              VerticalAlignment="Bottom" RenderTransformOrigin="0.5,1">
+                        <!-- Box, seen from its front-left corner: spine face on the left, front turned to the right.
+                             WPF has no perspective, so both faces are skewed around the shared edge (the nearest
+                             corner) and the box is lifted so its lowest corner rests on the plank.
+                             Prototype: mocks/shelf-box-3d.html (variant A). -->
+                        <Grid x:Name="Box" Width="356" Height="470" Margin="18,0,34,0" Visibility="Collapsed"
+                              VerticalAlignment="Bottom">
                             <Grid.RenderTransform>
-                                <TranslateTransform Y="-22" />
+                                <TranslateTransform Y="-48" />
                             </Grid.RenderTransform>
-                            <Border Background="#FF1D1B17" CornerRadius="3">
-                                <Border.Effect>
-                                    <DropShadowEffect ShadowDepth="22" Direction="300" BlurRadius="40" Opacity="0.45" Color="#FF3C2805" />
-                                </Border.Effect>
-                            </Border>
-                            <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
-                                   RenderOptions.BitmapScalingMode="Fant" Margin="4" />
-                            <Rectangle Margin="4">
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.4">
-                                        <GradientStop Color="#38FFFFFF" Offset="0" />
-                                        <GradientStop Color="#00FFFFFF" Offset="0.35" />
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                            <Rectangle Width="10" Margin="4" HorizontalAlignment="Left" Fill="#40000000" />
+                            <!-- Spine face -->
+                            <Grid Width="42" HorizontalAlignment="Left" RenderTransformOrigin="1,1">
+                                <Grid.RenderTransform>
+                                    <SkewTransform AngleY="-24" />
+                                </Grid.RenderTransform>
+                                <Border>
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding FullscreenListItemCoverObject}"
+                                                    Stretch="UniformToFill" AlignmentX="Left" />
+                                    </Border.Background>
+                                </Border>
+                                <Rectangle Fill="#8C000000" />
+                                <Rectangle Width="2" HorizontalAlignment="Right" Fill="#40FFFFFF" />
+                            </Grid>
+                            <!-- Front face -->
+                            <Grid Width="314" HorizontalAlignment="Right" RenderTransformOrigin="0,1">
+                                <Grid.RenderTransform>
+                                    <SkewTransform AngleY="8" />
+                                </Grid.RenderTransform>
+                                <Border Background="#FF1D1B17">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="24" Direction="315" BlurRadius="44" Opacity="0.45" Color="#FF3C2805" />
+                                    </Border.Effect>
+                                </Border>
+                                <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
+                                       RenderOptions.BitmapScalingMode="Fant" />
+                                <Rectangle>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.4">
+                                            <GradientStop Color="#38FFFFFF" Offset="0" />
+                                            <GradientStop Color="#00FFFFFF" Offset="0.35" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Grid>
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -132,7 +154,7 @@
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Orientation="Horizontal">
                                     <TextBlock Style="{DynamicResource ShelfDisplay}" FontSize="58"
                                                Text="{DynamicResource LOCDS_Shelf_Title}" VerticalAlignment="Center" />
-                                    <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Margin="26,14,0,0" FontSize="20"
+                                    <TextBlock Style="{DynamicResource ShelfText}" Margin="26,14,0,0" FontSize="20"
                                                Foreground="{DynamicResource ShelfSoftBrush}" VerticalAlignment="Center"
                                                Text="{Binding Items.Count, ElementName=ShelfList}" />
                                 </StackPanel>
@@ -167,9 +189,9 @@
                                     </ContentControl.Style>
                                 </ContentControl>
                                 <TextBlock x:Name="PART_TextBatteryPercentage" Grid.Column="3" Margin="0,0,16,0"
-                                           Style="{DynamicResource TextBlockBaseStyle}" VerticalAlignment="Center" />
+                                           Style="{DynamicResource ShelfText}" VerticalAlignment="Center" />
                                 <TextBlock x:Name="PART_TextClock" Grid.Column="4" Margin="10,0,20,0" FontWeight="SemiBold"
-                                           Style="{DynamicResource TextBlockBaseStyle}" VerticalAlignment="Center" />
+                                           Style="{DynamicResource ShelfText}" VerticalAlignment="Center" />
                                 <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Center">
                                     <ButtonEx x:Name="PART_ButtonProgramUpdate" Margin="4,0,4,0" Height="48" MinWidth="48"
                                               Style="{DynamicResource ButtonTopMenu}">
@@ -251,7 +273,7 @@
                             <TextBlock Grid.Row="1" FontSize="30" Text="{DynamicResource LOCNoGamesFound}"
                                        TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock.Style>
-                                    <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource ShelfText}">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Items.Count, ElementName=ShelfList}" Value="0">
@@ -280,16 +302,16 @@
                                     <TextBlock Style="{DynamicResource ShelfDisplay}" FontSize="52"
                                                Text="{Binding SelectedGame.DisplayName}" TextTrimming="CharacterEllipsis" />
                                     <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                        <TextBlock Style="{DynamicResource ShelfText}" Foreground="{DynamicResource ShelfSoftBrush}"
                                                    Text="{Binding SelectedGame.ReleaseYear}" />
-                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                        <TextBlock Style="{DynamicResource ShelfText}" Foreground="{DynamicResource ShelfSoftBrush}"
                                                    Text="  ·  " />
-                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                        <TextBlock Style="{DynamicResource ShelfText}" Foreground="{DynamicResource ShelfSoftBrush}"
                                                    MaxWidth="420" TextTrimming="CharacterEllipsis"
                                                    Text="{Binding SelectedGame.Genres, Converter={StaticResource ListToStringConverter}}" />
-                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                        <TextBlock Style="{DynamicResource ShelfText}" Foreground="{DynamicResource ShelfSoftBrush}"
                                                    Text="  ·  " />
-                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Foreground="{DynamicResource ShelfSoftBrush}"
+                                        <TextBlock Style="{DynamicResource ShelfText}" Foreground="{DynamicResource ShelfSoftBrush}"
                                                    Text="{Binding SelectedGame.Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,28,0,0">
@@ -325,21 +347,21 @@
                                               Content="{DynamicResource LOCFilter}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" x:Name="PART_ElemSearchActive" VerticalAlignment="Center">
-                                    <TextBlock FontSize="16" TextAlignment="Center" Style="{DynamicResource TextBlockBaseStyle}"
+                                    <TextBlock FontSize="16" TextAlignment="Center" Style="{DynamicResource ShelfText}"
                                                Foreground="{DynamicResource ShelfSoftBrush}"
                                                Text="{DynamicResource LOCGameListSearchResults}" />
-                                    <TextBlock TextAlignment="Center" Style="{DynamicResource TextBlockBaseStyle}"
+                                    <TextBlock TextAlignment="Center" Style="{DynamicResource ShelfText}"
                                                Text="{Binding AppSettings.Fullscreen.FilterSettings.Name}" />
                                 </StackPanel>
                                 <TextBlock Grid.Column="1" x:Name="PART_ElemExtraFilterActive" FontSize="18"
                                            VerticalAlignment="Center" TextAlignment="Center"
-                                           Style="{DynamicResource TextBlockBaseStyle}"
+                                           Style="{DynamicResource ShelfText}"
                                            Foreground="{DynamicResource ShelfSoftBrush}"
                                            Text="{DynamicResource LOCGameListExtraFiltered}" />
                                 <StackPanel x:Name="PART_ElemProgressIndicator" Grid.Column="2"
                                             Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock x:Name="PART_TextProgressTooltip" Margin="0,0,15,0" FontSize="18"
-                                               VerticalAlignment="Center" Style="{DynamicResource TextBlockBaseStyle}" />
+                                               VerticalAlignment="Center" Style="{DynamicResource ShelfText}" />
                                     <ContentControl Style="{DynamicResource ProgressIndicator}" Focusable="False"
                                                     Height="34" Width="34" VerticalAlignment="Center" />
                                 </StackPanel>

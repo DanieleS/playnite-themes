@@ -35,9 +35,11 @@
                 <ControlTemplate TargetType="ButtonEx">
                     <Border Background="#FFFFFFFF" CornerRadius="26" Padding="10,8,26,8">
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{TemplateBinding InputHint}"
-                                            Height="28" VerticalAlignment="Center"
-                                            Margin="0,0,10,0" Focusable="False" />
+                            <Grid Margin="0,0,10,0" VerticalAlignment="Center">
+                                <Ellipse Width="34" Height="34" Fill="#FF000000" />
+                                <ContentControl ContentTemplate="{TemplateBinding InputHint}"
+                                                Height="28" VerticalAlignment="Center" HorizontalAlignment="Center" Focusable="False" />
+                            </Grid>
                             <TextBlock Style="{DynamicResource TextBlockBaseStyle}" FontWeight="Bold" FontSize="19"
                                        Foreground="#FF000000" VerticalAlignment="Center">
                                 <ContentPresenter />

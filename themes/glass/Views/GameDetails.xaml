@@ -45,11 +45,7 @@
                         </StackPanel>
 
                         <!-- Main window -->
-                        <Border Grid.Column="1" Grid.Row="1" Style="{DynamicResource GlassPane}" Padding="20"
-                                RenderTransformOrigin="1,0.5">
-                            <Border.RenderTransform>
-                                <SkewTransform AngleY="1.2" />
-                            </Border.RenderTransform>
+                        <Border Grid.Column="1" Grid.Row="1" Style="{DynamicResource GlassPane}" Padding="20">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="400" />
@@ -58,11 +54,15 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
-                                <Border Grid.Row="0" CornerRadius="26">
-                                    <Border.Background>
-                                        <ImageBrush ImageSource="{Binding DisplayBackgroundImageObject}" Stretch="UniformToFill" />
-                                    </Border.Background>
-                                </Border>
+                                <FadeImage Grid.Row="0" Stretch="UniformToFill" Source="{Binding DisplayBackgroundImageObject}">
+                                    <FadeImage.OpacityMask>
+                                        <VisualBrush Stretch="Fill">
+                                            <VisualBrush.Visual>
+                                                <Border Width="1100" Height="400" CornerRadius="26" Background="#FF000000" />
+                                            </VisualBrush.Visual>
+                                        </VisualBrush>
+                                    </FadeImage.OpacityMask>
+                                </FadeImage>
                                 <Border Grid.Row="0" CornerRadius="26">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -145,10 +145,7 @@
 
                         <!-- Side window -->
                         <Border Grid.Column="3" Grid.Row="1" Style="{DynamicResource GlassPane}" Padding="22"
-                                VerticalAlignment="Top" Margin="0,30,0,0" RenderTransformOrigin="0,0.5">
-                            <Border.RenderTransform>
-                                <SkewTransform AngleY="-2.5" />
-                            </Border.RenderTransform>
+                                VerticalAlignment="Top" Margin="0,30,0,0">
                             <StackPanel>
                                 <Border Height="520" CornerRadius="20" ClipToBounds="True">
                                     <Image x:Name="PART_ImageCover" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="Fant">

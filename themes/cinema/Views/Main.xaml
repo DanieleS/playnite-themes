@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:pin="clr-namespace:Playnite.Input;assembly=Playnite"
                     mc:Ignorable="d">
 
     <!--
@@ -27,7 +28,9 @@
                             </Grid.RowDefinitions>
 
                             <!-- Artwork + veils -->
-                            <FadeImage x:Name="PART_ImageBackground" Grid.RowSpan="5" Stretch="UniformToFill"
+                            <!-- Our own background, so it shows regardless of Settings > Visuals > background image. -->
+                            <FadeImage Grid.RowSpan="5" Stretch="UniformToFill"
+                                       Source="{Binding SelectedGame.DisplayBackgroundImageObject}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                             <Rectangle Grid.RowSpan="5">
                                 <Rectangle.Fill>
@@ -200,7 +203,7 @@
                                            Text="{DynamicResource LOCLibrary}" />
                                 <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Margin="14,0,0,0"
                                            Foreground="{DynamicResource CinemaTextMutedBrush}"
-                                           Text="{Binding Items.Count, ElementName=PART_ListGameItems}" />
+                                           Text="{Binding Items.Count, ElementName=CinemaList}" />
                             </StackPanel>
 
                             <!-- The library row -->
@@ -208,10 +211,38 @@
                                 <Filters x:Name="PART_ElemFilters" DockPanel.Dock="Left" Focusable="False" />
                                 <FiltersAdditional x:Name="PART_ElemFiltersAdditional" DockPanel.Dock="Left" Focusable="False" />
                                 <ContentControl x:Name="PART_ContentFilterItems" DockPanel.Dock="Left" Focusable="False" />
-                                <ListBoxEx x:Name="PART_ListGameItems" Margin="84,0,40,0"
+                                <ListBoxEx x:Name="CinemaList" Margin="84,0,40,0"
                                            Background="Transparent" BorderThickness="0"
                                            DockPanel.Dock="Right"
-                                           KeyboardNavigation.DirectionalNavigation="Once" />
+                                           ItemsSource="{Binding GamesView.CollectionView}"
+                                           SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                                           Visibility="{Binding GameListVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           FocusBahaviors.FocusBinding="{Binding GameListFocused}"
+                                           ItemContainerStyle="{DynamicResource ListGameItemStyle}"
+                                           KeyboardNavigation.DirectionalNavigation="Once">
+                                    <!-- Our own list with Playnite's virtualized tile panel: the theme decides rows and size,
+                                         instead of Settings > Layout. -->
+                                    <ListBoxEx.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <FullscreenTilePanel Rows="1" Columns="7" UseHorizontalLayout="True"
+                                                                 ItemAspectRatio="2:3" ItemSpacing="24"
+                                                                 SmoothScrollEnabled="{Settings Fullscreen.SmoothScrolling}" />
+                                        </ItemsPanelTemplate>
+                                    </ListBoxEx.ItemsPanel>
+                                    <ListBoxEx.ItemTemplate>
+                                        <DataTemplate>
+                                            <GameListItem Style="{DynamicResource ListGameItemTemplate}" />
+                                        </DataTemplate>
+                                    </ListBoxEx.ItemTemplate>
+                                    <ListBoxEx.InputBindings>
+                                        <KeyBinding Key="A" Command="{Binding ToggleGameDetailsCommand}" />
+                                        <KeyBinding Key="X" Command="{Binding OpenGameMenuCommand}" />
+                                        <KeyBinding Key="Enter" Command="{Binding ActivateSelectedCommand}" />
+                                        <pin:GameControllerInputBinding Button="A" Command="{Binding ToggleGameDetailsCommand}" />
+                                        <pin:GameControllerInputBinding Button="X" Command="{Binding ActivateSelectedCommand}" />
+                                        <pin:GameControllerInputBinding Button="Start" Command="{Binding OpenGameMenuCommand}" />
+                                    </ListBoxEx.InputBindings>
+                                </ListBoxEx>
                             </DockPanel>
 
                             <TextBlock Grid.Row="3" FontSize="30" Text="{DynamicResource LOCNoGamesFound}"
@@ -220,7 +251,7 @@
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Items.Count, ElementName=PART_ListGameItems}" Value="0">
+                                            <DataTrigger Binding="{Binding Items.Count, ElementName=CinemaList}" Value="0">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </Style.Triggers>

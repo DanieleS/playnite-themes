@@ -8,21 +8,27 @@
     <Color x:Key="ShelfInkColor">#FF1D1B17</Color>
     <Color x:Key="ShelfAccentColor">#FFB4442C</Color>
 
-    <!-- Default palette overrides: stock menus become paper-and-ink too. -->
-    <Color x:Key="GlyphColor">#FFB4442C</Color>
-    <Color x:Key="GlyphLightColor">#FFD0654B</Color>
+    <!-- Default palette overrides. Playnite's own menus and dialogs (main menu, game menu, settings, filters)
+         are drawn by the Default theme with TextBrush on OverlayMenuBackgroundBrush, and some of their text is
+         hard-coded white, so they get a dark "ink" palette. Shelf's own views (Main, GameDetails) are paper and
+         use the Shelf* brushes and the ShelfText style explicitly. -->
+    <Color x:Key="GlyphColor">#FFE0654B</Color>
+    <Color x:Key="GlyphLightColor">#FFF08A6E</Color>
     <Color x:Key="SelectionLightColor">#FFA59D8E</Color>
     <Color x:Key="OverlayColor">#B31D1B17</Color>
-    <Color x:Key="ControlBackgroundColor">#FFDDD5C6</Color>
-    <Color x:Key="ControlBackgroundColorDark">#FFCFC6B5</Color>
-    <Color x:Key="TextColor">#FF1D1B17</Color>
-    <Color x:Key="TextColorDark">#FF7A7366</Color>
+    <Color x:Key="ControlBackgroundColor">#FF3A3128</Color>
+    <Color x:Key="ControlBackgroundColorDark">#FF2B241B</Color>
+    <Color x:Key="TextColor">#FFF3EEE4</Color>
+    <Color x:Key="TextColorDark">#FFA59D8E</Color>
 
     <SolidColorBrush x:Key="MainBackgourndBrush" Color="#FFECE6DA" />
     <SolidColorBrush x:Key="TopBarBackgroundBrush" Color="Transparent" />
     <SolidColorBrush x:Key="BottomBarBackgroundBrush" Color="Transparent" />
-    <SolidColorBrush x:Key="SelectionBrush" Color="#FFB4442C" />
-    <SolidColorBrush x:Key="OverlayMenuBackgroundBrush" Color="#FFF3EEE4" />
+    <SolidColorBrush x:Key="SelectionBrush" Color="#FFE0654B" />
+    <LinearGradientBrush x:Key="OverlayMenuBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF2B241B" Offset="0" />
+        <GradientStop Color="#FF1D1B17" Offset="1" />
+    </LinearGradientBrush>
     <SolidColorBrush x:Key="GameDetailsBackgroundBrush" Color="#FFECE6DA" />
 
     <SolidColorBrush x:Key="ShelfInkBrush" Color="#FF1D1B17" />
@@ -50,6 +56,11 @@
         <Setter Property="FontSize" Value="{DynamicResource FontSize}" />
         <Setter Property="FontFamily" Value="{DynamicResource ShelfFontBody}" />
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
+    <!-- Body text on paper. -->
+    <Style x:Key="ShelfText" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+        <Setter Property="Foreground" Value="{DynamicResource ShelfInkBrush}" />
     </Style>
 
     <Style x:Key="ShelfDisplay" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">

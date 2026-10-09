@@ -254,12 +254,18 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <Border Grid.Row="0" CornerRadius="24">
-                                        <Border.Background>
-                                            <ImageBrush ImageSource="{Binding SelectedGame.DisplayBackgroundImageObject}"
-                                                        Stretch="UniformToFill" />
-                                        </Border.Background>
-                                    </Border>
+                                    <!-- FadeImage, not ImageBrush: Playnite hands out background art as BitmapLoadProperties,
+                                         which only its own image controls understand. -->
+                                    <FadeImage Grid.Row="0" Stretch="UniformToFill"
+                                               Source="{Binding SelectedGame.DisplayBackgroundImageObject}">
+                                        <FadeImage.OpacityMask>
+                                            <VisualBrush Stretch="Fill">
+                                                <VisualBrush.Visual>
+                                                    <Border Width="1100" Height="500" CornerRadius="24" Background="#FF000000" />
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </FadeImage.OpacityMask>
+                                    </FadeImage>
                                     <Border Grid.Row="0" CornerRadius="24">
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">

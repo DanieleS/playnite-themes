@@ -10,7 +10,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Grid Margin="{Settings FullscreenItemSpacingMargin}">
+                    <Grid Margin="11">
                         <ContentPresenter />
                         <Border x:Name="Ring" BorderBrush="{DynamicResource JournalInkBrush}" BorderThickness="4"
                                 CornerRadius="17" Margin="-7" Visibility="Collapsed" />

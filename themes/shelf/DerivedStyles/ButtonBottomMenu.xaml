@@ -13,10 +13,13 @@
                 <ControlTemplate TargetType="ButtonEx">
                     <Border Background="{TemplateBinding Background}" Margin="0,0,30,0">
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{TemplateBinding InputHint}"
-                                            Height="30" VerticalAlignment="Center"
-                                            Margin="0,0,10,0" Focusable="False" />
-                            <TextBlock Style="{DynamicResource TextBlockBaseStyle}" FontWeight="Bold" FontSize="20"
+                            <!-- Playnite's controller glyphs are white: put them on an ink disc. -->
+                            <Grid Margin="0,0,10,0" VerticalAlignment="Center">
+                                <Ellipse Width="36" Height="36" Fill="{DynamicResource ShelfInkBrush}" />
+                                <ContentControl ContentTemplate="{TemplateBinding InputHint}"
+                                                Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+                            </Grid>
+                            <TextBlock Style="{DynamicResource ShelfText}" FontWeight="Bold" FontSize="20"
                                        Foreground="{DynamicResource ShelfInkBrush}" VerticalAlignment="Center">
                                 <ContentPresenter />
                             </TextBlock>

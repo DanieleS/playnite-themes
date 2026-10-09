@@ -130,7 +130,7 @@
                                     <Ellipse Stroke="{DynamicResource ShelfAccentBrush}" StrokeThickness="6" />
                                     <Ellipse Stroke="{DynamicResource ShelfAccentBrush}" StrokeThickness="2" Margin="12" />
                                     <StackPanel VerticalAlignment="Center" Margin="26,0,26,0">
-                                        <TextBlock Style="{DynamicResource TextBlockBaseStyle}" FontSize="15" FontWeight="Bold"
+                                        <TextBlock Style="{DynamicResource ShelfText}" FontSize="15" FontWeight="Bold"
                                                    Foreground="{DynamicResource ShelfAccentBrush}" TextAlignment="Center"
                                                    Text="{Binding Source={StaticResource LOCCompletionStatus}, Converter={StaticResource StringToUpperCaseConverter}}"
                                                    TextWrapping="Wrap" />
@@ -163,8 +163,12 @@
 
                         <!-- Back hint -->
                         <StackPanel Grid.Column="3" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
-                            <ContentControl ContentTemplate="{DynamicResource ButtonPromptB}" Height="30" Focusable="False" />
-                            <TextBlock Style="{DynamicResource TextBlockBaseStyle}" Margin="10,0,0,0" FontWeight="Bold"
+                            <Grid VerticalAlignment="Center">
+                                <Ellipse Width="36" Height="36" Fill="{DynamicResource ShelfInkBrush}" />
+                                <ContentControl ContentTemplate="{DynamicResource ButtonPromptB}" Height="30"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+                            </Grid>
+                            <TextBlock Style="{DynamicResource ShelfText}" Margin="10,0,0,0" FontWeight="Bold"
                                        Foreground="{DynamicResource ShelfInkBrush}" VerticalAlignment="Center"
                                        Text="{DynamicResource LOCDS_Shelf_BackToShelf}" />
                         </StackPanel>

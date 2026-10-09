@@ -53,10 +53,16 @@
                             </Grid.RowDefinitions>
 
                             <!-- Hero tile -->
-                            <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="2" Margin="9" CornerRadius="22">
-                                <Border.Background>
-                                    <ImageBrush ImageSource="{Binding DisplayBackgroundImageObject}" Stretch="UniformToFill" />
-                                </Border.Background>
+                            <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="2" Margin="9">
+                                <FadeImage Stretch="UniformToFill" Source="{Binding DisplayBackgroundImageObject}">
+                                    <FadeImage.OpacityMask>
+                                        <VisualBrush Stretch="Fill">
+                                            <VisualBrush.Visual>
+                                                <Border Width="1000" Height="560" CornerRadius="22" Background="#FF000000" />
+                                            </VisualBrush.Visual>
+                                        </VisualBrush>
+                                    </FadeImage.OpacityMask>
+                                </FadeImage>
                                 <Grid>
                                     <Border CornerRadius="22">
                                         <Border.Background>
@@ -87,7 +93,7 @@
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>
-                            </Border>
+                            </Grid>
 
                             <!-- Time played -->
                             <Border Grid.Column="2" Grid.Row="0" Style="{DynamicResource JournalTile}">
