@@ -39,6 +39,8 @@ public static class Win32 {
     [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hWnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
     [DllImport("user32.dll")] public static extern IntPtr FindWindow(string cls, string title);
+    [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
+    [DllImport("user32.dll")] public static extern bool SystemParametersInfo(int action, int param, ref RECT rect, int flags);
 }
 "@
 [void][Win32]::SetProcessDPIAware()
@@ -194,6 +196,10 @@ function Send([string]$keys, [int]$waitMs = 1200) {
 # --- No taskbar over the screenshots (a real fullscreen session covers it; the runner's doesn't) ----------
 $tray = [Win32]::FindWindow('Shell_TrayWnd', $null)
 if ($tray -ne [IntPtr]::Zero) { [void][Win32]::ShowWindow($tray, 0) }
+# ...and give the whole screen to windows: Playnite sizes itself to the work area.
+$work = New-Object Win32+RECT
+$work.Right = $bounds.Width; $work.Bottom = $bounds.Height
+[void][Win32]::SystemParametersInfo(0x2F, 0, [ref]$work, 2)
 
 # --- One session per theme --------------------------------------------------------------------------------
 $fullscreenThemes = Join-Path $PlayniteDir 'Themes\Fullscreen'
@@ -229,7 +235,7 @@ foreach ($theme in Get-ChildItem -Path $ThemesDir -Directory | Sort-Object Name)
     $pause = if ($theme.Name -eq 'glass') { 5000 } else { 1200 }
     Send $move $pause; Send $move $pause; Send $move ($pause + 1500)
     Save-Screen "$($theme.Name)-2-library-moved"
-    Send 'a' ($pause + 2500)
+    Send 'a' ($pause * 2 + 2500)
     Save-Screen "$($theme.Name)-3-details"
     Send '{BACKSPACE}' 800; Send '{ESC}' 1500
     Send '{F1}' 2000
