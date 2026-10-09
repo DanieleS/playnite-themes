@@ -95,23 +95,23 @@
                                 </Grid>
 
                                 <WrapPanel Grid.Row="1" Margin="22,26,22,0">
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding ReleaseYear, Converter={StaticResource NullToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding ReleaseYear}" />
                                     </Border>
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding Genres, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}"
                                                    Text="{Binding Genres, Converter={StaticResource ListToStringConverter}}" />
                                     </Border>
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding Developers, Converter={StaticResource ICollectionNullOrEmptyToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}"
                                                    Text="{Binding Developers, Converter={StaticResource ListToStringConverter}}" />
                                     </Border>
-                                    <Border Style="{DynamicResource GlassChip}">
+                                    <Border Style="{DynamicResource GlassChip}" Visibility="{Binding Source, Converter={StaticResource NullToVisibilityConverter}}">
                                         <TextBlock Style="{DynamicResource GlassChipText}" Text="{Binding Source.Name}" />
                                     </Border>
                                 </WrapPanel>
 
-                                <ScrollViewerEx Grid.Row="2" x:Name="PART_ScrollHtmlDescription" Margin="22,14,22,14"
+                                <ScrollViewerEx Grid.Row="2" x:Name="PART_ScrollHtmlDescription" FocusVisualStyle="{x:Null}" Margin="22,14,22,14"
                                                 CustomScrollAmount="42">
                                     <HtmlTextView x:Name="PART_HtmlDescription"
                                                   HtmlFontSize="19"

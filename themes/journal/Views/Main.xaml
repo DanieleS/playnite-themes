@@ -112,7 +112,8 @@
                                 <Filters x:Name="PART_ElemFilters" DockPanel.Dock="Left" Focusable="False" />
                                 <FiltersAdditional x:Name="PART_ElemFiltersAdditional" DockPanel.Dock="Left" Focusable="False" />
                                 <ContentControl x:Name="PART_ContentFilterItems" DockPanel.Dock="Left" Focusable="False" />
-                                <ListBoxEx x:Name="JournalList" Margin="56,0,56,0"
+                                <ListBoxEx x:Name="JournalList" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                           Margin="56,0,56,0"
                                            Background="Transparent" BorderThickness="0"
                                            DockPanel.Dock="Right"
                                            ItemsSource="{Binding GamesView.CollectionView}"
@@ -180,11 +181,11 @@
                                                        Text="{Binding SelectedGame.Genres, Converter={StaticResource ListToStringConverter}}" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                                            <ButtonEx x:Name="PART_ButtonInstall" Style="{DynamicResource ButtonBottomMenu}"
+                                            <ButtonEx x:Name="PART_ButtonInstall" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource ButtonBottomMenu}"
                                                       Content="{DynamicResource LOCInstallGame}" />
-                                            <ButtonEx x:Name="PART_ButtonPlay" Style="{DynamicResource ButtonBottomMenu}"
+                                            <ButtonEx x:Name="PART_ButtonPlay" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource ButtonBottomMenu}"
                                                       Content="{DynamicResource LOCPlayGame}" />
-                                            <ButtonEx x:Name="PART_ButtonDetails" Style="{DynamicResource ButtonBottomMenu}"
+                                            <ButtonEx x:Name="PART_ButtonDetails" InputHint="{DynamicResource ButtonPromptA}" Style="{DynamicResource ButtonBottomMenu}"
                                                       Content="{DynamicResource LOCGameDetails}" />
                                             <ButtonEx x:Name="PART_ButtonGameOptions" Style="{DynamicResource ButtonBottomMenu}"
                                                       Content="{DynamicResource LOCGameOptions}" />

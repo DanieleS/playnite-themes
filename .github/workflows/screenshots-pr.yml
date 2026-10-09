@@ -1,0 +1,92 @@
+name: Screenshots (PR)
+
+# Screenshots of every theme, embedded in a comment on the pull request (updated on every push).
+# Images need to live in the repository to render in a private repo's comments, so they are committed
+# under a hidden ref (refs/screenshots/pr-<number>) instead of a branch: nothing shows up in the branch
+# list or on main. The ref is deleted when the PR is closed.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    paths: ["themes/**", "scripts/ci/**", ".github/workflows/*screenshots*.yml"]
+
+concurrency:
+  group: screenshots-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  capture:
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/capture-screenshots.yml
+
+  comment:
+    name: Comment
+    needs: capture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: screenshots
+          path: shots
+
+      - name: Store under refs/screenshots and comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # A commit with only the screenshots, no parent, pushed to a hidden ref.
+          mkdir store && cd store
+          git init --quiet
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp ../shots/*.png .
+          git add -A
+          git commit --quiet -m "Screenshots for #${PR} at ${SHA::7}"
+          rev="$(git rev-parse HEAD)"
+          git push --quiet --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/screenshots/pr-${PR}"
+          cd ..
+
+          base="https://github.com/${GITHUB_REPOSITORY}/blob/${rev}"
+          {
+            echo "<!-- playnite-screenshots -->"
+            echo "### Screenshots in Playnite (commit ${SHA::7})"
+            echo
+            for theme in cinema shelf glass journal; do
+              [ -f "shots/${theme}-1-library.png" ] || continue
+              echo "<details open><summary><b>${theme^}</b></summary>"
+              echo
+              echo "| Libreria | Dopo qualche spostamento |"
+              echo "|---|---|"
+              echo "| ![](${base}/${theme}-1-library.png?raw=true) | ![](${base}/${theme}-2-library-moved.png?raw=true) |"
+              echo "| **Dettaglio** | **Menu** |"
+              echo "| ![](${base}/${theme}-3-details.png?raw=true) | ![](${base}/${theme}-4-menu.png?raw=true) |"
+              echo
+              echo "</details>"
+              echo
+            done
+            echo "[Tutti i file e il log di Playnite](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+          } > comment.md
+
+          existing="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" --paginate \
+            --jq '.[] | select(.body | startswith("<!-- playnite-screenshots -->")) | .id' | head -n 1)"
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${existing}" -F body=@comment.md >/dev/null
+          else
+            gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file comment.md
+          fi
+
+  cleanup:
+    name: Delete screenshot ref
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/screenshots/pr-${PR}" || echo "No ref to delete"

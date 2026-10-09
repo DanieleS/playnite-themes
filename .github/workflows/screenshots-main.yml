@@ -1,0 +1,50 @@
+name: Screenshots (main)
+
+# After a merge to main that touches the themes: take fresh screenshots and commit them, and only them,
+# to docs/screenshots/ (shown in the README).
+
+on:
+  push:
+    branches: [main]
+    paths: ["themes/**", "scripts/ci/**", ".github/workflows/*screenshots*.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: screenshots-main
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    uses: ./.github/workflows/capture-screenshots.yml
+
+  commit:
+    name: Commit screenshots
+    needs: capture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: screenshots
+          path: shots
+
+      - name: Commit docs/screenshots
+        run: |
+          set -euo pipefail
+          mkdir -p docs/screenshots
+          cp shots/*.png docs/screenshots/
+          git add docs/screenshots
+          if git diff --cached --quiet; then
+            echo "Screenshots unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --quiet -m "docs: update screenshots"
+          git push --quiet origin HEAD:main

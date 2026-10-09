@@ -35,12 +35,9 @@
 
                         <Rectangle Grid.ColumnSpan="5" Grid.RowSpan="3" Fill="{DynamicResource ShelfLightBrush}" />
 
-                        <!-- Cover, tilted slightly like a box on a table -->
+                        <!-- Cover -->
                         <Grid Grid.Column="1" Grid.Row="1" Width="540" Height="810" VerticalAlignment="Top"
-                              HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
-                            <Grid.RenderTransform>
-                                <SkewTransform AngleY="-2" />
-                            </Grid.RenderTransform>
+                              HorizontalAlignment="Left">
                             <Border Background="#FF1D1B17" CornerRadius="4">
                                 <Border.Effect>
                                     <DropShadowEffect ShadowDepth="26" Direction="300" BlurRadius="50" Opacity="0.45" Color="#FF3C2805" />
@@ -150,7 +147,7 @@
                             </StackPanel>
 
                             <!-- Description -->
-                            <ScrollViewerEx x:Name="PART_ScrollHtmlDescription" Margin="0,30,0,0"
+                            <ScrollViewerEx x:Name="PART_ScrollHtmlDescription" FocusVisualStyle="{x:Null}" Margin="0,30,0,0"
                                             DockPanel.Dock="Top" CustomScrollAmount="42">
                                 <HtmlTextView x:Name="PART_HtmlDescription"
                                               HtmlFontSize="19"

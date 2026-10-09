@@ -1,0 +1,42 @@
+name: Capture screenshots
+
+# Reusable: runs every theme in a real Playnite fullscreen session on Windows (sample library,
+# Extra Metadata Loader logos) and uploads library / details / menu screenshots as the "screenshots"
+# artifact. Called by screenshots-pr.yml and screenshots-main.yml.
+
+on:
+  workflow_call:
+
+env:
+  PLAYNITE_VERSION: "10.62"
+
+jobs:
+  capture:
+    name: Capture (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Playnite and Extra Metadata Loader
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download $env:PLAYNITE_VERSION --repo JosefNemec/Playnite --pattern "$env:PLAYNITE_VERSION.7z" --dir playnite-dl
+          7z x "playnite-dl/$env:PLAYNITE_VERSION.7z" -oplaynite -y | Out-Null
+          $tag = gh api repos/darklinkpower/PlayniteExtensionsCollection/releases --jq '[.[] | select(.assets[].name | test("^ExtraMetadataLoader_.*\\.pext$"))][0].tag_name'
+          gh release download $tag --repo darklinkpower/PlayniteExtensionsCollection --pattern "ExtraMetadataLoader_*.pext" --dir eml
+          Get-ChildItem eml | ForEach-Object { Copy-Item $_.FullName eml.pext }
+
+      # Playnite is 32-bit: its assemblies only load in the 32-bit Windows PowerShell.
+      - name: Run Playnite and capture
+        shell: cmd
+        run: '%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\ci\screenshots.ps1 -PlayniteDir playnite -ThemesDir themes -OutDir screenshots -EmlPext eml.pext -Language it_IT'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots/
+          if-no-files-found: warn

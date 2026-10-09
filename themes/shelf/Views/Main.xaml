@@ -22,10 +22,16 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Grid>
-                        <!-- Spine -->
-                        <Grid x:Name="Spine" Width="62" Height="470" VerticalAlignment="Bottom" ClipToBounds="True">
+                        <!-- Spine: the central slice of the cover, lightly blurred, with the game's name. -->
+                        <Grid x:Name="Spine" Width="62" Height="470" VerticalAlignment="Bottom" ClipToBounds="True"
+                              Background="#FF2B241B">
+                            <!-- Slightly oversized so the blur's soft edges fall outside the clip. -->
                             <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
-                                   HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="Fant" />
+                                   HorizontalAlignment="Center" Margin="-8" RenderOptions.BitmapScalingMode="Fant">
+                                <Image.Effect>
+                                    <BlurEffect Radius="5" RenderingBias="Performance" />
+                                </Image.Effect>
+                            </Image>
                             <Rectangle>
                                 <Rectangle.Fill>
                                     <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
@@ -35,7 +41,7 @@
                                     </LinearGradientBrush>
                                 </Rectangle.Fill>
                             </Rectangle>
-                            <Rectangle Width="3" HorizontalAlignment="Left" Fill="#33FFFFFF" />
+                            <Rectangle Width="2" HorizontalAlignment="Left" Fill="#40FFFFFF" />
                             <TextBlock Text="{Binding DisplayName, Converter={StaticResource StringToUpperCaseConverter}}"
                                        FontFamily="{DynamicResource ShelfFontBody}" FontWeight="Bold" FontSize="19"
                                        Foreground="#FFFFFFFF" TextTrimming="CharacterEllipsis" Width="380"
@@ -44,10 +50,10 @@
                                     <RotateTransform Angle="-90" />
                                 </TextBlock.LayoutTransform>
                                 <TextBlock.Effect>
-                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.8" Color="#FF000000" />
+                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.7" Color="#FF000000" />
                                 </TextBlock.Effect>
                             </TextBlock>
-                            <Border Height="46" VerticalAlignment="Bottom" Background="#A6000000">
+                            <Border Height="46" VerticalAlignment="Bottom" Background="#8C000000">
                                 <TextBlock Text="{Binding Source.Name, Converter={StaticResource StringToUpperCaseConverter}}"
                                            FontFamily="{DynamicResource ShelfFontBody}" FontWeight="Bold" FontSize="12"
                                            Foreground="#D9FFFFFF" TextTrimming="CharacterEllipsis"
@@ -56,53 +62,117 @@
                             <Border x:Name="Darken" Background="#66000000" Visibility="Collapsed" />
                         </Grid>
 
-                        <!-- Box, seen from its front-left corner: spine face on the left, front turned to the right.
-                             WPF has no perspective, so both faces are skewed around the shared edge (the nearest
-                             corner) and the box is lifted so its lowest corner rests on the plank.
-                             Prototype: mocks/shelf-box-3d.html (variant A). -->
-                        <Grid x:Name="Box" Width="356" Height="470" Margin="18,0,34,0" Visibility="Collapsed"
+                        <!-- Box: a real 3D box (front + spine faces) under a perspective camera, turned so its
+                             front-left edge is the nearest corner. The two faces are ordinary WPF content mapped
+                             onto the 3D planes with Viewport2DVisual3D. -->
+                        <Grid x:Name="Box" Width="380" Height="530" Margin="6,0,22,0" Visibility="Collapsed"
                               VerticalAlignment="Bottom">
-                            <Grid.RenderTransform>
-                                <TranslateTransform Y="-48" />
-                            </Grid.RenderTransform>
-                            <!-- Spine face -->
-                            <Grid Width="42" HorizontalAlignment="Left" RenderTransformOrigin="1,1">
-                                <Grid.RenderTransform>
-                                    <SkewTransform AngleY="-24" />
-                                </Grid.RenderTransform>
-                                <Border>
-                                    <Border.Background>
-                                        <ImageBrush ImageSource="{Binding FullscreenListItemCoverObject}"
-                                                    Stretch="UniformToFill" AlignmentX="Left" />
-                                    </Border.Background>
-                                </Border>
-                                <Rectangle Fill="#8C000000" />
-                                <Rectangle Width="2" HorizontalAlignment="Right" Fill="#40FFFFFF" />
-                            </Grid>
-                            <!-- Front face -->
-                            <Grid Width="314" HorizontalAlignment="Right" RenderTransformOrigin="0,1">
-                                <Grid.RenderTransform>
-                                    <SkewTransform AngleY="8" />
-                                </Grid.RenderTransform>
-                                <Border Background="#FF1D1B17">
-                                    <Border.Effect>
-                                        <DropShadowEffect ShadowDepth="24" Direction="315" BlurRadius="44" Opacity="0.45" Color="#FF3C2805" />
-                                    </Border.Effect>
-                                </Border>
-                                <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
-                                       RenderOptions.BitmapScalingMode="Fant" />
-                                <Rectangle>
-                                    <Rectangle.Fill>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.4">
-                                            <GradientStop Color="#38FFFFFF" Offset="0" />
-                                            <GradientStop Color="#00FFFFFF" Offset="0.35" />
-                                        </LinearGradientBrush>
-                                    </Rectangle.Fill>
-                                </Rectangle>
-                            </Grid>
+                            <!-- Contact shadow on the plank -->
+                            <Ellipse Height="34" Margin="40,0,10,-14" VerticalAlignment="Bottom" Opacity="0.55">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="#993C2805" Offset="0" />
+                                        <GradientStop Color="#003C2805" Offset="1" />
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <Viewport3D ClipToBounds="False" IsHitTestVisible="False">
+                                <Viewport3D.Camera>
+                                    <!-- WPF's FieldOfView is horizontal. At distance 5 a 29 degree view spans ~2.6 units,
+                                         so the 2-unit-wide box fills most of the 380px slot; the camera sits a bit high
+                                         so the box rests near the bottom (on the plank) and its top is seen slightly from above. -->
+                                    <PerspectiveCamera Position="0,0.24,5" LookDirection="0,0,-1" UpDirection="0,1,0"
+                                                       FieldOfView="29" />
+                                </Viewport3D.Camera>
+                                <ModelVisual3D>
+                                    <ModelVisual3D.Content>
+                                        <AmbientLight Color="#FFFFFFFF" />
+                                    </ModelVisual3D.Content>
+                                </ModelVisual3D>
+                                <ModelVisual3D>
+                                    <ModelVisual3D.Transform>
+                                        <RotateTransform3D>
+                                            <RotateTransform3D.Rotation>
+                                                <AxisAngleRotation3D Axis="0,1,0" Angle="26" />
+                                            </RotateTransform3D.Rotation>
+                                        </RotateTransform3D>
+                                    </ModelVisual3D.Transform>
+
+                                    <!-- Front face: x -1..1, y -1.5..1.5, z 0 -->
+                                    <Viewport2DVisual3D>
+                                        <Viewport2DVisual3D.Geometry>
+                                            <MeshGeometry3D Positions="-1,1.5,0 -1,-1.5,0 1,-1.5,0 1,1.5,0"
+                                                            TextureCoordinates="0,0 0,1 1,1 1,0"
+                                                            TriangleIndices="0 1 2 0 2 3" />
+                                        </Viewport2DVisual3D.Geometry>
+                                        <Viewport2DVisual3D.Material>
+                                            <DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" Brush="White" />
+                                        </Viewport2DVisual3D.Material>
+                                        <Viewport2DVisual3D.Visual>
+                                            <Grid Width="300" Height="450" Background="#FF1D1B17">
+                                                <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
+                                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                                                <Rectangle>
+                                                    <Rectangle.Fill>
+                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.4">
+                                                            <GradientStop Color="#33FFFFFF" Offset="0" />
+                                                            <GradientStop Color="#00FFFFFF" Offset="0.35" />
+                                                        </LinearGradientBrush>
+                                                    </Rectangle.Fill>
+                                                </Rectangle>
+                                            </Grid>
+                                        </Viewport2DVisual3D.Visual>
+                                    </Viewport2DVisual3D>
+
+                                    <!-- Spine face: x -1, z -0.45..0 -->
+                                    <Viewport2DVisual3D>
+                                        <Viewport2DVisual3D.Geometry>
+                                            <MeshGeometry3D Positions="-1,1.5,-0.45 -1,-1.5,-0.45 -1,-1.5,0 -1,1.5,0"
+                                                            TextureCoordinates="0,0 0,1 1,1 1,0"
+                                                            TriangleIndices="0 1 2 0 2 3" />
+                                        </Viewport2DVisual3D.Geometry>
+                                        <Viewport2DVisual3D.Material>
+                                            <DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" Brush="White" />
+                                        </Viewport2DVisual3D.Material>
+                                        <Viewport2DVisual3D.Visual>
+                                            <Grid Width="68" Height="450" Background="#FF2B241B" ClipToBounds="True">
+                                                <!-- Central slice, like the shelf spines (the left edge would repeat the front). -->
+                                                <Image Source="{Binding FullscreenListItemCoverObject}" Stretch="UniformToFill"
+                                                       HorizontalAlignment="Center" Margin="-8" RenderOptions.BitmapScalingMode="Fant">
+                                                    <Image.Effect>
+                                                        <BlurEffect Radius="5" RenderingBias="Performance" />
+                                                    </Image.Effect>
+                                                </Image>
+                                                <Rectangle Fill="#80000000" />
+                                                <TextBlock Text="{Binding DisplayName, Converter={StaticResource StringToUpperCaseConverter}}"
+                                                           FontFamily="{DynamicResource ShelfFontBody}" FontWeight="Bold" FontSize="20"
+                                                           Foreground="#FFFFFFFF" TextTrimming="CharacterEllipsis" Width="400"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,22,0,0">
+                                                    <TextBlock.LayoutTransform>
+                                                        <RotateTransform Angle="-90" />
+                                                    </TextBlock.LayoutTransform>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Viewport2DVisual3D.Visual>
+                                    </Viewport2DVisual3D>
+                                </ModelVisual3D>
+                            </Viewport3D>
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <!-- Real shelves are uneven: vary spine heights a little, repeating every five games. -->
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter TargetName="Spine" Property="Height" Value="446" />
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="2">
+                            <Setter TargetName="Spine" Property="Height" Value="458" />
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="3">
+                            <Setter TargetName="Spine" Property="Height" Value="430" />
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="4">
+                            <Setter TargetName="Spine" Property="Height" Value="464" />
+                        </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Spine" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Box" Property="Visibility" Value="Visible" />
@@ -237,6 +307,7 @@
                                            Visibility="{Binding GameListVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                            FocusBahaviors.FocusBinding="{Binding GameListFocused}"
                                            ItemContainerStyle="{StaticResource ShelfItemStyle}"
+                                           AlternationCount="5"
                                            KeyboardNavigation.DirectionalNavigation="Once"
                                            ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -315,11 +386,11 @@
                                                    Text="{Binding SelectedGame.Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,28,0,0">
-                                        <ButtonEx x:Name="PART_ButtonInstall" Style="{DynamicResource ButtonBottomMenu}"
+                                        <ButtonEx x:Name="PART_ButtonInstall" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCInstallGame}" />
-                                        <ButtonEx x:Name="PART_ButtonPlay" Style="{DynamicResource ButtonBottomMenu}"
+                                        <ButtonEx x:Name="PART_ButtonPlay" InputHint="{DynamicResource ButtonPromptX}" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCPlayGame}" />
-                                        <ButtonEx x:Name="PART_ButtonDetails" Style="{DynamicResource ButtonBottomMenu}"
+                                        <ButtonEx x:Name="PART_ButtonDetails" InputHint="{DynamicResource ButtonPromptA}" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCDS_Shelf_BackOfBox}" />
                                         <ButtonEx x:Name="PART_ButtonGameOptions" Style="{DynamicResource ButtonBottomMenu}"
                                                   Content="{DynamicResource LOCGameOptions}" />
