@@ -38,6 +38,7 @@ public static class Win32 {
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hWnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
+    [DllImport("user32.dll")] public static extern IntPtr FindWindow(string cls, string title);
 }
 "@
 [void][Win32]::SetProcessDPIAware()
@@ -191,9 +192,8 @@ function Send([string]$keys, [int]$waitMs = 1200) {
 }
 
 # --- No taskbar over the screenshots (a real fullscreen session covers it; the runner's doesn't) ----------
-Set-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon' -Name AutoRestartShell -Value 0 -ErrorAction SilentlyContinue
-Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
-Start-Sleep -Seconds 2
+$tray = [Win32]::FindWindow('Shell_TrayWnd', $null)
+if ($tray -ne [IntPtr]::Zero) { [void][Win32]::ShowWindow($tray, 0) }
 
 # --- One session per theme --------------------------------------------------------------------------------
 $fullscreenThemes = Join-Path $PlayniteDir 'Themes\Fullscreen'
@@ -223,11 +223,13 @@ foreach ($theme in Get-ChildItem -Path $ThemesDir -Directory | Sort-Object Name)
     Start-Sleep -Seconds 2
 
     Save-Screen "$($theme.Name)-1-library"
-    # Glass has a vertical list; the others move horizontally.
+    # Glass has a vertical list; the others move horizontally. Glass also re-renders a full-screen blur on
+    # every move, which takes seconds on the GPU-less runner: give it more time.
     $move = if ($theme.Name -eq 'glass') { '{DOWN}' } else { '{RIGHT}' }
-    Send $move; Send $move; Send $move 2500
+    $pause = if ($theme.Name -eq 'glass') { 5000 } else { 1200 }
+    Send $move $pause; Send $move $pause; Send $move ($pause + 1500)
     Save-Screen "$($theme.Name)-2-library-moved"
-    Send 'a' 3000
+    Send 'a' ($pause + 2500)
     Save-Screen "$($theme.Name)-3-details"
     Send '{BACKSPACE}' 800; Send '{ESC}' 1500
     Send '{F1}' 2000
