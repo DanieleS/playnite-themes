@@ -107,7 +107,7 @@
                             </StackPanel>
 
                             <!-- Description -->
-                            <ScrollViewerEx x:Name="PART_ScrollHtmlDescription" Margin="0,34,0,0"
+                            <ScrollViewerEx x:Name="PART_ScrollHtmlDescription" FocusVisualStyle="{x:Null}" Margin="0,34,0,0"
                                             DockPanel.Dock="Top" CustomScrollAmount="42">
                                 <HtmlTextView x:Name="PART_HtmlDescription"
                                               HtmlFontSize="19"

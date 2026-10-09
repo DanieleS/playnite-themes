@@ -219,6 +219,7 @@ foreach ($theme in Get-ChildItem -Path $ThemesDir -Directory | Sort-Object Name)
 
     $proc = Start-Process -FilePath (Join-Path $PlayniteDir 'Playnite.FullscreenApp.exe') -PassThru
     Start-Sleep -Seconds $StartupSeconds
+    for ($i = 0; $i -lt 30 -and $proc.MainWindowHandle -eq [IntPtr]::Zero; $i++) { Start-Sleep -Seconds 1; $proc.Refresh() }
     $proc.Refresh()
     if ($proc.MainWindowHandle -ne [IntPtr]::Zero) {
         [void][Win32]::ShowWindow($proc.MainWindowHandle, 3)
