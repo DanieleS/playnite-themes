@@ -7,6 +7,7 @@
 //
 //   dotnet run --project tests/MosaicNavigation [path/to/Main.xaml]
 using System.Globalization;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;

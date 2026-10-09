@@ -50,9 +50,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      # Playnite is a 32-bit application: its assemblies only load in the 32-bit Windows PowerShell.
       - name: Parse every theme file
-        shell: powershell
-        run: ./scripts/ci/parse-xaml.ps1 -PlayniteDir playnite -ThemesDir themes
+        shell: cmd
+        run: '%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\ci\parse-xaml.ps1 -PlayniteDir playnite -ThemesDir themes'
 
   mosaic-navigation:
     name: Journal mosaic navigation (Windows)
