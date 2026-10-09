@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf — dorsi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Spine variants for Shelf. Everything here maps to WPF primitives available in a theme:
+     image crops (Image + Stretch/Alignment), BlurEffect, gradients, solid fills, rotated text. */
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#121212; color:#eaeaea; font-family:system-ui,sans-serif; padding:40px 16px 80px; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  h1 { font-size:28px; font-weight:800; }
+  .intro { color:#9a9a9a; margin-top:6px; max-width:900px; line-height:1.55; font-size:15px; }
+  section { margin-top:44px; }
+  h2 { font-size:21px; font-weight:800; display:flex; gap:12px; align-items:baseline; }
+  h2 .tag { font-size:13px; background:#fff; color:#000; border-radius:4px; padding:2px 8px; }
+  h2 .rec { font-size:12px; background:#b4442c; color:#fff; border-radius:4px; padding:2px 8px; }
+  section > p { color:#9a9a9a; margin:6px 0 14px; font-size:15px; max-width:900px; line-height:1.5; }
+  .frame { aspect-ratio:16/7; container-type:inline-size; position:relative; overflow:hidden; border-radius:8px; background:#ece6da; }
+  .frame::before { content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 40% -10%, rgba(255,255,255,.65), transparent 60%); }
+  .shelf { position:absolute; left:3cqw; right:3cqw; bottom:7cqw; height:28cqw; display:flex; align-items:flex-end; gap:.3cqw; }
+  .plank { position:absolute; left:2cqw; right:2cqw; bottom:6cqw; height:1cqw; background:#2b241b; border-radius:.2cqw; box-shadow:0 .8cqw 1.2cqw -.4cqw rgba(0,0,0,.4); }
+  .sp { position:relative; width:3.3cqw; flex:none; overflow:hidden; }
+  .sp .nm { position:absolute; left:50%; top:1.2cqw; transform:translateX(-50%) rotate(180deg); writing-mode:vertical-rl; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-height:78%; z-index:2;
+            font-family:"Barlow Semi Condensed",sans-serif; font-weight:700; font-size:1.05cqw; letter-spacing:.06em; text-transform:uppercase; }
+  .sp .pl { position:absolute; left:0; right:0; bottom:0; height:2.6cqw; display:grid; place-items:center; z-index:2;
+            font-family:"Barlow Semi Condensed",sans-serif; font-weight:700; font-size:.72cqw; letter-spacing:.05em; }
+  .sp .art { position:absolute; inset:0; background-size:cover; background-position:center; }
+
+  /* the selected box, flat-ish here: the 3D is the same in every variant */
+  .box { position:relative; flex:none; width:19cqw; height:28.5cqw; margin:0 1.6cqw 0 1cqw; transform:perspective(60cqw) rotateY(18deg); transform-origin:left center; }
+  .box .f { position:absolute; inset:0; background-size:cover; background-position:center; box-shadow:1.4cqw 1.6cqw 2.4cqw -1cqw rgba(30,20,5,.55); }
+
+  /* A: slice of the cover, as in the first version */
+  .A .sp .art { filter:none; }
+  .A .sp::after { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,.12) 40%, rgba(0,0,0,.5)); }
+  .A .sp .nm { color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.8); }
+  .A .sp .pl { background:rgba(0,0,0,.6); color:rgba(255,255,255,.85); }
+
+  /* B: blur, but light and saturated, with a strong ink band for the name */
+  .B .sp .art { inset:-1cqw; filter:blur(.35cqw) saturate(1.5); }
+  .B .sp::after { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(0,0,0,.35), rgba(0,0,0,0) 35%, rgba(0,0,0,.4)); }
+  .B .sp .nm { top:auto; bottom:3.6cqw; color:#fff; background:rgba(20,16,12,.78); padding:.6cqw .35cqw; border-radius:.2cqw; max-height:60%; }
+  .B .sp .pl { background:rgba(20,16,12,.85); color:rgba(255,255,255,.85); }
+
+  /* C: editorial, like a book collection: solid ink/paper tones, serif names, no artwork */
+  .C .sp { border-left:.12cqw solid rgba(255,255,255,.12); box-shadow:inset -.25cqw 0 .3cqw rgba(0,0,0,.25); }
+  .C .sp .nm { font-family:"DM Serif Display",serif; font-weight:400; font-size:1.25cqw; letter-spacing:.01em; text-transform:none; top:1.6cqw; }
+  .C .sp .pl { background:none; }
+  .C .sp .pl::before { content:""; position:absolute; left:20%; right:20%; top:0; height:.12cqw; background:currentColor; opacity:.5; }
+
+  /* D: the top of the cover (where the logo usually is), then a solid band with the name */
+  .D .sp .art { bottom:auto; height:42%; background-position:center top; }
+  .D .sp .art::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 60%, rgba(0,0,0,.35)); }
+  .D .sp .nm { top:auto; bottom:3.4cqw; max-height:50%; }
+  .D .sp .pl { }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Shelf — quattro dorsi</h1>
+  <p class="intro">Stessa mensola, stessa scatola selezionata; cambia solo come è fatto il dorso. Tutto si può fare in un tema WPF (ritagli dell'immagine, sfocatura, colori pieni, testo ruotato). Nel tema la scatola selezionata resta in 3D vero.</p>
+
+  <section class="A"><h2><span class="tag">A</span> Fetta della copertina</h2>
+    <p>Come nella prima versione: una striscia verticale della copertina, scurita ai lati, con il nome. Si riconoscono i colori di ogni gioco, ma alcune strisce sono confuse.</p>
+    <div class="frame"><div class="shelf" id="sA"></div><div class="plank"></div></div></section>
+
+  <section class="B"><h2><span class="tag">B</span> Sfocatura leggera + fascia</h2>
+    <p>Sfocatura molto più leggera di quella provata, colori saturati, e il nome su una fascia d'inchiostro, così resta leggibile qualunque sia l'immagine.</p>
+    <div class="frame"><div class="shelf" id="sB"></div><div class="plank"></div></div></section>
+
+  <section class="C"><h2><span class="tag">C</span> Collana editoriale <span class="rec">secondo me</span></h2>
+    <p>Come una collana di libri: dorsi in tinte piene dalla palette del tema (inchiostro, mattone, carta, ottanio, ocra…), titoli in serif. Niente artwork sul dorso, solo sulla scatola selezionata, che così risalta molto di più. È la più elegante e la più "Shelf".</p>
+    <div class="frame"><div class="shelf" id="sC"></div><div class="plank"></div></div></section>
+
+  <section class="D"><h2><span class="tag">D</span> Testa della copertina + fascia</h2>
+    <p>In alto un ritaglio della parte superiore della copertina, dove di solito c'è il logo; sotto una fascia piena con il nome. Un compromesso tra A e C.</p>
+    <div class="frame"><div class="shelf" id="sD"></div><div class="plank"></div></div></section>
+</div>
+<script>
+const S='https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/';
+const cov=id=>`url(${S}${id}/library_600x900.jpg)`;
+const games=[[1086940,"Baldur's Gate 3"],[2379780,'Balatro'],[504230,'Celeste'],[588650,'Dead Cells'],[632470,'Disco Elysium'],[1245620,'Elden Ring','box'],[1145360,'Hades'],[1145350,'Hades II'],[367520,'Hollow Knight'],[753640,'Outer Wilds'],[1687950,'Persona 5 Royal'],[620,'Portal 2'],[1174180,'Red Dead Redemption 2'],[646570,'Slay the Spire'],[413150,'Stardew Valley'],[292030,'The Witcher 3']];
+const heights=[27,25.8,26.6,24.6,27.3];
+// C: palette tones (background, text) that would come from the theme, cycled by position
+const tones=[['#1d1b17','#ece6da'],['#b4442c','#f6e9df'],['#ddd5c6','#1d1b17'],['#2f5d62','#ecf2ef'],['#c9a227','#1d1b17'],['#3a3128','#ece6da'],['#7a2e1d','#f3e6dc']];
+// D: band colours
+const bands=['#1d1b17','#2b241b','#3a3128'];
+function render(id,v){
+  document.getElementById(id).innerHTML=games.map(([a,n,b],i)=>{
+    if(b) return `<div class="box"><div class="f" style="background-image:${cov(a)}"></div></div>`;
+    const h=heights[i%5];
+    if(v==='C'){const [bg,fg]=tones[i%tones.length]; return `<div class="sp" style="height:${h}cqw;background:${bg};color:${fg}"><span class="nm">${n}</span><span class="pl" style="color:${fg}">STEAM</span></div>`;}
+    if(v==='D'){return `<div class="sp" style="height:${h}cqw;background:${bands[i%3]};color:#f3eee4"><div class="art" style="background-image:${cov(a)}"></div><span class="nm">${n}</span><span class="pl" style="color:rgba(243,238,228,.75)">STEAM</span></div>`;}
+    return `<div class="sp" style="height:${h}cqw"><div class="art" style="background-image:${cov(a)}"></div><span class="nm">${n}</span><span class="pl">STEAM</span></div>`;
+  }).join('');
+}
+render('sA','A');render('sB','B');render('sC','C');render('sD','D');
+</script>
+</body>
+</html>
