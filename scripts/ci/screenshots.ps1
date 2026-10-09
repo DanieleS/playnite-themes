@@ -37,6 +37,7 @@ public static class Win32 {
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
+    [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hWnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
 }
 "@
 [void][Win32]::SetProcessDPIAware()
@@ -215,6 +216,8 @@ foreach ($theme in Get-ChildItem -Path $ThemesDir -Directory | Sort-Object Name)
     $proc.Refresh()
     if ($proc.MainWindowHandle -ne [IntPtr]::Zero) {
         [void][Win32]::ShowWindow($proc.MainWindowHandle, 3)
+        # Topmost and full screen, over the runner's taskbar.
+        [void][Win32]::SetWindowPos($proc.MainWindowHandle, [IntPtr](-1), 0, 0, $bounds.Width, $bounds.Height, 0x0040)
         [void][Win32]::SetForegroundWindow($proc.MainWindowHandle)
     }
     Start-Sleep -Seconds 2

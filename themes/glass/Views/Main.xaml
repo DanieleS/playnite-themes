@@ -191,7 +191,7 @@
                                                Visibility="{Binding GameListVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                FocusBahaviors.FocusBinding="{Binding GameListFocused}"
                                                ItemContainerStyle="{StaticResource GlassListItemStyle}"
-                                               KeyboardNavigation.DirectionalNavigation="Contained"
+                                               KeyboardNavigation.DirectionalNavigation="Once"
                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                                ScrollViewer.VerticalScrollBarVisibility="Hidden"
                                                ScrollViewer.CanContentScroll="True"
