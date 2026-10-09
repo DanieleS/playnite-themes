@@ -3,11 +3,11 @@ Type: ThemeFullscreen
 InstallerManifestUrl: https://raw.githubusercontent.com/DanieleS/playnite-themes/main/themes/journal/installer.yaml
 Name: Journal
 Author: Davide Specchia
-ShortDescription: 'A still mosaic of big, wide, tall and small tiles with spatial navigation, and a bento-style details page.'
-Description: 'Journal lays out your library as a mosaic of big, wide, tall and small tiles that repeats a fixed pattern, so it stays fast with libraries of any size. Navigation is spatial: up, down, left and right go to the tile that is really there. The details view is a bento of tiles: artwork and logo, time played, sessions, last played, completion, size, cover and description.'
+ShortDescription: 'A still grid of covers with your time played, and a bento-style details page.'
+Description: "Journal is a dashboard of how you actually play. The library is a still grid of covers with time played on every tile and a bar showing the selected game's hours in large type; nothing moves except the focus. The details view is a bento of tiles: artwork and logo, time played, sessions, last played, completion, size, cover and description."
 Tags:
   - Modern
-  - Mosaic
+  - Grid
   - Dark
   - Dashboard
 SourceUrl: https://github.com/DanieleS/playnite-themes

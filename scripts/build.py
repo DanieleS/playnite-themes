@@ -140,18 +140,6 @@ def validate_theme(theme: Path, playnite_keys):
     return errors
 
 
-def check_generated():
-    """The Journal mosaic block must match scripts/gen_mosaic.py."""
-    sys.path.insert(0, str(ROOT / "scripts"))
-    import gen_mosaic  # noqa: E402
-    text = gen_mosaic.MAIN.read_text(encoding="utf-8")
-    start = text.index(gen_mosaic.BEGIN)
-    end = text.index(gen_mosaic.END) + len(gen_mosaic.END)
-    if text[start:end] != gen_mosaic.render():
-        return ["themes/journal/Views/Main.xaml: mosaic block is stale, run python3 scripts/gen_mosaic.py"]
-    return []
-
-
 def cmd_validate(args):
     playnite_keys = set(loc_keys(Path(args.loc_source))) if args.loc_source else None
     failed = False
@@ -161,9 +149,6 @@ def cmd_validate(args):
         for e in errors:
             print(f"     - {e}")
         failed |= bool(errors)
-    for e in check_generated():
-        print(f"FAIL {e}")
-        failed = True
     if playnite_keys is None:
         print("note: Playnite string keys not checked (pass --loc-source)")
     return 1 if failed else 0

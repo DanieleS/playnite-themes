@@ -54,16 +54,3 @@ jobs:
       - name: Parse every theme file
         shell: cmd
         run: '%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\ci\parse-xaml.ps1 -PlayniteDir playnite -ThemesDir themes'
-
-  mosaic-navigation:
-    name: Journal mosaic navigation (Windows)
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
-
-      - name: Run navigation test
-        run: dotnet run --project tests/MosaicNavigation -c Release -- themes/journal/Views/Main.xaml

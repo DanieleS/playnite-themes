@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <VisualBrush x:Key="JournalTileMask" Stretch="Fill">
+        <VisualBrush.Visual>
+            <Border Width="200" Height="300" CornerRadius="12" Background="#FF000000" />
+        </VisualBrush.Visual>
+    </VisualBrush>
+
+    <!-- Cover with title and time played in the journal's mono type. -->
+    <Style x:Key="ListGameItemTemplate" TargetType="{x:Type GameListItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GameListItem}">
+                    <Grid>
+                        <Border CornerRadius="12" Background="{DynamicResource JournalCardBrush}">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="6" BlurRadius="20" Opacity="0.45" Color="#FF000000" />
+                            </Border.Effect>
+                        </Border>
+                        <Image x:Name="PART_ImageCover" RenderOptions.BitmapScalingMode="Fant"
+                               Stretch="{Settings CoverArtStretch}" StretchDirection="Both"
+                               OpacityMask="{DynamicResource JournalTileMask}" />
+                        <Border CornerRadius="0,0,12,12" VerticalAlignment="Bottom" Padding="12,30,12,10">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#000F1115" Offset="0" />
+                                    <GradientStop Color="#E60F1115" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <StackPanel>
+                                <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"
+                                           Visibility="{Settings Fullscreen.ShowGameTitles}"
+                                           Style="{DynamicResource TextBlockBaseStyle}" FontSize="17" FontWeight="SemiBold" />
+                                <TextBlock Style="{DynamicResource JournalLabel}" FontSize="14" Foreground="#CCFFFFFF"
+                                           Text="{Binding Playtime, Converter={StaticResource PlayTimeToStringConverter}}" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="Darken" CornerRadius="12" Background="#8C000000" Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsInstalled}" Value="False" />
+                                <Condition Binding="{Settings Fullscreen.DarkenUninstalledGamesGrid}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="Darken" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
