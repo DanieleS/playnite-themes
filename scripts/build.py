@@ -11,6 +11,7 @@ No third-party dependencies: runs on any Python 3.9+.
 """
 import argparse
 import datetime
+import json
 import re
 import subprocess
 import sys
@@ -226,7 +227,8 @@ def cmd_installer_entry(args):
         f"    ReleaseDate: {datetime.date.today().isoformat()}",
         f"    PackageUrl: {args.url}",
         "    Changelog:",
-        *[f"      - {line}" for line in changelog],
+        # JSON strings are valid YAML scalars: titles with ":", "#" or quotes can't break the manifest.
+        *[f"      - {json.dumps(line.strip(), ensure_ascii=False)}" for line in changelog],
     ]
     text = f"AddonId: {m['Id']}\nPackages:\n" + "\n".join(entry) + "\n" + packages.lstrip("\n")
     path.write_text(text, encoding="utf-8")
