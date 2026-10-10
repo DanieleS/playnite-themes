@@ -1,0 +1,8 @@
+AddonId: DanieleS_Shelf_Fullscreen
+Packages:
+  - Version: 1.0.0
+    RequiredApiVersion: 2.10.0
+    ReleaseDate: 2026-10-10
+    PackageUrl: https://github.com/DanieleS/playnite-themes/releases/download/shelf-v1.0.0/DanieleS_Shelf_Fullscreen_1_0_0.pthm
+    Changelog:
+      - "Release automatica a ogni merge su main"
