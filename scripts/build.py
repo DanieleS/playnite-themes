@@ -206,7 +206,7 @@ def cmd_bump(args):
     else:
         patch += 1
     new = f"{major}.{minor}.{patch}"
-    text = re.sub(r"^Version:.*$", f"Version: {new}", path.read_text(encoding="utf-8-sig"), count=1, flags=re.M)
+    text = re.sub(r"^(Version:\s*).*$", rf"\g<1>{new}", path.read_text(encoding="utf-8-sig"), count=1, flags=re.M)
     path.write_text(text, encoding="utf-8")
     print(new)
     return 0

@@ -3,7 +3,8 @@ name: Release
 # Automatic release on every push to main (i.e. every merged PR).
 # For each theme whose files changed since its last release (tag <theme>-v<version>):
 #   - bump Version in theme.yaml (patch by default; PR label release:minor / release:major to go higher,
-#     release:skip to release nothing), unless the theme has never been released (then its current version)
+#     release:skip to release nothing), unless the theme has never been released or its Version was already
+#     raised by hand (then its current version)
 #   - build the .pthm, create the tag and a GitHub release with it
 #   - add the package to themes/<theme>/installer.yaml (what Playnite reads to install and update)
 # The PR title becomes the changelog line. Version bumps and installer manifests are committed back to main.
@@ -100,7 +101,11 @@ jobs:
               continue
             fi
             last="$(git tag --list "${t}-v*" --sort=-v:refname | head -n 1)"
+            version="$(python scripts/build.py version "$t")"
             if [ -z "$last" ]; then
+              themes="$themes $t:first"
+            elif ! git rev-parse -q --verify "refs/tags/$t-v$version" >/dev/null; then
+              # Version already raised by hand in theme.yaml (not released yet): release it as is.
               themes="$themes $t:first"
             elif [ "$EVENT" = "workflow_dispatch" ]; then
               themes="$themes $t:bump"
