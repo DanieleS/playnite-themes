@@ -1,18 +1,23 @@
 name: Release
 
-# Runs on every push to main that touches a theme, and can be run by hand.
-# For each theme changed since its last release (tag <theme>-v<version>):
-#   - if Version in themes/<theme>/theme.yaml was not bumped, bump the PATCH part automatically;
-#   - build the .pthm, add it to themes/<theme>/installer.yaml (the manifest Playnite reads to install
-#     and update the theme), commit both to main;
-#   - create the tag and a GitHub release with the package.
-# The changelog is the list of commit subjects that touched the theme, unless given by hand.
-# A theme that has never been released is released at its current version.
+# Automatic release on every push to main (i.e. every merged PR).
+# For each theme whose files changed since its last release (tag <theme>-v<version>):
+#   - bump Version in theme.yaml (patch by default; PR label release:minor / release:major to go higher,
+#     release:skip to release nothing), unless the theme has never been released or its Version was already
+#     raised by hand (then its current version)
+#   - build the .pthm, create the tag and a GitHub release with it
+#   - add the package to themes/<theme>/installer.yaml (what Playnite reads to install and update)
+# The PR title becomes the changelog line. Version bumps and installer manifests are committed back to main.
+# Pushes made with the workflow token don't trigger workflows, so this doesn't loop.
+#
+# Manual run (Actions > Release > Run workflow): release one theme or all, even without changes.
 
 on:
   push:
     branches: [main]
-    paths: ["themes/**"]
+    # The workflow itself is listed so that changing it runs it: themes never released get their first release,
+    # themes without changes are left alone.
+    paths: ["themes/**", ".github/workflows/release.yml"]
   workflow_dispatch:
     inputs:
       theme:
@@ -20,13 +25,19 @@ on:
         type: choice
         options: [all, cinema, shelf, glass, journal]
         default: all
+      level:
+        description: Version bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
       changelog:
-        description: Changelog lines, separated by | (default: commit subjects)
+        description: Changelog line
         type: string
         required: false
 
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
   group: release
@@ -53,84 +64,104 @@ jobs:
           curl -fsSL -o LocSource.xaml "https://raw.githubusercontent.com/JosefNemec/Playnite/${PLAYNITE_VERSION}/source/Playnite/Localization/LocSource.xaml"
           python scripts/build.py validate --loc-source LocSource.xaml
 
-      - name: Release
+      - name: Decide what to release
+        id: plan
         env:
-          THEME: ${{ inputs.theme || 'all' }}
-          CHANGELOG: ${{ inputs.changelog }}
+          EVENT: ${{ github.event_name }}
+          INPUT_THEME: ${{ inputs.theme }}
+          INPUT_LEVEL: ${{ inputs.level }}
+          INPUT_CHANGELOG: ${{ inputs.changelog }}
+        run: |
+          set -euo pipefail
+          level=patch
+          changelog=""
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            level="$INPUT_LEVEL"
+            changelog="$INPUT_CHANGELOG"
+          else
+            # The PR that produced this push, if any: its labels pick the bump, its title is the changelog.
+            pr="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls" --jq '.[0] // empty')"
+            if [ -n "$pr" ]; then
+              labels="$(jq -r '[.labels[].name] | join(" ")' <<<"$pr")"
+              changelog="$(jq -r '.title' <<<"$pr")"
+              case " $labels " in
+                *" release:skip "*) echo "PR labelled release:skip, nothing to release"; echo "themes=" >> "$GITHUB_OUTPUT"; exit 0 ;;
+                *" release:major "*) level=major ;;
+                *" release:minor "*) level=minor ;;
+              esac
+            else
+              changelog="$(git log -1 --format=%s)"
+            fi
+          fi
+
+          themes=""
+          for dir in themes/*/; do
+            t="$(basename "$dir")"
+            if [ "$EVENT" = "workflow_dispatch" ] && [ "$INPUT_THEME" != "all" ] && [ "$INPUT_THEME" != "$t" ]; then
+              continue
+            fi
+            last="$(git tag --list "${t}-v*" --sort=-v:refname | head -n 1)"
+            version="$(python scripts/build.py version "$t")"
+            if [ -z "$last" ]; then
+              themes="$themes $t:first"
+            elif ! git rev-parse -q --verify "refs/tags/$t-v$version" >/dev/null; then
+              # Version already raised by hand in theme.yaml (not released yet): release it as is.
+              themes="$themes $t:first"
+            elif [ "$EVENT" = "workflow_dispatch" ]; then
+              themes="$themes $t:bump"
+            elif ! git diff --quiet "$last" HEAD -- "themes/$t" ':!themes/'"$t"'/installer.yaml'; then
+              themes="$themes $t:bump"
+            fi
+          done
+          echo "Plan:${themes:- nothing} (level $level)"
+          {
+            echo "themes=${themes# }"
+            echo "level=$level"
+            echo "changelog<<EOF"
+            echo "${changelog:-Maintenance release.}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Release
+        if: steps.plan.outputs.themes != ''
+        env:
+          THEMES: ${{ steps.plan.outputs.themes }}
+          LEVEL: ${{ steps.plan.outputs.level }}
+          CHANGELOG: ${{ steps.plan.outputs.changelog }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if [ "$THEME" = "all" ]; then themes="cinema shelf glass journal"; else themes="$THEME"; fi
-
-          manual_lines=()
-          if [ -n "$CHANGELOG" ]; then
-            IFS='|' read -ra parts <<< "$CHANGELOG"
-            for line in "${parts[@]}"; do
-              line="$(sed 's/^[[:space:]]*//;s/[[:space:]]*$//' <<< "$line")"
-              [ -n "$line" ] && manual_lines+=("$line")
-            done
-          fi
-
-          declare -A notes files
           released=()
-          for t in $themes; do
-            last_tag="$(git tag --list "$t-v*" --sort=-v:refname | head -n 1)"
-            version="$(python scripts/build.py version "$t")"
-            changed=(":(top)themes/$t" ":(top,exclude)themes/$t/installer.yaml")
-
-            if [ -n "$last_tag" ]; then
-              if [ -z "$(git log --format=%H -1 "$last_tag..HEAD" -- "${changed[@]}")" ]; then
-                echo "$t: unchanged since $last_tag"
-                continue
-              fi
-              if git rev-parse -q --verify "refs/tags/$t-v$version" >/dev/null; then
-                version="$(python scripts/build.py bump "$t")"
-                echo "$t: bumped to $version"
-              fi
-              mapfile -t lines < <(git log --no-merges --format=%s "$last_tag..HEAD" -- "${changed[@]}" | grep -v '^release: ' || true)
+          for item in $THEMES; do
+            t="${item%%:*}"
+            mode="${item##*:}"
+            if [ "$mode" = "bump" ]; then
+              version="$(python scripts/build.py bump "$t" "$LEVEL")"
             else
-              lines=("First release")
+              version="$(python scripts/build.py version "$t")"
             fi
-            [ ${#manual_lines[@]} -gt 0 ] && lines=("${manual_lines[@]}")
-            [ ${#lines[@]} -eq 0 ] && lines=("Maintenance update")
-
             tag="$t-v$version"
             package="$(python scripts/build.py build "$t" --out dist | tail -n 1)"
-            url="https://github.com/${GITHUB_REPOSITORY}/releases/download/$tag/$(basename "$package")"
-            changelog_args=()
-            body="Changes:"
-            for line in "${lines[@]}"; do
-              changelog_args+=(--changelog "$line")
-              body="$body"$'\n'"- $line"
-            done
-            if ! grep -qE "^\s*-\s*Version:\s*$version\s*$" "themes/$t/installer.yaml" 2>/dev/null; then
-              python scripts/build.py installer-entry "$t" --url "$url" "${changelog_args[@]}"
-            fi
-            notes[$tag]="$body"
-            files[$tag]="$package"
-            released+=("$tag")
+            file="$(basename "$package")"
+            url="https://github.com/${GITHUB_REPOSITORY}/releases/download/$tag/$file"
+            python scripts/build.py installer-entry "$t" --url "$url" --changelog "$CHANGELOG"
+            git add "themes/$t/theme.yaml" "themes/$t/installer.yaml"
+            released+=("$t:$tag:$package")
           done
 
-          if [ ${#released[@]} -eq 0 ]; then
-            echo "::notice::Nothing to release"
-            exit 0
-          fi
-
-          # Commit version bumps and installer manifests; retry if main moved (e.g. the screenshots job).
-          git add themes/*/theme.yaml themes/*/installer.yaml
-          git diff --cached --quiet || git commit -m "release: ${released[*]}"
-          for i in 1 2 3 4 5; do
-            git push origin HEAD:main && break
-            [ "$i" = 5 ] && exit 1
-            sleep $((i * 3))
-            git pull --rebase origin main
+          # Commit versions + manifests first, so each tag points at the commit that contains them.
+          git commit --quiet -m "release: $(for r in "${released[@]}"; do r="${r#*:}"; printf '%s ' "${r%%:*}"; done)"
+          for attempt in 1 2 3; do
+            git push --quiet origin HEAD:main && break
+            git pull --quiet --rebase origin main
           done
           sha="$(git rev-parse HEAD)"
 
-          for tag in "${released[@]}"; do
-            t="${tag%-v*}"
+          for r in "${released[@]}"; do
+            t="${r%%:*}"; rest="${r#*:}"; tag="${rest%%:*}"; package="${rest#*:}"
             name="$(grep '^Name:' "themes/$t/theme.yaml" | cut -d: -f2- | xargs)"
-            gh release create "$tag" "${files[$tag]}" --target "$sha" --title "$name ${tag#*-v}" --notes "${notes[$tag]}"
+            gh release create "$tag" "$package" --target "$sha" --title "$name ${tag##*-v}" --notes "$CHANGELOG"
+            echo "Released $tag"
           done
