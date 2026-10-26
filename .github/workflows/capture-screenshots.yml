@@ -40,3 +40,4 @@ jobs:
           name: screenshots
           path: screenshots/
           if-no-files-found: warn
+          retention-days: 3
