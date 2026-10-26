@@ -35,6 +35,7 @@ jobs:
           name: themes
           path: dist/*.pthm
           if-no-files-found: error
+          retention-days: 7
 
   xaml:
     name: Load XAML with Playnite (Windows)
